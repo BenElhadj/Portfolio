@@ -7,13 +7,15 @@
 
     <!-- Page 2 : Diplômes -->
     <section class="page">
-      <h1>Diplômes</h1>
+      <!-- <h1>Diplômes</h1> -->
+      <Diplomas />
       <!-- contenu -->
     </section>
 
     <!-- Page 3 : Expériences -->
     <section class="page">
-      <h1>Expériences</h1>
+      <!-- <h1>Expériences</h1> -->
+      <Experiences />
     </section>
 
     <!-- Page 4 : Compétences techniques -->
@@ -40,6 +42,9 @@
 
 <script setup>
 import Timeline from "./components/Timeline.vue";
+import Diplomas from "./components/Diplomas.vue";
+import Experiences from "./components/Experiences.vue";
+
 import { usePageNavigation } from "./composables/usePageNavigation.js";
 usePageNavigation(".pages");
 </script>
