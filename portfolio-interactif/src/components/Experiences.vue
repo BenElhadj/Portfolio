@@ -137,9 +137,12 @@
   <style scoped>
   .experiences-wrap {
     width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     padding: 40px 24px;
-    max-width: 1200px;
-    margin: 0 auto;
+    box-sizing: border-box; /* Inclut padding dans hauteur */
+    justify-content: space-between; /* Force étirement vertical */
   }
   
   .title {
@@ -147,10 +150,19 @@
     margin-bottom: 32px;
     text-align: center;
     color: #0b6fb8;
+    flex-shrink: 0;
   }
   
   .category {
     margin-bottom: 56px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Étire la grille */
+  }
+  
+  .category:last-child {
+    margin-bottom: 0;
   }
   
   .category-header {
@@ -158,6 +170,7 @@
     justify-content: space-between;
     align-items: baseline;
     margin-bottom: 20px;
+    flex-shrink: 0;
   }
   
   .category-header h3 {
@@ -174,6 +187,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 18px;
+    flex: 1;
+    min-height: 0; /* Permet flex-shrink si besoin */
   }
   
   .card {
@@ -184,6 +199,7 @@
     border-left: 4px solid #0b6fb8;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
   }
   
   .dates {
@@ -212,6 +228,53 @@
     color: #444;
     margin: 0;
     padding-left: 18px;
+    flex: 1;
+  }
+
+  /* AJOUT : Responsive renforcé */
+  @media (max-width: 768px) {
+    .experiences-wrap {
+      padding: 20px 12px;
+      justify-content: flex-start; /* Pas d'étirement forcé sur mobile */
+    }
+
+    .title {
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+    }
+
+    .category {
+      margin-bottom: 40px;
+    }
+
+    .category-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .category-header h3 {
+      font-size: 1.3rem;
+    }
+
+    .grid {
+      grid-template-columns: 1fr; /* Une colonne sur mobile */
+      gap: 12px;
+    }
+
+    .card {
+      padding: 12px 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .experiences-wrap {
+      padding: 16px 8px;
+    }
+
+    .title {
+      font-size: 1.6rem;
+    }
   }
   </style>
-  

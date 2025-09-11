@@ -76,10 +76,13 @@
   </script>
   
   <style scoped>
+  /* MODIF : Wrap remplit la hauteur du .page */
   .diplomas-wrap {
     width: 100%;
+    height: 100%; /* Nouvelle : Remplit le parent */
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Colonne pour timeline */
+    justify-content: center; /* Centre verticalement le contenu */
     padding: 40px 24px;
     box-sizing: border-box;
   }
@@ -87,6 +90,10 @@
   .diplomas-inner {
     width: 100%;
     max-width: 1100px;
+    flex: 1; /* Étire pour remplir */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   
   /* Titre */
@@ -96,6 +103,7 @@
     color: #0b6fb8;
     font-weight: 700;
     letter-spacing: -0.2px;
+    flex-shrink: 0; /* Ne rétrécit pas */
   }
   
   /* Timeline */
@@ -103,6 +111,10 @@
     position: relative;
     padding-left: 68px;
     padding-right: 12px;
+    flex: 1; /* Prend le reste de l'espace */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   
   /* ligne verticale */
@@ -149,6 +161,7 @@
     justify-content: center;
     box-shadow: 0 6px 18px rgba(10,10,20,0.12);
     border: 2px solid rgba(11,111,184,0.12);
+    flex-shrink: 0;
   }
   
   .dot .icon {
@@ -168,6 +181,7 @@
     min-width: 260px;
     max-width: calc(100% - 120px);
     border-left: 4px solid rgba(11,111,184,0.06);
+    flex-shrink: 0;
   }
   
   /* meta */
@@ -216,6 +230,6 @@
       padding: 12px 14px;
     }
     .title { text-align: center; }
+    .diplomas-wrap { padding: 20px 12px; } /* Réduit padding mobile */
   }
   </style>
-  

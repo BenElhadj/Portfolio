@@ -20,7 +20,8 @@
 
     <!-- Page 4 : Compétences techniques -->
     <section class="page">
-      <h1>Compétences techniques</h1>
+      <!-- <h1>Compétences techniques</h1> -->
+      <Skills />
     </section>
 
     <!-- Page 5 : Soft skills -->
@@ -44,14 +45,16 @@
 import Timeline from "./components/Timeline.vue";
 import Diplomas from "./components/Diplomas.vue";
 import Experiences from "./components/Experiences.vue";
+import Skills from "./components/Skills.vue";
 
 import { usePageNavigation } from "./composables/usePageNavigation.js";
 usePageNavigation(".pages");
 </script>
 
 <style>
+/* MODIF : .pages utilise height relative à #app */
 .pages {
-  height: 100vh;
+  height: 100%; /* Au lieu de 100vh */
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
@@ -64,16 +67,25 @@ usePageNavigation(".pages");
   display: none; /* Chrome, Safari, Edge */
 }
 
+/* MODIF : .page force min-height et stretch pour enfants */
 .page {
-  height: 100vh;
+  min-height: 100vh; /* Au lieu de height: 100vh pour flexibilité */
+  height: 100%; /* Remplit le parent */
   scroll-snap-align: start;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch; /* Au lieu de center : étire les enfants verticalement */
   font-size: 3rem;
 }
 .page::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Edge */
 }
 
+/* AJOUT : Responsive pour mobile (hauteurs auto si overflow) */
+@media (max-width: 768px) {
+  .page {
+    align-items: flex-start; /* Pas de stretch sur mobile pour éviter overflows */
+    padding-top: 20px;
+  }
+}
 </style>
