@@ -19,7 +19,9 @@
               <img :src="`/logos/${skill.logo}`" :alt="skill.name" class="logo" />
               <div class="info">
                 <div class="name">{{ skill.name }}</div>
-                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="bar">
+                  <div class="fill" :style="{ width: levels[skill.level] + '%' }"></div>
+                </div>
                 <div class="level">{{ skill.level }}</div>
               </div>
             </div>
@@ -27,6 +29,7 @@
         </div>
       </template>
 
+      <!-- Répétez pour les autres groupes -->
       <!-- Groupe 2 -->
       <template #slot2>
         <div class="group">
@@ -39,10 +42,12 @@
               v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
               :class="{ visible: visibleSkills.includes(skill.name) }"
             >
-              <img :src="`/portfolio-interactif/public/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <img :src="`/logos/${skill.logo}`" :alt="skill.name" class="logo" />
               <div class="info">
                 <div class="name">{{ skill.name }}</div>
-                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="bar">
+                  <div class="fill" :style="{ width: levels[skill.level] + '%' }"></div>
+                </div>
                 <div class="level">{{ skill.level }}</div>
               </div>
             </div>
@@ -62,10 +67,12 @@
               v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
               :class="{ visible: visibleSkills.includes(skill.name) }"
             >
-              <img :src="`/portfolio-interactif/public/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <img :src="`/logos/${skill.logo}`" :alt="skill.name" class="logo" />
               <div class="info">
                 <div class="name">{{ skill.name }}</div>
-                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="bar">
+                  <div class="fill" :style="{ width: levels[skill.level] + '%' }"></div>
+                </div>
                 <div class="level">{{ skill.level }}</div>
               </div>
             </div>
@@ -85,10 +92,12 @@
               v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
               :class="{ visible: visibleSkills.includes(skill.name) }"
             >
-              <img :src="`/portfolio-interactif/public/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <img :src="`/logos/${skill.logo}`" :alt="skill.name" class="logo" />
               <div class="info">
                 <div class="name">{{ skill.name }}</div>
-                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="bar">
+                  <div class="fill" :style="{ width: levels[skill.level] + '%' }"></div>
+                </div>
                 <div class="level">{{ skill.level }}</div>
               </div>
             </div>
@@ -221,29 +230,29 @@ const skillGroups = [
 
 .card {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column; /* Changer l'orientation pour empiler les éléments */
+  align-items: center; /* Centrer les éléments horizontalement */
+  gap: 8px; /* Espacement entre les éléments */
   padding: 10px;
   border-radius: 8px;
-  background: #f9fafb;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.4s ease;
+  /* background: #f9fafb; */
+  /* transform: translateY(20px); */
+  /* transition: all 0.4s ease; */
 }
 .card.visible {
-  opacity: 1;
   transform: translateY(0);
 }
 
 .logo {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
+  width: 100px;
+  height: 100px;
+  /* object-fit: contain; */
   flex-shrink: 0;
 }
 
 .info {
   flex: 1;
+  text-align: center; /* Centrer le texte */
 }
 
 .name {
