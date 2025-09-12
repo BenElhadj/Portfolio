@@ -206,7 +206,7 @@ const skillGroups = [
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-  padding: 16px;
+  padding: 25px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -237,7 +237,7 @@ const skillGroups = [
   border-radius: 8px;
   /* background: #f9fafb; */
   /* transform: translateY(20px); */
-  /* transition: all 0.4s ease; */
+  transition: all 0.4s ease;
 }
 .card.visible {
   transform: translateY(0);
