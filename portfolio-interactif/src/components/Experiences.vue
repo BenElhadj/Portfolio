@@ -1,46 +1,53 @@
 <template>
     <div class="experiences-wrap">
       <h2 class="title">Expériences Professionnelles</h2>
+      <PageLayout :columns="1" :rows="2">
+        <template #slot1>
+            <!-- Développement -->
+            <div class="category">
+                <div class="category-header">
+                <h3>Développement</h3>
+                <span class="years">{{ devYears }} ans d'expérience</span>
+                </div>
+                <div class="grid">
+                <div v-for="(exp, i) in devExperiences" :key="i" class="card">
+                    <div class="dates">{{ exp.dates }}</div>
+                    <div class="company">{{ exp.company }}</div>
+                    <div class="role">{{ exp.role }}</div>
+                    <ul class="details">
+                    <li v-for="(d, j) in exp.details" :key="j">{{ d }}</li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+        </template>
   
-      <!-- Développement -->
-      <div class="category">
-        <div class="category-header">
-          <h3>Développement</h3>
-          <span class="years">{{ devYears }} ans d'expérience</span>
-        </div>
-        <div class="grid">
-          <div v-for="(exp, i) in devExperiences" :key="i" class="card">
-            <div class="dates">{{ exp.dates }}</div>
-            <div class="company">{{ exp.company }}</div>
-            <div class="role">{{ exp.role }}</div>
-            <ul class="details">
-              <li v-for="(d, j) in exp.details" :key="j">{{ d }}</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Technicien -->
-      <div class="category">
-        <div class="category-header">
-          <h3>Technicien & Maintenance Informatique</h3>
-          <span class="years">{{ techYears }} ans d'expérience</span>
-        </div>
-        <div class="grid">
-          <div v-for="(exp, i) in techExperiences" :key="i" class="card">
-            <div class="dates">{{ exp.dates }}</div>
-            <div class="company">{{ exp.company }}</div>
-            <div class="role">{{ exp.role }}</div>
-            <ul class="details">
-              <li v-for="(d, j) in exp.details" :key="j">{{ d }}</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+        <template #slot2>
+            <!-- Technicien -->
+            <div class="category">
+                <div class="category-header">
+                <h3>Technicien & Maintenance Informatique</h3>
+                <span class="years">{{ techYears }} ans d'expérience</span>
+                </div>
+                <div class="grid">
+                <div v-for="(exp, i) in techExperiences" :key="i" class="card">
+                    <div class="dates">{{ exp.dates }}</div>
+                    <div class="company">{{ exp.company }}</div>
+                    <div class="role">{{ exp.role }}</div>
+                    <ul class="details">
+                    <li v-for="(d, j) in exp.details" :key="j">{{ d }}</li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+            </template>
+      </PageLayout>
     </div>
   </template>
   
   <script setup>
+  import PageLayout from "../assets/PageLayout.vue";
+
   const devExperiences = [
     {
       dates: "2024 – Aujourd'hui",

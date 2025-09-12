@@ -2,27 +2,114 @@
   <div class="skills-wrap">
     <h2 class="title">Compétences Techniques</h2>
 
-    <div class="skills-grid">
-      <div v-for="(group, gIndex) in skillGroups" :key="gIndex" class="group">
-        <h3 class="group-title">{{ group.title }}</h3>
-        <div class="skills-scroll">
-          <div v-for="(skill, i) in group.skills" :key="i" class="card">
-            <img :src="`/logos/${skill.logo}`" :alt="skill.name" class="logo" />
-            <div class="info">
-              <div class="name">{{ skill.name }}</div>
-              <div class="bar">
-                <div class="fill" :style="{ width: levels[skill.level] + '%' }"></div>
+    <!-- Découpe générale 2 colonnes x 2 lignes -->
+    <PageLayout :columns="2" :rows="2">
+      <!-- Groupe 1 -->
+      <template #slot1>
+        <div class="group">
+          <h3 class="group-title">{{ skillGroups[0].title }}</h3>
+          <div class="skills-scroll">
+            <div
+              v-for="(skill, i) in skillGroups[0].skills"
+              :key="i"
+              class="card"
+              v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
+              :class="{ visible: visibleSkills.includes(skill.name) }"
+            >
+              <img :src="`/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <div class="info">
+                <div class="name">{{ skill.name }}</div>
+                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="level">{{ skill.level }}</div>
               </div>
-              <div class="level">{{ skill.level }}</div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+
+      <!-- Groupe 2 -->
+      <template #slot2>
+        <div class="group">
+          <h3 class="group-title">{{ skillGroups[1].title }}</h3>
+          <div class="skills-scroll">
+            <div
+              v-for="(skill, i) in skillGroups[1].skills"
+              :key="i"
+              class="card"
+              v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
+              :class="{ visible: visibleSkills.includes(skill.name) }"
+            >
+              <img :src="`/portfolio-interactif/public/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <div class="info">
+                <div class="name">{{ skill.name }}</div>
+                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="level">{{ skill.level }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Groupe 3 -->
+      <template #slot3>
+        <div class="group">
+          <h3 class="group-title">{{ skillGroups[2].title }}</h3>
+          <div class="skills-scroll">
+            <div
+              v-for="(skill, i) in skillGroups[2].skills"
+              :key="i"
+              class="card"
+              v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
+              :class="{ visible: visibleSkills.includes(skill.name) }"
+            >
+              <img :src="`/portfolio-interactif/public/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <div class="info">
+                <div class="name">{{ skill.name }}</div>
+                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="level">{{ skill.level }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Groupe 4 -->
+      <template #slot4>
+        <div class="group">
+          <h3 class="group-title">{{ skillGroups[3].title }}</h3>
+          <div class="skills-scroll">
+            <div
+              v-for="(skill, i) in skillGroups[3].skills"
+              :key="i"
+              class="card"
+              v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
+              :class="{ visible: visibleSkills.includes(skill.name) }"
+            >
+              <img :src="`/portfolio-interactif/public/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <div class="info">
+                <div class="name">{{ skill.name }}</div>
+                <div class="bar"><div class="fill" :style="{ width: levels[skill.level] + '%' }"></div></div>
+                <div class="level">{{ skill.level }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </PageLayout>
   </div>
 </template>
 
 <script setup>
+import { ref } from "vue";
+import PageLayout from "../assets/PageLayout.vue";
+
+const visibleSkills = ref([]);
+function onVisible(isVisible, skillName) {
+  if (isVisible && !visibleSkills.value.includes(skillName)) {
+    visibleSkills.value.push(skillName);
+  }
+}
+
 const levels = {
   "Maîtrise": 100,
   "Avancé": 75,
@@ -70,7 +157,9 @@ const skillGroups = [
   {
     title: "Autres Outils",
     skills: [
-      { name: "C / C++ / C#", logo: "cplusplus.svg", level: "Maîtrise" },
+      { name: "C", logo: "c.svg", level: "Maîtrise" },
+      { name: "C++", logo: "cplusplus.svg", level: "Maîtrise" },
+      { name: "C#", logo: "sarp.svg", level: "Maîtrise" },
       { name: "VS Code", logo: "vscode.svg", level: "Maîtrise" },
       { name: "IntelliJ", logo: "intellij.svg", level: "Avancé" },
       { name: "Photoshop", logo: "photoshop.svg", level: "Intermédiaire" },
@@ -95,76 +184,70 @@ const skillGroups = [
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Changé : flex-start pour permettre overflow et scroll */
 }
 
 .title {
   font-size: 2.2rem;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   text-align: center;
   color: #0b6fb8;
-  flex-shrink: 0;
-}
-
-.skills-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 20px;
-  width: 100%;
-  flex: 1; /* Prend tout l'espace restant */
-  min-height: 0; /* Permet au grid de shrink si besoin */
 }
 
 .group {
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-  padding: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .group-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   margin-bottom: 12px;
   color: #1f2937;
   text-align: center;
-  flex-shrink: 0;
 }
 
 .skills-scroll {
   flex: 1;
-  overflow-y: auto; /* Scroll restauré */
+  overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 12px;
-  padding-right: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding-right: 8px;
 }
 
 .card {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px;
   border-radius: 8px;
   background: #f9fafb;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+}
+.card.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .logo {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   flex-shrink: 0;
 }
 
 .info {
   flex: 1;
-  min-width: 0;
 }
 
 .name {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #111;
 }
@@ -173,8 +256,8 @@ const skillGroups = [
   background: #e5e7eb;
   border-radius: 6px;
   overflow: hidden;
-  height: 8px;
-  margin: 6px 0;
+  height: 6px;
+  margin: 4px 0;
 }
 
 .fill {
@@ -184,79 +267,19 @@ const skillGroups = [
 }
 
 .level {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #444;
 }
 
-/* Scrollbar stylisée */
+/* Scrollbar */
 .skills-scroll::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 .skills-scroll::-webkit-scrollbar-thumb {
   background: #0b6fb8;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 .skills-scroll::-webkit-scrollbar-track {
   background: #f1f1f1;
-}
-
-/* Responsive renforcé */
-@media (max-width: 768px) {
-  .skills-wrap {
-    padding: 20px 12px;
-    justify-content: flex-start;
-  }
-
-  .title {
-    font-size: 1.8rem;
-    margin-bottom: 24px;
-  }
-
-  .skills-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
-    gap: 12px;
-  }
-
-  .group {
-    padding: 16px;
-  }
-
-  .group-title {
-    font-size: 1.3rem;
-  }
-
-  .skills-scroll {
-    grid-template-columns: 1fr; /* Une colonne sur mobile */
-    gap: 8px;
-  }
-
-  .card {
-    padding: 10px 12px;
-  }
-
-  .logo {
-    width: 36px;
-    height: 36px;
-  }
-
-  .name {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .skills-wrap {
-    padding: 16px 8px;
-  }
-
-  .title {
-    font-size: 1.6rem;
-  }
-
-  .skills-scroll {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
 }
 </style>
