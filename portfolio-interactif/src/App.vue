@@ -1,5 +1,6 @@
 <template>
   <div class="pages">
+    <Navbar />
     <!-- Page 1 : Timeline + Avatar -->
     <section class="page">
       <Timeline />
@@ -31,7 +32,7 @@
 
     <!-- Page 6 : Projets -->
     <section class="page">
-      <h1>Projets</h1>
+      {{ $t('projects') }}
     </section>
 
     <!-- Page 7 : Liens utiles -->
@@ -42,6 +43,7 @@
 </template>
 
 <script setup>
+import Navbar from "./assets/Navbar.vue";
 import Timeline from "./components/Timeline.vue";
 import Diplomas from "./components/Diplomas.vue";
 import Experiences from "./components/Experiences.vue";

@@ -1,6 +1,6 @@
 <template>
   <div class="diplomas-wrap">
-    <h2 class="title">Diplômes</h2>
+    <h2 class="title">{{ $t("diplomas") }}</h2>
     <div class="diplomas-inner">
       <div class="timeline" aria-label="Timeline des diplômes">
             <PageLayout :columns="1" :rows="1">

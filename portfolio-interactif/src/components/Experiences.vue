@@ -1,6 +1,7 @@
 <template>
     <div class="experiences-wrap">
-      <h2 class="title">Expériences Professionnelles</h2>
+      <h2 class="title">{{ $t("experiences") }}</h2>
+
       <PageLayout :columns="1" :rows="2">
         <template #slot1>
             <!-- Développement -->
