@@ -2,7 +2,6 @@
   <div class="skills-wrap">
     <h2 class="title">{{ $t("skills") }}</h2>
 
-
     <!-- Layout -->
     <PageLayout :columns="2" :rows="2">
       <!-- Groupe -->
@@ -13,7 +12,7 @@
             <div
               v-for="(skill, i) in group.skills"
               :key="i"
-              class="card"
+              class="card skill-card"
               v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
               :class="{ visible: visibleSkills.includes(skill.name) }"
               @click="openPopup(skill)"
@@ -24,7 +23,6 @@
                 <div class="bar">
                   <div class="fill" :style="{ width: levels[skill.level] + '%' }"></div>
                 </div>
-                <div class="level">{{ skill.level }}</div>
               </div>
             </div>
           </div>
@@ -120,7 +118,8 @@ const skillGroups = [
       { name: "C", logo: "c.svg", level: "Maîtrise", info: "Langage appris à 42 (42cursus, projets systèmes bas niveau). 2 ans." },
       { name: "C++", logo: "cpp.svg", level: "Maîtrise", info: "Expérience académique et projets persos. 2 ans." },
       { name: "C#", logo: "sharp.svg", level: "Maîtrise", info: "Utilisé dans projets desktop et tests. 2 ans." },
-      { name: "VS Code", logo: "vscode.svg", level: "Maîtrise", info: "IDE principal pour tous mes projets. 6 ans d’expérience." },
+      { name: "VS Code", logo: "visual-studio.svg", level: "Maîtrise", info: "IDE principal pour tous mes projets. 6 ans d’expérience." },
+      { name: "Visual Studio", logo: "vscode.svg", level: "Maîtrise", info: "IDE principal pour tous mes projets. 6 ans d’expérience." },
       { name: "IntelliJ", logo: "intellij.svg", level: "Avancé", info: "Employé pour projets Java. 2 ans." },
       { name: "Photoshop", logo: "photoshop.svg", level: "Intermédiaire", info: "Montages graphiques pour Global Info. 3 ans." },
       { name: "Adobe Illustrator", logo: "illustrator.svg", level: "Intermédiaire", info: "Création de visuels. 2 ans." },
@@ -138,111 +137,95 @@ const skillGroups = [
 ];
 </script>
 
-
 <style scoped>
-.skills-wrap {
+/* .skills-wrap {
   width: 100%;
   height: 100%;
-  padding: 40px 24px;
+  padding: 5px 5px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-}
+} */
 
-.title {
+/* .title {
   font-size: 2.2rem;
-  margin-bottom: 24px;
+  margin-bottom: 2px;
   text-align: center;
   color: #0b6fb8;
-}
+} */
 
-.group {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-  padding: 25px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.group-title {
+/* .group-title {
   font-size: 1.4rem;
-  margin-bottom: 12px;
+  margin-bottom: 5px;
   color: #1f2937;
   text-align: center;
-}
+} */
 
-.skills-scroll {
+/* .skills-scroll {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto; 
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-  padding-right: 8px;
-}
+  grid-template-columns: repeat(auto-fill, 130px);
+  grid-auto-rows: 150px;
+  overflow: visible; 
+  gap: 15px; 
+  padding-right: 1px;
+} */
 
-.card {
+/* .card {
   display: flex;
-  flex-direction: column; /* Changer l'orientation pour empiler les éléments */
-  align-items: center; /* Centrer les éléments horizontalement */
-  gap: 8px; /* Espacement entre les éléments */
-  padding: 10px;
-  border-radius: 8px;
-  /* background: #f9fafb; */
-  /* transform: translateY(20px); */
-  transition: all 0.4s ease;
-}
-.card.visible {
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px;
+  border-radius: 5px;
+  width: 130px;
+  height: 100%;
+  box-sizing: border-box;
+  transition: all 1s ease;
+  overflow: hidden;
+} */
+/* .card.visible {
   transform: translateY(0);
-}
+} */
 
-.logo {
+/* .logo {
   width: 100px;
   height: 100px;
-  /* object-fit: contain; */
   flex-shrink: 0;
-}
+} */
 
-.info {
+/* .info {
   flex: 1;
-  text-align: center; /* Centrer le texte */
-}
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+} */
 
-.name {
+/* .name {
   font-size: 0.9rem;
+  color: #111;
   font-weight: 600;
   color: #111;
-}
-
-.bar {
-  background: #e5e7eb;
-  border-radius: 6px;
+  white-space: nowrap;
   overflow: hidden;
-  height: 6px;
-  margin: 4px 0;
-}
+  text-overflow: ellipsis;
+  max-width: 100%;
+} */
 
-.fill {
+
+
+/* .fill {
   height: 100%;
   background: linear-gradient(90deg, #0ea5e9, #60a5fa);
   border-radius: 6px;
-}
+} */
 
-.level {
+/* .level {
   font-size: 0.75rem;
   color: #444;
-}
+} */
 
-/* Scrollbar */
-.skills-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.skills-scroll::-webkit-scrollbar-thumb {
-  background: #0b6fb8;
-  border-radius: 3px;
-}
-.skills-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
 </style>
