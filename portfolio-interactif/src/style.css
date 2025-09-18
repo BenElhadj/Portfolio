@@ -98,13 +98,7 @@ button {
 button:hover { filter: brightness(1.1); }
 
 /* ===== PROGRESS BAR ===== */
-.bar {
-  background: var(--bar-bg);
-  border-radius: 6px;
-  overflow: hidden;
-  height: 6px;
-  margin: 4px 0;
-}
+
 .fill {
   height: 100%;
   background: var(--bar-fill);
@@ -602,11 +596,11 @@ a:hover { text-decoration: underline; }
   transform: translateY(0);
 }
 
-.logo {
+/* .logo {
   width: 100px;
   height: 100px;
   flex-shrink: 0;
-}
+} */
 
 .info {
   flex: 1;
@@ -631,14 +625,30 @@ a:hover { text-decoration: underline; }
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
+
 .bar {
-  /* background: #e5e7eb; */
+  background: var(--bar-bg);
   border-radius: 6px;
   overflow: hidden;
   height: 6px;
+  margin: 4px 0;
   width: 100px;
   flex-shrink: 0;
 }
+/* Effet lumineux sur les logos SVG */
+.logo {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 0 6px rgba(11, 111, 184, 0.5)); /* Glow léger */
+}
+
+.logo:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 12px var(--accent)) drop-shadow(0 0 20px var(--accent));
+}
+
 
 /* ========================
    APP LAYOUT (pages & sections)
