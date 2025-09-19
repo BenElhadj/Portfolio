@@ -6,6 +6,21 @@
       <span v-if="theme === 'light'">🌙</span>
       <span v-else>☀️</span>
     </button>
+    <!-- Navigation Pages -->
+    <ul class="nav-links" role="menubar">
+      <li
+        v-for="(key, i) in navKeys"
+        :key="key"
+        role="menuitem"
+        tabindex="0"
+        :class="{ active: currentIndex === i }"
+        @click="goToIndex(i)"
+        @keydown.enter="goToIndex(i)"
+        :aria-current="currentIndex === i ? 'true' : 'false'"
+      >
+        {{ getLabel(key) }}
+      </li>
+    </ul>
     <!-- Sélecteur de langues -->
     <div class="lang-switcher">
       <img src="/flags/fr.svg" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" />
@@ -16,68 +31,142 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useI18n } from "vue-i18n";
 
-const { locale } = useI18n();
+/* i18n */
+let tFn = (k) => k;
+let locale = ref(null);
+try {
+  const i18n = useI18n();
+  tFn = i18n.t;
+  locale = i18n.locale;
+} catch (e) {
+  // si pas de vue-i18n, on ignore ; getLabel utilisera fallback
+}
 
+/* Clés de navigation (ordre = ordre des .page dans App.vue) */
+const navKeys = [
+  "timeline",
+  "diplomas",
+  "experiences",
+  "skills",
+  "softSkills",
+  "projects",
+  "links"
+];
+
+/* libellés de secours si $t() n'existe pas / clé introuvable */
+const fallback = {
+  timeline: "Timeline",
+  diplomas: "Diplômes",
+  experiences: "Expériences",
+  skills: "Compétences",
+  softSkills: "Soft Skills",
+  projects: "Projets",
+  links: "Liens utiles"
+};
+
+/* état */
+const currentIndex = ref(0);
+const theme = ref("light");
+
+/* Dom refs / observer */
+let pagesContainer = null;
+let pageEls = [];
+let observer = null;
+
+/* Retourne le libellé (i18n si dispo + fallback) */
+function getLabel(key) {
+  try {
+    const translated = tFn(key);
+    if (translated && translated !== key) return translated;
+  } catch (e) { /* ignore */ }
+  return fallback[key] ?? key;
+}
+
+/* Scroll vers l'index i */
+function goToIndex(i) {
+  const el = pageEls[i];
+  if (!el) return;
+  if (pagesContainer && pagesContainer.scrollTo) {
+    // scroll relatif au container .pages
+    const top = el.offsetTop - (pagesContainer.offsetTop || 0);
+    pagesContainer.scrollTo({ top, behavior: "smooth" });
+  } else {
+    // fallback global
+    el.scrollIntoView({ behavior: "smooth" });
+  }
+  currentIndex.value = i;
+  localStorage.setItem("lastPageIndex", String(i));
+}
+
+/* langue */
 function changeLang(lang) {
-  locale.value = lang;
+  if (locale) locale.value = lang;
   localStorage.setItem("lang", lang);
 }
 
-// === THEME ===
-const theme = ref("light");
-
-onMounted(() => {
+/* theme */
+function applySavedTheme() {
   const saved = localStorage.getItem("theme") || "light";
   theme.value = saved;
   document.documentElement.classList.toggle("dark", saved === "dark");
-});
-
+}
 function toggleTheme() {
   theme.value = theme.value === "light" ? "dark" : "light";
   localStorage.setItem("theme", theme.value);
   document.documentElement.classList.toggle("dark", theme.value === "dark");
 }
+
+/* initialisation : observer + restauration dernière page */
+onMounted(() => {
+  // récupérer container scrollable principal (ta structure utilise .pages)
+  pagesContainer = document.querySelector(".pages");
+
+  // trouver toutes les pages visibles
+  pageEls = Array.from(document.querySelectorAll(".pages .page"));
+  if (!pageEls.length) pageEls = Array.from(document.querySelectorAll(".page"));
+
+  // si toujours vide, on sort
+  if (!pageEls.length) {
+    console.warn("[Navbar] Aucun élément .page trouvé.");
+  }
+
+  // IntersectionObserver pour suivre la page visible
+  const root = pagesContainer || null;
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const idx = pageEls.indexOf(entry.target);
+          if (idx !== -1) {
+            currentIndex.value = idx;
+            localStorage.setItem("lastPageIndex", String(idx));
+          }
+        }
+      });
+    },
+    {
+      root,
+      threshold: 0.6
+    }
+  );
+
+  pageEls.forEach((el) => observer.observe(el));
+
+  // restaurer la dernière page visitée
+  const saved = parseInt(localStorage.getItem("lastPageIndex"));
+  if (!Number.isNaN(saved) && pageEls[saved]) {
+    // petite attente pour laisser le rendu se stabiliser
+    setTimeout(() => goToIndex(saved), 80);
+  }
+
+  // appliquer thème sauvegardé
+  applySavedTheme();
+});
+
+onUnmounted(() => {
+  if (observer) observer.disconnect();
+});
 </script>
-
-<style scoped>
-.navbar {
-  position: fixed;
-  top: 10px;
-  right: 20px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  z-index: 3000;
-}
-
-.lang-switcher {
-  display: flex;
-  gap: 8px;
-}
-
-.lang-switcher img {
-  width: 28px;
-  height: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  opacity: 0.5;
-  transition: transform 0.2s, opacity 0.2s;
-}
-.lang-switcher img.active {
-  opacity: 1;
-  transform: scale(1.1);
-  border: 2px solid #0b6fb8;
-}
-
-/* Bouton toggle */
-.theme-toggle {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-</style>

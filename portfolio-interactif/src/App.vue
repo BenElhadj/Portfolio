@@ -1,6 +1,8 @@
 <template>
   <div class="pages">
-    <Navbar />
+    <div>
+      <Navbar />
+    </div>
     <!-- Page 1 : Timeline + Avatar -->
     <section class="page">
       <Timeline />

@@ -1,8 +1,8 @@
 export default {
     timeline: "Timeline",
     diplomas: "Diplomas",
-    experiences: "Professional Experiences",
-    skills: "Technical Skills",
+    experiences: "Experiences",
+    skills: "Hard Skills",
     softSkills: "Soft Skills",
     projects: "Projects",
     links: "Useful Links",

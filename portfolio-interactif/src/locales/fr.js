@@ -1,7 +1,7 @@
 export default {
     timeline: "Frise Chronologique",
     diplomas: "Diplômes",
-    experiences: "Expériences Professionnelles",
+    experiences: "Expériences",
     skills: "Compétences Techniques",
     softSkills: "Compétences Comportementales",
     projects: "Projets",
