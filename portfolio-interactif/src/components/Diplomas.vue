@@ -1,6 +1,6 @@
 <template>
   <div class="diplomas-wrap">
-    <h2 class="title">{{ $t("diplomas") }}</h2>
+    <h2 class="title">{{ $t("diplomas.title") }}</h2>
     <div class="diplomas-inner">
       <div class="timeline" aria-label="Timeline des diplômes">
         <PageLayout :columns="1" :rows="1">
@@ -25,7 +25,7 @@
                   <span class="year">{{ d.period }}</span>
                   <span class="institution">{{ d.institution }}</span>
                 </div>
-                <div class="degree">{{ d.title }}</div>
+                <div class="degree">{{ d.degree }}</div>
               </div>
             </div>
           </template>
@@ -36,22 +36,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import PageLayout from "../assets/PageLayout.vue";
 
-const diplomas = [
-  { period: "2016 - 2023", institution: "Ecole 42 — Paris", title: "Ingénieur Expert en architecture des BDD et data" },
-  { period: "2017 - 2019", institution: "GRETA — Paris", title: "BTS Systèmes Numériques, informatique et réseau" },
-  { period: "2011 - 2013", institution: "CSFIEE — Tunis", title: "BTS en Production électronique" },
-  { period: "2006 - 2008", institution: "CSFIEE — Tunis", title: "BAC Pro en fabrication électronique" },
-  { period: "2003 - 2005", institution: "IPH — Tunis", title: "BAC Pro en maintenance informatique" }
-];
+const { t, tm } = useI18n();
 
+// diplomas = liste traduite selon la langue courante
+const diplomas = computed(() => {
+  const list = tm("diplomas.list");
+  return Array.isArray(list) ? list : [];
+});
+
+// état visibilité (animations au scroll)
 const items = ref([]);
-const visible = ref(diplomas.map(() => false));
+const visible = ref([]);
 let observer = null;
 
 onMounted(() => {
+  visible.value = diplomas.value.map(() => false);
+
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -66,8 +70,14 @@ onMounted(() => {
     },
     { root: null, threshold: 0.45 }
   );
-  items.value.forEach((el) => { if (el) observer.observe(el); });
+
+  items.value.forEach((el) => {
+    if (el) observer.observe(el);
+  });
 });
 
-onBeforeUnmount(() => { if (observer) observer.disconnect(); });
+onBeforeUnmount(() => {
+  if (observer) observer.disconnect();
+});
 </script>
+

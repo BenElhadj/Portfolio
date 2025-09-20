@@ -47,13 +47,13 @@ try {
 
 /* Clés de navigation (ordre = ordre des .page dans App.vue) */
 const navKeys = [
-  "timeline",
-  "diplomas",
-  "experiences",
-  "skills",
-  "softSkills",
-  "projects",
-  "links"
+  "navbar.timeline",
+  "navbar.diplomas",
+  "navbar.experiences",
+  "navbar.skills",
+  "navbar.softSkills",
+  "navbar.projects",
+  "navbar.links"
 ];
 
 /* libellés de secours si $t() n'existe pas / clé introuvable */
@@ -80,10 +80,11 @@ let observer = null;
 function getLabel(key) {
   try {
     const translated = tFn(key);
-    if (translated && translated !== key) return translated;
-  } catch (e) { /* ignore */ }
-  return fallback[key] ?? key;
+    if (translated && !translated.startsWith("navbar.")) return translated;
+  } catch (e) {}
+  return fallback[key.split(".").pop()] ?? key;
 }
+
 
 /* Scroll vers l'index i */
 function goToIndex(i) {

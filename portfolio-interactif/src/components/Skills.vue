@@ -1,27 +1,29 @@
 <template>
   <div class="skills-wrap">
-    <h2 class="title">{{ $t("skills") }}</h2>
+    <h2 class="title">{{ $t("skills.title") }}</h2>
 
-    <!-- Layout -->
     <PageLayout :columns="2" :rows="2">
-      <!-- Groupe -->
-      <template v-for="(group, gIndex) in skillGroups" :key="gIndex" v-slot:[`slot${gIndex+1}`]>
+      <template
+        v-for="(group, gIndex) in skillGroups"
+        :key="gIndex"
+        v-slot:[`slot${gIndex+1}`]
+      >
         <div class="group">
-          <h3 class="group-title">{{ group.title }}</h3>
+          <h3 class="group-title">{{ $t(group.title) }}</h3>
           <div class="skills-scroll">
             <div
               v-for="(skill, i) in group.skills"
               :key="i"
               class="card skill-card"
-              v-observe-visibility="(isVisible) => onVisible(isVisible, skill.name)"
-              :class="{ visible: visibleSkills.includes(skill.name) }"
+              v-observe-visibility="(isVisible) => onVisible(isVisible, skill.key)"
+              :class="{ visible: visibleSkills.includes(skill.key) }"
               @click="openPopup(skill)"
             >
-              <img :src="`/logos/${skill.logo}`" :alt="skill.name" class="logo" />
+              <img :src="`/logos/${skill.logo}`" :alt="$t(`skills.items.${skill.key}.name`)" class="logo" />
               <div class="info">
-                <div class="name">{{ skill.name }}</div>
+                <div class="name">{{ $t(`skills.items.${skill.key}.name`) }}</div>
                 <div class="bar">
-                  <div class="fill" :style="{ width: levels[skill.level] + '%' }"></div>
+                  <div class="fill" :style="{ width: levels[$t(`skills.items.${skill.key}.level`)] + '%' }"></div>
                 </div>
               </div>
             </div>
@@ -30,22 +32,25 @@
       </template>
     </PageLayout>
 
-    <!-- Popup placé hors du layout -->
+    <!-- Popup -->
     <Popup
       v-if="selectedSkill"
       :visible="true"
-      :title="selectedSkill.name"
+      :title="$t(`skills.items.${selectedSkill.key}.name`)"
       @close="closePopup"
     >
-      <p><strong>Niveau :</strong> {{ selectedSkill.level }}</p>
-      <p><strong>Détails :</strong> {{ selectedSkill.info }}</p>
-      <p v-if="selectedSkill.years"><strong>Expérience :</strong> {{ selectedSkill.years }} ans</p>
+      <p><strong>{{ $t("skills.labels.level") }} :</strong> {{ $t(`skills.items.${selectedSkill.key}.level`) }}</p>
+      <p><strong>{{ $t("skills.labels.details") }} :</strong> {{ $t(`skills.items.${selectedSkill.key}.info`) }}</p>
+      <p v-if="selectedSkill.years">
+        <strong>{{ $t("skills.labels.years") }} :</strong>
+        {{ selectedSkill.years }} {{ $t("skills.labels.yearsUnit") }}
+      </p>
       <a
         v-if="selectedSkill.link"
         :href="selectedSkill.link"
         target="_blank"
         class="popup-link"
-      >🔗 Voir le projet</a>
+      >🔗 {{ $t("skills.labels.link") }}</a>
     </Popup>
   </div>
 </template>
@@ -55,83 +60,83 @@ import { ref } from "vue";
 import PageLayout from "../assets/PageLayout.vue";
 import Popup from "./Popup.vue";
 
+/* Animation visibilité */
 const visibleSkills = ref([]);
-function onVisible(isVisible, skillName) {
-  if (isVisible && !visibleSkills.value.includes(skillName)) {
-    visibleSkills.value.push(skillName);
+function onVisible(isVisible, skillKey) {
+  if (isVisible && !visibleSkills.value.includes(skillKey)) {
+    visibleSkills.value.push(skillKey);
   }
 }
 
+/* Popup */
 const selectedSkill = ref(null);
-function openPopup(skill) {
-  selectedSkill.value = skill;
-}
-function closePopup() {
-  selectedSkill.value = null;
-}
+function openPopup(skill) { selectedSkill.value = skill; }
+function closePopup() { selectedSkill.value = null; }
 
+/* Barres de progression */
 const levels = {
-  "Maîtrise": 100,
-  "Avancé": 75,
-  "Intermédiaire": 50
+  "Maîtrise": 100, "Avancé": 75, "Intermédiaire": 50,
+  "Mastery": 100, "Advanced": 75, "Intermediate": 50,
+  "إتقان": 100, "متقدم": 75, "متوسط": 50
 };
 
+/* Données brutes (logos, liens, années seulement) */
 const skillGroups = [
   {
-    title: "Front-End",
+    title: "skills.groups.frontend",
     skills: [
-      { name: "Vue.js", logo: "vue.svg", level: "Maîtrise", info: "Utilisé dans mon portfolio interactif et plusieurs projets web.", years: 3, link: "https://github.com/BenElhadj" },
-      { name: "HTML5", logo: "html5.svg", level: "Maîtrise", info: "Fondement de tous mes projets web (Multiserv Plus, Global Info).", years: 5 },
-      { name: "Svelte", logo: "svelte.svg", level: "Intermédiaire", info: "Utilisé dans des projets expérimentaux (simulateur de code).", years: 1 },
-      { name: "CSS3", logo: "css3.svg", level: "Maîtrise", info: "Responsive design et animations.", years: 5 },
-      { name: "JavaScript", logo: "javascript.svg", level: "Maîtrise", info: "Langage central de mon parcours (Full-Stack, ICM, KEAKR).", years: 6, link: "https://keakr.com" },
-      { name: "React Native", logo: "react.svg", level: "Avancé", info: "Développement mobile (ICM – app médicale, KEAKR – app musicale).", years: 3 }
+      { key: "vue", logo: "vue.svg", years: 3, link: "https://github.com/BenElhadj" },
+      { key: "html", logo: "html5.svg", years: 5 },
+      { key: "svelte", logo: "svelte.svg", years: 1 },
+      { key: "css", logo: "css3.svg", years: 5 },
+      { key: "javascript", logo: "javascript.svg", years: 6, link: "https://keakr.com" },
+      { key: "reactnative", logo: "react.svg", years: 3 }
     ]
   },
   {
-    title: "Back-End",
+    title: "skills.groups.backend",
     skills: [
-      { name: "PHP", logo: "php.svg", level: "Maîtrise", info: "Utilisé pour le site e-commerce Multiserv Plus. 4 ans d’expérience." },
-      { name: "Node.js", logo: "nodejs.svg", level: "Avancé", info: "Employé dans des projets Full-Stack et API REST (ICM, 42). 2 ans d’expérience." },
-      { name: "Python", logo: "python.svg", level: "Avancé", info: "Utilisé pour IA et data science (42, ICM). 3 ans d’expérience." },
-      { name: "Java", logo: "java.svg", level: "Intermédiaire", info: "Expérience académique et projets Android. 2 ans." },
-      { name: "ArangoDB", logo: "arangodb.svg", level: "Maîtrise", info: "Utilisé comme base NoSQL pour projets complexes. 1 an." },
-      { name: "MySQL", logo: "mysql.svg", level: "Avancé", info: "Utilisé sur Multiserv Plus, Global Info et projets d’école. 4 ans d’expérience." },
-      { name: "MongoDB", logo: "mongodb.svg", level: "Avancé", info: "Employé dans plusieurs projets Full-Stack (42, ICM). 2 ans." }
+      { key: "php", logo: "php.svg" },
+      { key: "node", logo: "nodejs.svg", years: 2 },
+      { key: "python", logo: "python.svg", years: 3 },
+      { key: "java", logo: "java.svg", years: 2 },
+      { key: "arangodb", logo: "arangodb.svg", years: 1 },
+      { key: "mysql", logo: "mysql.svg", years: 4 },
+      { key: "mongodb", logo: "mongodb.svg", years: 2 }
     ]
   },
   {
-    title: "DevOps",
+    title: "skills.groups.devops",
     skills: [
-      { name: "Git", logo: "git.svg", level: "Maîtrise", info: "Utilisé quotidiennement (GitHub, GitLab). 6 ans d’expérience." },
-      { name: "Docker", logo: "docker.svg", level: "Avancé", info: "Mise en place d’environnements de dev (42, projets multi-services). 2 ans." },
-      { name: "Jenkins", logo: "jenkins.svg", level: "Intermédiaire", info: "Découvert en CI/CD, utilisé sur des projets de formation. 1 an." },
-      { name: "Active Directory", logo: "ad.svg", level: "Maîtrise", info: "Gestion utilisateurs/serveurs (DIM, Dior, Chanel). 2 ans en maintenance IT." },
-      { name: "PowerShell", logo: "powershell.svg", level: "Avancé", info: "Scripts d’automatisation pour la maintenance IT. 3 ans." },
-      { name: "VOIP / Cisco", logo: "cisco.svg", level: "Avancé", info: "Administration réseaux et téléphonie. Expérience chez Dior et DIM. 2 ans." },
-      { name: "Bash", logo: "bash.svg", level: "Avancé", info: "Utilisé dans projets Linux (42, devops). 2 ans." }
+      { key: "git", logo: "git.svg", years: 6 },
+      { key: "docker", logo: "docker.svg", years: 2 },
+      { key: "jenkins", logo: "jenkins.svg", years: 1 },
+      { key: "ad", logo: "ad.svg", years: 2 },
+      { key: "powershell", logo: "powershell.svg", years: 3 },
+      { key: "cisco", logo: "cisco.svg", years: 2 },
+      { key: "bash", logo: "bash.svg", years: 2 }
     ]
   },
   {
-    title: "Autres Outils",
+    title: "skills.groups.tools",
     skills: [
-      { name: "C", logo: "c.svg", level: "Maîtrise", info: "Langage appris à 42 (42cursus, projets systèmes bas niveau). 2 ans." },
-      { name: "C++", logo: "cpp.svg", level: "Maîtrise", info: "Expérience académique et projets persos. 2 ans." },
-      { name: "C#", logo: "sharp.svg", level: "Maîtrise", info: "Utilisé dans projets desktop et tests. 2 ans." },
-      { name: "VS Code", logo: "visual-studio.svg", level: "Maîtrise", info: "IDE principal pour tous mes projets. 6 ans d’expérience." },
-      { name: "Visual Studio", logo: "vscode.svg", level: "Maîtrise", info: "IDE principal pour tous mes projets. 6 ans d’expérience." },
-      { name: "IntelliJ", logo: "intellij.svg", level: "Avancé", info: "Employé pour projets Java. 2 ans." },
-      { name: "Photoshop", logo: "photoshop.svg", level: "Intermédiaire", info: "Montages graphiques pour Global Info. 3 ans." },
-      { name: "Adobe Illustrator", logo: "illustrator.svg", level: "Intermédiaire", info: "Création de visuels. 2 ans." },
-      { name: "Qt Creator", logo: "qt.svg", level: "Intermédiaire", info: "Projets académiques. 1 an." },
-      { name: "Blender", logo: "blender.svg", level: "Intermédiaire", info: "Projets 3D personnels. 1 an." },
-      { name: "Unreal Engine", logo: "unreal.svg", level: "Intermédiaire", info: "Exploré pour prototypage. 1 an." },
-      { name: "iOS", logo: "ios.svg", level: "Avancé", info: "Développement mobile (ICM, KEAKR). 2 ans." },
-      { name: "Android", logo: "android.svg", level: "Avancé", info: "Développement mobile (ICM, KEAKR). 3 ans." },
-      { name: "MacOS", logo: "macos.svg", level: "Avancé", info: "Utilisation quotidienne à 42. 2 ans." },
-      { name: "Windows", logo: "windows.svg", level: "Maîtrise", info: "OS principal pour maintenance IT (DIM, Dior). 6 ans." },
-      { name: "Linux", logo: "linux.svg", level: "Avancé", info: "Utilisé pour serveurs et développement (42). 3 ans." },
-      { name: "VirtualBox", logo: "virtualbox.svg", level: "Avancé", info: "Utilisé pour tests systèmes et environnements virtuels. 2 ans." }
+      { key: "c", logo: "c.svg", years: 2 },
+      { key: "cpp", logo: "cpp.svg", years: 2 },
+      { key: "csharp", logo: "sharp.svg", years: 2 },
+      { key: "vscode", logo: "visual-studio.svg", years: 6 },
+      { key: "visualstudio", logo: "vscode.svg", years: 6 },
+      { key: "intellij", logo: "intellij.svg", years: 2 },
+      { key: "photoshop", logo: "photoshop.svg", years: 3 },
+      { key: "illustrator", logo: "illustrator.svg", years: 2 },
+      { key: "qt", logo: "qt.svg", years: 1 },
+      { key: "blender", logo: "blender.svg", years: 1 },
+      { key: "unreal", logo: "unreal.svg", years: 1 },
+      { key: "ios", logo: "ios.svg", years: 2 },
+      { key: "android", logo: "android.svg", years: 3 },
+      { key: "macos", logo: "macos.svg", years: 2 },
+      { key: "windows", logo: "windows.svg", years: 6 },
+      { key: "linux", logo: "linux.svg", years: 3 },
+      { key: "virtualbox", logo: "virtualbox.svg", years: 2 }
     ]
   }
 ];

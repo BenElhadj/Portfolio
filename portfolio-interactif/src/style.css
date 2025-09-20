@@ -33,6 +33,7 @@
   --fs-small: 0.85rem;
 
   --radius: 10px;
+  --navbar-height: 36px; /* Hauteur de la navbar */
 }
 
 .dark {
@@ -53,6 +54,12 @@
 
   --scrollbar-track: #1e1e1e;
   --scrollbar-thumb: #3b82f6;
+}
+
+/* ===== RTL SUPPORT ===== */
+html.rtl {
+  direction: rtl;
+  --font-family: 'Noto Sans Arabic', system-ui, sans-serif;
 }
 
 /* ===== STRUCTURE ===== */
@@ -104,7 +111,6 @@ button {
 button:hover { filter: brightness(1.1); }
 
 /* ===== PROGRESS BAR ===== */
-
 .fill {
   height: 100%;
   background: var(--bar-fill);
@@ -160,7 +166,7 @@ a:hover { text-decoration: underline; }
    SECTION
 ======================== */
 .section {
-  height: 100vh;
+  height: calc(100vh - var(--navbar-height));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -170,6 +176,12 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid var(--border);
   scroll-snap-align: start;
   color: var(--text);
+  padding-top: var(--navbar-height);
+}
+
+/* RTL adjustments for section */
+html.rtl .section {
+  align-items: flex-end;
 }
 
 /* ========================
@@ -199,11 +211,9 @@ a:hover { text-decoration: underline; }
 
 .close-btn {
   float: right;
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: var(--text);
+}
+html.rtl .close-btn {
+  float: left;
 }
 
 .popup-title {
@@ -238,7 +248,7 @@ a:hover { text-decoration: underline; }
 .timeline-viewport {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - var(--navbar-height));
   overflow: hidden;
   background: linear-gradient(90deg, var(--bar-fill));
   border-bottom: none;
@@ -253,6 +263,11 @@ a:hover { text-decoration: underline; }
   display: block;
   background-image: linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 60px 100%;
+}
+html.rtl .timeline-track {
+  left: auto;
+  right: 0;
+  background-image: linear-gradient(-90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
 }
 
 /* Milestones */
@@ -290,6 +305,10 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
   transition: background 0.3s, opacity 0.3s;
 }
+html.rtl .sky-icon {
+  left: auto;
+  right: 20px;
+}
 
 .dark .sky-icon {
   background: radial-gradient(circle at 30% 30%, #cbd5e1, #1e293b);
@@ -304,18 +323,14 @@ a:hover { text-decoration: underline; }
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   padding: 40px 24px;
   box-sizing: border-box;
 }
 
-.diplomas-inner {
-  width: 100%;
-  max-width: 1100px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+/* RTL adjustments for diplomas */
+html.rtl .diplomas-wrap {
+  padding: 40px 24px;
 }
 
 /* Timeline */
@@ -328,6 +343,10 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   justify-content: center;
 }
+html.rtl .timeline {
+  padding-left: 12px;
+  padding-right: 68px;
+}
 
 /* ligne verticale */
 .timeline::before {
@@ -339,6 +358,10 @@ a:hover { text-decoration: underline; }
   width: 4px;
   background: linear-gradient(180deg, var(--accent), rgba(96, 165, 250, 0.55));
   border-radius: 4px;
+}
+html.rtl .timeline::before {
+  left: auto;
+  right: 34px;
 }
 
 /* items */
@@ -372,11 +395,9 @@ a:hover { text-decoration: underline; }
   border: 2px solid var(--border);
   flex-shrink: 0;
 }
-.dot .icon {
-  width: 36px;
-  height: 36px;
-  fill: var(--accent);
-  opacity: 0.95;
+html.rtl .dot {
+  left: auto;
+  right: 0;
 }
 
 /* carte diplôme */
@@ -387,6 +408,12 @@ a:hover { text-decoration: underline; }
   max-width: calc(100% - 120px);
   border-left: 4px solid var(--border);
 }
+html.rtl .diploma-card {
+  margin-left: 0;
+  margin-right: 80px;
+  border-left: none;
+  border-right: 4px solid var(--border);
+}
 
 /* meta */
 .meta {
@@ -395,6 +422,12 @@ a:hover { text-decoration: underline; }
   align-items: baseline;
   flex-wrap: wrap;
 }
+
+/* RTL adjustments for meta */
+html.rtl .meta {
+  flex-direction: row-reverse;
+}
+
 .year {
   font-weight: 700;
   color: var(--accent);
@@ -418,19 +451,33 @@ a:hover { text-decoration: underline; }
   .timeline {
     padding-left: 14px;
   }
+  html.rtl .timeline {
+    padding-left: 12px;
+    padding-right: 14px;
+  }
   .timeline::before {
     left: 18px;
+  }
+  html.rtl .timeline::before {
+    left: auto;
+    right: 18px;
   }
   .dot {
     width: 52px;
     height: 52px;
   }
+  html.rtl .dot {
+    left: auto;
+    right: 0;
+  }
   .diploma-card {
     margin-left: 66px;
     padding: 12px 14px;
   }
-  .title {
-    text-align: center;
+  html.rtl .diploma-card {
+    margin-left: 0;
+    margin-right: 66px;
+    padding: 12px 14px;
   }
   .diplomas-wrap {
     padding: 20px 12px;
@@ -447,7 +494,12 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   padding: 40px 24px;
   box-sizing: border-box;
-  justify-content: space-between;
+  justify-content: center;
+}
+
+/* RTL adjustments for experiences */
+html.rtl .experiences-wrap {
+  padding: 40px 24px;
 }
 
 .category {
@@ -455,7 +507,7 @@ a:hover { text-decoration: underline; }
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
 }
 .category:last-child {
   margin-bottom: 0;
@@ -467,6 +519,10 @@ a:hover { text-decoration: underline; }
   align-items: baseline;
   margin-bottom: 20px;
 }
+html.rtl .category-header {
+  flex-direction: row-reverse;
+}
+
 .category-header h3 {
   font-size: var(--fs-h3);
   color: var(--text);
@@ -490,6 +546,10 @@ a:hover { text-decoration: underline; }
   border-left: 4px solid var(--accent);
   display: flex;
   flex-direction: column;
+}
+html.rtl .experience-card {
+  border-left: none;
+  border-right: 4px solid var(--accent);
 }
 
 .dates {
@@ -517,16 +577,16 @@ a:hover { text-decoration: underline; }
   padding-left: 18px;
   flex: 1;
 }
+html.rtl .details {
+  padding-left: 0;
+  padding-right: 18px;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
   .experiences-wrap {
     padding: 20px 12px;
     justify-content: flex-start;
-  }
-  .title {
-    font-size: 1.8rem;
-    margin-bottom: 24px;
   }
   .category {
     margin-bottom: 40px;
@@ -536,6 +596,9 @@ a:hover { text-decoration: underline; }
     align-items: flex-start;
     gap: 4px;
     margin-bottom: 16px;
+  }
+  html.rtl .category-header {
+    align-items: flex-end;
   }
   .category-header h3 {
     font-size: 1.3rem;
@@ -547,13 +610,13 @@ a:hover { text-decoration: underline; }
   .experience-card {
     padding: 12px 14px;
   }
+  html.rtl .experience-card {
+    padding: 12px 14px;
+  }
 }
 @media (max-width: 480px) {
   .experiences-wrap {
     padding: 16px 8px;
-  }
-  .title {
-    font-size: 1.6rem;
   }
 }
 
@@ -563,10 +626,17 @@ a:hover { text-decoration: underline; }
 .skills-wrap {
   width: 100%;
   height: 100%;
-  padding: 5px;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  padding: 40px 24px;
+  box-sizing: border-box;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* RTL adjustments for skills */
+html.rtl .skills-wrap {
+  font-family: 'Noto Sans Arabic', 'Poppins', sans-serif;
 }
 
 .group-title {
@@ -585,6 +655,10 @@ a:hover { text-decoration: underline; }
   padding-right: 1px;
   overflow: visible;
 }
+html.rtl .skills-scroll {
+  padding-right: 0;
+  padding-left: 1px;
+}
 
 .skill-card {
   display: flex;
@@ -600,13 +674,30 @@ a:hover { text-decoration: underline; }
 }
 .skill-card.visible {
   transform: translateY(0);
+  opacity: 1;
 }
 
-/* .logo {
+.logo {
   width: 100px;
   height: 100px;
   flex-shrink: 0;
-} */
+  transition: filter 0.3s ease;
+}
+
+.logo :deep(svg) {
+  width: 100%;
+  height: 100%;
+  filter: url(#glow);
+}
+
+.skill-card:hover .logo :deep(svg) {
+  filter: url(#glow-hover);
+}
+
+.skill-card:hover .logo :deep(path) {
+  stroke: var(--accent);
+  transition: stroke 0.3s ease;
+}
 
 .info {
   flex: 1;
@@ -641,56 +732,87 @@ a:hover { text-decoration: underline; }
   width: 100px;
   flex-shrink: 0;
 }
-/* Effet lumineux sur les logos SVG */
-.logo {
-  width: 100px;
-  height: 100px;
-  flex-shrink: 0;
-  transition: transform 0.3s ease, filter 0.3s ease;
-  filter: drop-shadow(0 0 6px rgba(11, 111, 184, 0.5)); /* Glow léger */
+
+/* Filtres SVG pour l'effet de lueur */
+.filters {
+  position: absolute;
+  width: 0;
+  height: 0;
 }
 
-.logo:hover {
-  transform: scale(1.08);
-  filter: drop-shadow(0 0 12px var(--accent)) drop-shadow(0 0 20px var(--accent));
+#glow, #glow-hover {
+  --glow-color: var(--accent);
 }
 
+#glow {
+  --blur-radius: 4px;
+  --opacity: 0.5;
+}
+
+#glow-hover {
+  --blur-radius: 8px;
+  --opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .skills-wrap {
+    padding: 20px 12px;
+    justify-content: flex-start;
+  }
+  .skills-scroll {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  html.rtl .skills-scroll {
+    padding-left: 1px;
+    padding-right: 0;
+  }
+  .skill-card {
+    width: 120px;
+  }
+  .bar {
+    width: 90px;
+  }
+}
 
 /* ========================
    APP LAYOUT (pages & sections)
 ======================== */
 .pages {
-  height: 100%; /* occupe toute la hauteur de #app */
+  height: 100%;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
-
-  /* masquer scrollbar */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .pages::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
+  display: none;
 }
 
 .page {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--navbar-height));
   height: 100%;
   scroll-snap-align: start;
   display: flex;
   justify-content: center;
-  align-items: stretch; /* étire les enfants verticalement */
+  align-items: center;
   font-size: 3rem;
+  padding-top: var(--navbar-height);
 }
 .page::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
+  display: none;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .page {
-    align-items: flex-start; /* éviter les débordements sur mobile */
-    padding-top: 20px;
+    align-items: flex-start;
+    padding-top: calc(var(--navbar-height) + 20px);
+  }
+  html.rtl .page {
+    align-items: flex-end;
   }
 }
 
@@ -700,7 +822,7 @@ a:hover { text-decoration: underline; }
   top: 0;
   left: 0;
   right: 0;
-  height: 36px;
+  height: var(--navbar-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -709,6 +831,11 @@ a:hover { text-decoration: underline; }
   background: var(--page-bg);
   border-bottom: 1px solid var(--border);
   z-index: 3000;
+}
+
+/* RTL adjustments for navbar */
+html.rtl .navbar {
+  flex-direction: row-reverse;
 }
 
 /* left: links */
@@ -721,6 +848,10 @@ a:hover { text-decoration: underline; }
   align-items: center;
   overflow-x: auto;
 }
+html.rtl .nav-links {
+  flex-direction: row-reverse;
+}
+
 .nav-links li {
   cursor: pointer;
   padding: 8px 6px;
@@ -730,7 +861,7 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
   transition: color 0.18s, background 0.18s, transform 0.12s;
 }
-.nav-links li:hover { color: var(--accent); transform: translateY(-1px); }
+.nav-links li:hover { color: var(--accent); transform: translateY(-2px); }
 .nav-links li.active {
   color: var(--accent);
   font-weight: 700;
@@ -740,8 +871,11 @@ a:hover { text-decoration: underline; }
 /* right side group */
 .nav-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
+}
+html.rtl .nav-actions {
+  flex-direction: row-reverse;
 }
 
 /* Lang switcher */
@@ -750,6 +884,10 @@ a:hover { text-decoration: underline; }
   gap: 8px;
   align-items: center;
 }
+html.rtl .lang-switcher {
+  flex-direction: row-reverse;
+}
+
 .lang-switcher img {
   width: 28px;
   height: 20px;
@@ -777,13 +915,13 @@ a:hover { text-decoration: underline; }
 }
 .theme-toggle:hover { filter: brightness(1.05); }
 
-/* espace visuel pour le contenu sous la navbar */
-body, #app {
-/* padding-top: 36px; */
-}
-
-/* responsive */
+/* Responsive */
 @media (max-width: 720px) {
-  .nav-links { gap: 10px; }
-  .lang-switcher img { width: 24px; height: 16px; }
+  .nav-links {
+    gap: 10px;
+  }
+  .lang-switcher img {
+    width: 24px;
+    height: 16px;
+  }
 }

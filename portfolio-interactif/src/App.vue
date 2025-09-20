@@ -25,17 +25,17 @@
 
     <!-- Page 5 : Soft skills -->
     <section class="page">
-      <h1>Soft Skills</h1>
+      {{ $t("softSkills.title") }}
     </section>
 
     <!-- Page 6 : Projets -->
     <section class="page">
-      {{ $t("projects") }}
+      {{ $t("projects.title") }}
     </section>
 
     <!-- Page 7 : Liens utiles -->
     <section class="page">
-      <h1>Liens utiles</h1>
+      {{ $t("links.title") }}
     </section>
   </div>
 </template>
