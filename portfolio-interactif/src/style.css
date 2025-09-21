@@ -838,6 +838,24 @@ html.rtl .navbar {
   flex-direction: row-reverse;
 }
 
+/* Structure interne de la navbar */
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* RTL : inversion des blocs */
+html.rtl .navbar {
+  flex-direction: row-reverse;
+}
+
+/* RTL : inverser aussi l’ordre des nav-links */
+html.rtl .nav-links {
+  flex-direction: row-reverse;
+}
+
+
 /* left: links */
 .nav-links {
   display: flex;

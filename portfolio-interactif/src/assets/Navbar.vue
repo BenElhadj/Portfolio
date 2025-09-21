@@ -9,7 +9,7 @@
     <!-- Navigation Pages -->
     <ul class="nav-links" role="menubar">
       <li
-        v-for="(key, i) in navKeys"
+        v-for="(key, i) in navKeysOrdered"
         :key="key"
         role="menuitem"
         tabindex="0"
@@ -21,6 +21,7 @@
         {{ getLabel(key) }}
       </li>
     </ul>
+
     <!-- Sélecteur de langues -->
     <div class="lang-switcher">
       <img src="/flags/fr.svg" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" />
@@ -41,11 +42,9 @@ try {
   const i18n = useI18n();
   tFn = i18n.t;
   locale = i18n.locale;
-} catch (e) {
-  // si pas de vue-i18n, on ignore ; getLabel utilisera fallback
-}
+} catch (e) {}
 
-/* Clés de navigation (ordre = ordre des .page dans App.vue) */
+/* Clés de navigation (ordre de base = gauche → droite) */
 const navKeys = [
   "navbar.timeline",
   "navbar.diplomas",
@@ -56,7 +55,15 @@ const navKeys = [
   "navbar.links"
 ];
 
-/* libellés de secours si $t() n'existe pas / clé introuvable */
+/* 🟢 Liste des liens selon la langue */
+const navKeysOrdered = computed(() => {
+  if (locale.value === "ar") {
+    return [...navKeys].reverse(); // copie inversée
+  }
+  return navKeys; // normal pour fr/en
+});
+
+/* libellés fallback */
 const fallback = {
   timeline: "Timeline",
   diplomas: "Diplômes",
@@ -76,7 +83,7 @@ let pagesContainer = null;
 let pageEls = [];
 let observer = null;
 
-/* Retourne le libellé (i18n si dispo + fallback) */
+/* Traduction */
 function getLabel(key) {
   try {
     const translated = tFn(key);
@@ -85,24 +92,21 @@ function getLabel(key) {
   return fallback[key.split(".").pop()] ?? key;
 }
 
-
-/* Scroll vers l'index i */
+/* Scroll vers une section */
 function goToIndex(i) {
   const el = pageEls[i];
   if (!el) return;
   if (pagesContainer && pagesContainer.scrollTo) {
-    // scroll relatif au container .pages
     const top = el.offsetTop - (pagesContainer.offsetTop || 0);
     pagesContainer.scrollTo({ top, behavior: "smooth" });
   } else {
-    // fallback global
     el.scrollIntoView({ behavior: "smooth" });
   }
   currentIndex.value = i;
   localStorage.setItem("lastPageIndex", String(i));
 }
 
-/* langue */
+/* Langue */
 function changeLang(lang) {
   if (locale) locale.value = lang;
   localStorage.setItem("lang", lang);
@@ -119,8 +123,7 @@ function changeLang(lang) {
   }
 }
 
-
-/* theme */
+/* Thème */
 function applySavedTheme() {
   const saved = localStorage.getItem("theme") || "light";
   theme.value = saved;
@@ -132,22 +135,12 @@ function toggleTheme() {
   document.documentElement.classList.toggle("dark", theme.value === "dark");
 }
 
-/* initialisation : observer + restauration dernière page */
+/* Init */
 onMounted(() => {
-  // récupérer container scrollable principal (ta structure utilise .pages)
   pagesContainer = document.querySelector(".pages");
-
-  // trouver toutes les pages visibles
   pageEls = Array.from(document.querySelectorAll(".pages .page"));
   if (!pageEls.length) pageEls = Array.from(document.querySelectorAll(".page"));
 
-  // si toujours vide, on sort
-  if (!pageEls.length) {
-    console.warn("[Navbar] Aucun élément .page trouvé.");
-  }
-
-  // IntersectionObserver pour suivre la page visible
-  const root = pagesContainer || null;
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -160,26 +153,18 @@ onMounted(() => {
         }
       });
     },
-    {
-      root,
-      threshold: 0.6
-    }
+    { root: pagesContainer || null, threshold: 0.6 }
   );
 
   pageEls.forEach((el) => observer.observe(el));
 
-  // restaurer la dernière page visitée
   const saved = parseInt(localStorage.getItem("lastPageIndex"));
   if (!Number.isNaN(saved) && pageEls[saved]) {
-    // petite attente pour laisser le rendu se stabiliser
     setTimeout(() => goToIndex(saved), 80);
   }
 
-  // appliquer thème sauvegardé
   applySavedTheme();
 });
 
-onUnmounted(() => {
-  if (observer) observer.disconnect();
-});
+onUnmounted(() => { if (observer) observer.disconnect(); });
 </script>
