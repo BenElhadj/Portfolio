@@ -106,7 +106,19 @@ function goToIndex(i) {
 function changeLang(lang) {
   if (locale) locale.value = lang;
   localStorage.setItem("lang", lang);
+
+  const html = document.documentElement;
+  html.setAttribute("lang", lang);
+
+  if (lang === "ar") {
+    html.classList.add("rtl");
+    html.setAttribute("dir", "rtl");
+  } else {
+    html.classList.remove("rtl");
+    html.setAttribute("dir", "ltr");
+  }
 }
+
 
 /* theme */
 function applySavedTheme() {
