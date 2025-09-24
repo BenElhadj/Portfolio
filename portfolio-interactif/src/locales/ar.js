@@ -44,7 +44,7 @@ export default {
     yearsLabel: "سنوات خبرة",
     list: [
       {
-        title: "التطوير",
+        title: "مهندس في البرمجة",
         years: 4,
         experiences: [
           {
@@ -88,7 +88,7 @@ export default {
         ]
       },
       {
-        title: "فني وصيانة الحواسيب",
+        title: "فني في صيانة الحواسيب",
         years: 8,
         experiences: [
           {

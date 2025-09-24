@@ -19,7 +19,7 @@
                   <path d="M11 13.5V21h2v-7.5l-1 0.45-1-0.45z" />
                 </svg>
               </div>
-
+              
               <div class="card diploma-card">
                 <div class="meta">
                   <span class="year">{{ d.period }}</span>
