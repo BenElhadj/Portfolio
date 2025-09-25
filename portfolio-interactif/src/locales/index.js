@@ -1,7 +1,7 @@
 import { createI18n } from "vue-i18n";
-import fr from "./fr";
-import en from "./en";
-import ar from "./ar";
+import fr from "./fr/fr";
+import en from "./en/en";
+import ar from "./ar/ar";
 
 // récupérer la langue sauvegardée ou fallback sur "fr"
 const savedLocale = localStorage.getItem("lang") || "fr";
