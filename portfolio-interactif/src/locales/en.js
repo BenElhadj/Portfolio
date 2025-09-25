@@ -89,7 +89,7 @@ export default {
       },
       {
         title: "Technician & IT Maintenance",
-        years: 8,
+        years: 9,
         experiences: [
           {
             dates: "2020 – 2021",
@@ -98,14 +98,61 @@ export default {
             details: ["IT asset management", "System & network maintenance"]
           },
           {
-            dates: "2018 – 2020",
-            company: "DIM, LVMH, CHANEL",
-            role: "VIP Technician / Logistician (HELPLINE missions)",
+            dates: "2020",
+            company: "LVMH Fragrance Brands",
+            role: "IT Asset Manager / Logistician (HELPLINE)",
+            details: ["IT asset management", "Planning of technical interventions"]
+          },
+          {
+            dates: "2020",
+            company: "DIM",
+            role: "VIP Technician (HELPLINE)",
+            details: ["VIP support", "Computer and smartphone imaging"]
+          },
+          {
+            dates: "2019 – 2020",
+            company: "Brain & Spine Institute",
+            role: "Mobile Developer",
             details: [
-              "VIP support",
-              "Computer & smartphone imaging",
-              "IT asset management"
+              "Designed and developed CONNECT app (stroke patients)",
+              "Won 1st place in a Hackathon"
             ]
+          },
+          {
+            dates: "2019",
+            company: "DIM",
+            role: "VIP Technician (HELPLINE)",
+            details: ["VIP support", "Computer and smartphone imaging"]
+          },
+          {
+            dates: "2019",
+            company: "LVMH Fragrance Brands",
+            role: "IT Asset Manager / Logistician (HELPLINE)",
+            details: ["IT asset management", "Planning of technical interventions"]
+          },
+          {
+            dates: "2019",
+            company: "LVMH Fragrance Brands",
+            role: "IT Asset Manager / Logistician (HELPLINE)",
+            details: ["IT asset management", "Planning of technical interventions"]
+          },
+          {
+            dates: "2018 – 2019",
+            company: "ATOUTEK - Computer Refurbishment Factory",
+            role: "Computer Maintenance Technician (KIATOO)",
+            details: ["Hardware and software maintenance"]
+          },
+          {
+            dates: "2018",
+            company: "LVMH Fragrance Brands",
+            role: "IT Asset Manager / Logistician (HELPLINE)",
+            details: ["IT asset management", "Planning of technical interventions"]
+          },
+          {
+            dates: "2018",
+            company: "CHANEL",
+            role: "VIP On-site Technician (HELPLINE)",
+            details: ["Intervention planning", "VIP support", "Computer imaging"]
           },
           {
             dates: "2017 – 2018",
@@ -118,16 +165,31 @@ export default {
           },
           {
             dates: "2016",
-            company: "Solutions30, Fnac",
-            role: "Maintenance Technician",
+            company: "Solutions30 France",
+            role: "Computer Maintenance Technician (HELP 1FO)",
             details: [
-              "Hardware & software maintenance",
+              "Hardware and software maintenance",
               "On-site customer support"
             ]
           },
           {
-            dates: "2010 – 2014",
-            company: "Global Info (Tunis)",
+            dates: "2016",
+            company: "MSS Fnac",
+            role: "Computer Technician",
+            details: [
+              "Hardware and software maintenance",
+              "Customer support"
+            ]
+          },
+          {
+            dates: "2015",
+            company: "EUROPEAN TRADE LA FORCE DE VENTE",
+            role: "Field Sales",
+            details: ["Sales of GDF contracts"]
+          },
+          {
+            dates: "2012 – 2014",
+            company: "Global Info",
             role: "Manager & Technician",
             details: [
               "PC assembly and repair",
@@ -136,14 +198,73 @@ export default {
             ]
           },
           {
-            dates: "2007 – 2013",
-            company: "Various internships (STIE, TRANSTU, Retronix, Sagemcom, Microlux, Tekne)",
-            role: "Electronics Technician",
+            dates: "2013",
+            company: "STIE",
+            role: "Computer Maintenance Technician (Intern)",
             details: [
-              "PC assembly & repair",
-              "Industrial & electronic maintenance",
-              "Electronic production & wiring"
+              "Computer assembly and repair",
+              "Diagnostic and intervention on motherboards, hard drives, screens, processors"
             ]
+          },
+          {
+            dates: "2012",
+            company: "TRANSTU TGM",
+            role: "Industrial Maintenance Technician (Intern)",
+            details: [
+              "Maintenance of Citadis Alstom and Hanovre Siemens metros",
+              "Diagnosis and maintenance of doors (electrical, pneumatic) and dashboard"
+            ]
+          },
+          {
+            dates: "2011",
+            company: "Retronix Tunisie",
+            role: "Electronics Technician (Intern)",
+            details: [
+              "Repair of modems, computers, decoders",
+              "Dismantling and assembly of electronic components and processors"
+            ]
+          },
+          {
+            dates: "2010 – 2011",
+            company: "Global Info",
+            role: "Manager & Technician",
+            details: [
+              "PC assembly and repair",
+              "Sales & after-sales service",
+              "Printer, scanner, photocopier setup"
+            ]
+          },
+          {
+            dates: "2008 – 2009",
+            company: "Internet Cafe and Network Games",
+            role: "Associate Manager",
+            details: [
+              "PC assembly, sales, repair",
+              "Printing, copying services",
+              "Printer, scanner setup"
+            ]
+          },
+          {
+            dates: "2007 – 2008",
+            company: "Sagemcom",
+            role: "Electronics Manufacturing Technician (Intern)",
+            details: [
+              "Follow electronic production cycle",
+              "Test manufactured boards",
+              "Troubleshoot defective boards and ensure quality control"
+            ]
+          },
+          {
+            dates: "2007",
+            company: "Microlux-Dimatec",
+            role: "Computer Assembly and Maintenance (Intern)",
+            details: ["Computer assembly and maintenance"]
+          },
+          {
+            dates: "2007",
+            company: "TEKNE-TUNISIE",
+            role: "Electric Cable Assembler (Intern)",
+            details: ["Assembly of electrical car cables"]
           }
         ]
       }

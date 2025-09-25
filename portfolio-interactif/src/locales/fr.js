@@ -41,19 +41,19 @@ export default {
   },
   experiences: {
     title: "Expériences",
-    yearsLabel: "ans d'expérience",
+    yearsLabel: "années d'expérience",
     list: [
       {
         title: "Développement",
         years: 4,
         experiences: [
           {
-            dates: "2024 – Aujourd'hui",
+            dates: "2024 – Présent",
             company: "Indépendant",
-            role: "Développeur IA/LM",
+            role: "Développeur IA/ML",
             details: [
               "Projets IA : classification d'images/données, détection d'anomalies",
-              "Réseaux de neurones, NLP, apprentissage supervisé et non supervisé",
+              "Réseaux neuronaux, NLP, apprentissage supervisé et non supervisé",
               "Techs : Python, NumPy, Pandas, Scikit-learn, TensorFlow, OpenCV"
             ]
           },
@@ -62,15 +62,15 @@ export default {
             company: "KEAKR",
             role: "Développeur Full Stack",
             details: [
-              "Maintenance et amélioration d'une app & site web (Vue.js, C#)",
+              "Maintenance et amélioration de l'appli & site web (Vue.js, C#)",
               "Mise en place CI/CD avec Jenkins",
-              "Participation à une plateforme Web3 (NFTs)"
+              "Contribution à une plateforme Web3 (NFTs)"
             ]
           },
           {
             dates: "2019 – 2020",
-            company: "Institut du Cerveau et de la Moelle Épinière (ICM)",
-            role: "Développeur mobile",
+            company: "Institut du Cerveau et de la Moelle Epinière (ICM)",
+            role: "Développeur d'applications mobiles",
             details: [
               "Conception et développement de l'application CONNECT (patients AVC)",
               "Collaboration avec CHU Brest, Pitié-Salpêtrière et école 42"
@@ -82,14 +82,14 @@ export default {
             role: "Stagiaire Développeur Web",
             details: [
               "Création d'un site e-commerce de films",
-              "Travail sur la base de données et l'interface utilisateur"
+              "Travail sur base de données et interface utilisateur"
             ]
           }
         ]
       },
       {
-        title: "Technicien & Maintenance Informatique",
-        years: 8,
+        title: "Technicien & Maintenance IT",
+        years: 9,
         experiences: [
           {
             dates: "2020 – 2021",
@@ -98,52 +98,173 @@ export default {
             details: ["Gestion de parc informatique", "Maintenance système et réseau"]
           },
           {
-            dates: "2018 – 2020",
-            company: "DIM, LVMH, CHANEL",
-            role: "Technicien VIP / Logisticien (missions HELPLINE)",
+            dates: "2020",
+            company: "LVMH Fragrance Brands",
+            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
+          },
+          {
+            dates: "2020",
+            company: "DIM",
+            role: "Technicien VIP (HELPLINE)",
+            details: ["Support VIP", "Masterisation des postes et smartphones"]
+          },
+          {
+            dates: "2019 – 2020",
+            company: "Institut du Cerveau et de la Moelle Epinière",
+            role: "Développeur d'applications mobiles",
             details: [
-              "Support VIP",
-              "Masterisation postes, smartphones",
-              "Gestion parc IT"
+              "Conception et développement de l'application CONNECT (patients AVC)",
+              "1ère place à un Hackathon"
             ]
+          },
+          {
+            dates: "2019",
+            company: "DIM",
+            role: "Technicien VIP (HELPLINE)",
+            details: ["Support VIP", "Masterisation des postes et smartphones"]
+          },
+          {
+            dates: "2019",
+            company: "LVMH Fragrance Brands",
+            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
+          },
+          {
+            dates: "2019",
+            company: "LVMH Fragrance Brands",
+            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
+          },
+          {
+            dates: "2018 – 2019",
+            company: "ATOUTEK - Usine de Reconditionnement Informatique",
+            role: "Technicien de maintenance informatique KIATOO",
+            details: ["Maintenance software + hardware"]
+          },
+          {
+            dates: "2018",
+            company: "LVMH Fragrance Brands",
+            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
+          },
+          {
+            dates: "2018",
+            company: "CHANEL",
+            role: "Technicien de proximité VIP (HELPLINE)",
+            details: ["Gestion des plannings d'intervention", "Support VIP", "Masterisation des postes"]
           },
           {
             dates: "2017 – 2018",
             company: "Parkeon",
-            role: "Technicien itinérant",
+            role: "Technicien en itinérant",
             details: [
-              "Maintenance bornes billettiques",
+              "Maintenance de borne télé-billettique",
               "Réseaux, électronique, mécanique"
             ]
           },
           {
             dates: "2016",
-            company: "Solutions30, Fnac",
-            role: "Technicien de maintenance",
+            company: "Solutions30 France",
+            role: "Technicien de maintenance informatique (HELP 1FO)",
             details: [
-              "Maintenance hardware & software",
-              "Support SAV itinérant"
+              "Maintenance software + hardware",
+              "Support client sur site"
             ]
           },
           {
-            dates: "2010 – 2014",
-            company: "Global Info (Tunis)",
-            role: "Gérant & technicien",
+            dates: "2016",
+            company: "MSS Fnac",
+            role: "Technicien informatique",
             details: [
-              "Montage et réparation ordinateurs",
-              "Vente & SAV informatique",
-              "Installation imprimantes, scanners, photocopieurs"
+              "Maintenance software + hardware",
+              "Support client"
             ]
           },
           {
-            dates: "2007 – 2013",
-            company: "Stages divers (STIE, TRANSTU, Retronix, Sagemcom, Microlux, Tekne)",
-            role: "Technicien / Maintenance électronique",
+            dates: "2015",
+            company: "EUROPEAN TRADE LA FORCE DE VENTE",
+            role: "Commercial terrain",
+            details: ["Commercialisation des contrats GDF"]
+          },
+          {
+            dates: "2012 – 2014",
+            company: "Global Info",
+            role: "Propriétaire gérant",
             details: [
-              "Assemblage & réparation ordinateurs",
-              "Maintenance industrielle & électronique",
-              "Production électronique et câblage"
+              "Montage et réparation d'ordinateurs",
+              "Vente et SAV",
+              "Installation d'imprimantes, scanners, photocopieurs"
             ]
+          },
+          {
+            dates: "2013",
+            company: "STIE",
+            role: "Technicien supérieur en maintenance informatique (Stagiaire)",
+            details: [
+              "Assemblage et réparation d'ordinateurs",
+              "Diagnostic et intervention sur carte mère, disque dur, écran, processeur"
+            ]
+          },
+          {
+            dates: "2012",
+            company: "TRANSTU TGM",
+            role: "Technicien supérieur en maintenance industrielle (Stagiaire)",
+            details: [
+              "Entretien de métro type Citadis Alstom et Hanovre Siemens",
+              "Diagnostic et maintenance des portes électriques, pneumatiques et tableau de bord"
+            ]
+          },
+          {
+            dates: "2011",
+            company: "Retronix Tunisie",
+            role: "Technicien supérieur en maintenance électronique (Stagiaire)",
+            details: [
+              "Réparation de modems, ordinateurs, décodeurs",
+              "Démontage et montage des composants électroniques et processeurs"
+            ]
+          },
+          {
+            dates: "2010 – 2011",
+            company: "Global Info",
+            role: "Propriétaire gérant",
+            details: [
+              "Montage et réparation d'ordinateurs",
+              "Vente et SAV",
+              "Installation d'imprimantes, scanners, photocopieurs"
+            ]
+          },
+          {
+            dates: "2008 – 2009",
+            company: "Salle d'internet et jeux en réseaux",
+            role: "Associé gérant",
+            details: [
+              "Montage d'ordinateurs, vente, réparation",
+              "Services de traitement de texte, tirage, photocopie",
+              "Installation d'imprimantes, scanners"
+            ]
+          },
+          {
+            dates: "2007 – 2008",
+            company: "Sagemcom",
+            role: "Technicien en fabrication électronique (Stagiaire)",
+            details: [
+              "Suivi d'un cycle de production électronique",
+              "Test des cartes fabriquées",
+              "Dépannage des cartes défectueuses et contrôle qualité"
+            ]
+          },
+          {
+            dates: "2007",
+            company: "Microlux-Dimatec",
+            role: "Montage et maintenance d'ordinateur (Stagiaire)",
+            details: ["Montage et maintenance d'ordinateur"]
+          },
+          {
+            dates: "2007",
+            company: "TEKNE-TUNISIE",
+            role: "Monteur de câbles électriques de voiture (Stagiaire)",
+            details: ["Montage des câbles électriques de voiture"]
           }
         ]
       }
