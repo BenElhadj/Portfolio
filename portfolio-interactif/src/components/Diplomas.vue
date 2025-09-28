@@ -127,28 +127,5 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.degree-thumb {
-  width: 64px;
-  height: 64px;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--card-bg, #222);
-}
-.degree-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
 
-.popup-image {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: auto;
-}
 </style>

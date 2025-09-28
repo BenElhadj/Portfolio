@@ -8,7 +8,7 @@ export default {
           period: "2016 - 2023",
           institution: "42 School — Paris",
           degree: "Expert Engineer in Database Architecture and Data",
-          image: "bac+5-42.svg"
+          image: "42.svg"
         }
       ]
     },
@@ -19,13 +19,13 @@ export default {
           period: "2017 - 2019",
           institution: "GRETA — Paris",
           degree: "BTS Digital Systems, Computer Science & Networking",
-          image: "bac+2-greta.svg"
+          image: "GRETA.svg"
         },
         {
           period: "2011 - 2013",
           institution: "CSFIEE — Tunis",
           degree: "BTS in Electronic Production",
-          image: "bac+2-csfiee.svg"
+          image: "MEFP.svg"
         }
       ]
     },
@@ -36,13 +36,13 @@ export default {
           period: "2006 - 2008",
           institution: "CSFIEE — Tunis",
           degree: "Professional Baccalaureate in Electronic Manufacturing",
-          image: "bac-csfiee.svg"
+          image: "MEFP.svg"
         },
         {
           period: "2003 - 2005",
           institution: "IPH — Tunis",
           degree: "Professional Baccalaureate in IT Maintenance",
-          image: "bac-iph.svg"
+          image: "MEFP.svg"
         }
       ]
     }

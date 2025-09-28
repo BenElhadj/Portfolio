@@ -25,6 +25,9 @@
   --scrollbar-track: #f1f1f1;
   --scrollbar-thumb: #0b6fb8;
 
+  --green-glow: #34D399;
+
+
   /* Font sizes */
   --fs-h1: 2.6rem;
   --fs-h2: 2.2rem;
@@ -54,6 +57,7 @@
 
   --scrollbar-track: #1e1e1e;
   --scrollbar-thumb: #3b82f6;
+  --green-glow: #34D399;
 }
 
 /* ===== RTL SUPPORT ===== */
@@ -326,7 +330,43 @@ html.rtl .sky-icon {
   /* justify-content: center; */
   padding: 40px 24px;
   box-sizing: border-box;
+  
 }
+
+.degree-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  /* flex-shrink: 0; */
+  /* display: flex; */
+  align-items: center;
+  justify-content: center;
+  /* background: var(--card-bg, #222); */
+}
+.degree-thumb img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 2px var(--accent));
+}
+
+.popup-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: auto;
+  filter: drop-shadow(0 0 2px var(--green-glow));
+}
+
+.degree-thumb :hover{
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 2px var(--green-glow));
+
+}
+ 
 
 /* RTL adjustments for diplomas */
 html.rtl .diplomas-wrap {
@@ -520,7 +560,7 @@ html.rtl .experiences-wrap {
   margin-bottom: 20px;
 }
 html.rtl .category-header {
-  flex-direction: row-reverse;
+  flex-direction: auto;
 }
 
 .category-header h3 {
@@ -669,9 +709,13 @@ html.rtl .skills-scroll {
   width: 130px;
   height: 100%;
   box-sizing: border-box;
-  transition: all 0.8s ease;
   overflow: hidden;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: all 0.2s ease-out;
+  
 }
+
 .skill-card.visible {
   transform: translateY(0);
   opacity: 1;
@@ -681,22 +725,42 @@ html.rtl .skills-scroll {
   width: 100px;
   height: 100px;
   flex-shrink: 0;
-  transition: filter 0.3s ease;
+  filter: drop-shadow(0 0 2px var(--accent)); 
+  opacity: 0.75; /* Basse opacité */
 }
 
 .logo :deep(svg) {
   width: 100%;
   height: 100%;
   filter: url(#glow);
+  opacity: 1;
+}
+
+
+
+.skill-card.visible .logo {
+  opacity: 0.8;
 }
 
 .skill-card:hover .logo :deep(svg) {
-  filter: url(#glow-hover);
+  filter: url(#glow-green);
+  transform: scale(1.1);
+  
 }
 
-.skill-card:hover .logo :deep(path) {
-  stroke: var(--accent);
-  transition: stroke 0.3s ease;
+.skill-card:hover .logo {
+    opacity: 1;
+    transform: scale(1.1); /* Petit zoom pour l'effet de souris */
+    filter: drop-shadow(0 0 2px var(--green-glow));
+  }
+
+.skill-card:active .logo {
+    transform: scale(0.95); /* Petit effet de pression/clic */
+    transform: none;
+}
+
+.skill-card:not(.is-clicked):hover .logo :deep(svg) {
+  filter: url(#glow-green); /* Revert à la lueur verte si non cliqué */
 }
 
 .info {
