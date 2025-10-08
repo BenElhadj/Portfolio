@@ -51,5 +51,18 @@ export default {
     windows: { name: "Windows", level: "Maîtrise", info: "OS principal pour maintenance IT." },
     linux: { name: "Linux", level: "Avancé", info: "Utilisé pour serveurs et dev." },
     virtualbox: { name: "VirtualBox", level: "Avancé", info: "Tests systèmes et environnements virtuels." },
+    
+    
+    github: { name: "GitHub", level: "Maîtrise", info: "Utilisé quotidiennement (GitHub, GitLab)." },
+    gitlab: { name: "GitLab", level: "Maîtrise", info: "Utilisé quotidiennement (GitHub, GitLab)." },
+    argocd: { name: "ArgoCD", level: "Maîtrise", info: "Utilisé quelques fois pour la gestion des déploiements." },
+    postman: { name: "Postman", level: "Maîtrise", info: "Utilisé pour tester les API." },
+    androidstudio: { name: "Android Studio", level: "Avancé", info: "Utilisé pour le développement d'applications Android." },
+    dart: { name: "Dart", level: "Avancé", info: "Utilisé pour le développement d'applications Flutter." },
+    quasar: { name: "Quasar", level: "Maîtrise", info: "Utilisé pour des projets Vue.js avec Quasar Framework." },
+    vuetify: { name: "Vuetify", level: "Maîtrise", info: "Utilisé pour des projets Vue.js avec Vuetify." },
+    vite: { name: "Vite", level: "Maîtrise", info: "Utilisé comme bundler dans plusieurs projets Vue.js." },
+    flutter: { name: "Flutter", level: "Intermédiaire", info: "Utilisé pour le développement d'applications mobiles cross-platform." },
+    firebase: { name: "Firebase", level: "Intermédiaire", info: "Utilisé pour des projets avec authentification et base de données en temps réel." },
     },
 };

@@ -220,12 +220,6 @@ html.rtl .close-btn {
   float: left;
 }
 
-.popup-title {
-  margin: 0 0 10px;
-  text-align: center;
-  font-size: var(--fs-h3);
-  color: var(--title);
-}
 
 .popup-body {
   font-size: var(--fs-body);
@@ -322,12 +316,11 @@ html.rtl .sky-icon {
 /* ========================
    DIPLOMAS
 ======================== */
-.diplomas-wrap {
+.wrapper {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   padding: 40px 24px;
   box-sizing: border-box;
   
@@ -339,11 +332,8 @@ html.rtl .sky-icon {
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  /* flex-shrink: 0; */
-  /* display: flex; */
   align-items: center;
   justify-content: center;
-  /* background: var(--card-bg, #222); */
 }
 .degree-thumb img {
   width: 90%;
@@ -369,7 +359,7 @@ html.rtl .sky-icon {
  
 
 /* RTL adjustments for diplomas */
-html.rtl .diplomas-wrap {
+html.rtl .wrapper {
   padding: 40px 24px;
 }
 
@@ -519,7 +509,7 @@ html.rtl .meta {
     margin-right: 66px;
     padding: 12px 14px;
   }
-  .diplomas-wrap {
+  .wrapper {
     padding: 20px 12px;
   }
 }
@@ -527,21 +517,6 @@ html.rtl .meta {
 /* ========================
    EXPERIENCES
 ======================== */
-.experiences-wrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 40px 24px;
-  box-sizing: border-box;
-  justify-content: center;
-}
-
-/* RTL adjustments for experiences */
-html.rtl .experiences-wrap {
-  padding: 40px 24px;
-}
-
 .category {
   margin-bottom: 56px;
   flex: 1;
@@ -624,10 +599,6 @@ html.rtl .details {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .experiences-wrap {
-    padding: 20px 12px;
-    justify-content: flex-start;
-  }
   .category {
     margin-bottom: 40px;
   }
@@ -654,30 +625,10 @@ html.rtl .details {
     padding: 12px 14px;
   }
 }
-@media (max-width: 480px) {
-  .experiences-wrap {
-    padding: 16px 8px;
-  }
-}
 
 /* ========================
    SKILLS
 ======================== */
-.skills-wrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 40px 24px;
-  box-sizing: border-box;
-  justify-content: center;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* RTL adjustments for skills */
-html.rtl .skills-wrap {
-  font-family: 'Noto Sans Arabic', 'Poppins', sans-serif;
-}
 
 .group-title {
   font-size: 1.4rem;
@@ -685,6 +636,7 @@ html.rtl .skills-wrap {
   color: var(--text);
   text-align: center;
 }
+
 
 .skills-scroll {
   flex: 1;
@@ -828,10 +780,6 @@ html.rtl .skills-scroll {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .skills-wrap {
-    padding: 20px 12px;
-    justify-content: flex-start;
-  }
   .skills-scroll {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 12px;
