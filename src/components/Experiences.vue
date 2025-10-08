@@ -1,5 +1,5 @@
 <template>
-  <div class="experiences-wrap">
+  <div class="wrapper">
     <h2 class="title">{{ $t("experiences.title") }}</h2>
 
     <PageLayout :columns="1" :rows="categories.length">

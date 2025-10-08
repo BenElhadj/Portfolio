@@ -1,5 +1,5 @@
 <template>
-  <div class="skills-wrap">
+  <div class="wrapper">
     <h2 class="title">{{ $t("skills.title") }}</h2>
 
     <PageLayout :columns="2" :rows="2">
@@ -85,12 +85,16 @@ const skillGroups = [
   {
     title: "skills.groups.frontend",
     skills: [
-      { key: "vue", logo: "vue.svg", years: 3, link: "https://github.com/BenElhadj" },
+      { key: "vue", logo: "vue.svg", years: 3 },
+      { key: "quasar", logo: "quasar.svg", years: 1 },
+      { key: "vuetify", logo: "veutify.svg", years: 1 },
+      { key: "vite", logo: "vite.svg", years: 2 },
       { key: "html", logo: "html5.svg", years: 5 },
       { key: "svelte", logo: "svelte.svg", years: 1 },
       { key: "css", logo: "css3.svg", years: 5 },
-      { key: "javascript", logo: "javascript.svg", years: 6, link: "https://keakr.com" },
-      { key: "reactnative", logo: "react.svg", years: 3 }
+      { key: "javascript", logo: "javascript.svg", years: 6 },
+      { key: "reactnative", logo: "react.svg", years: 3 },
+      { key: "flutter", logo: "flutter.svg", years: 1 },
     ]
   },
   {
@@ -100,6 +104,8 @@ const skillGroups = [
       { key: "node", logo: "nodejs.svg", years: 2 },
       { key: "python", logo: "python.svg", years: 3 },
       { key: "java", logo: "java.svg", years: 2 },
+      { key: "dart", logo: "dart.svg", years: 1 },
+      { key: "firebase", logo: "firebase.svg", years: 1 },
       { key: "arangodb", logo: "arangodb.svg", years: 1 },
       { key: "mysql", logo: "mysql.svg", years: 4 },
       { key: "mongodb", logo: "mongodb.svg", years: 2 }
@@ -109,8 +115,12 @@ const skillGroups = [
     title: "skills.groups.devops",
     skills: [
       { key: "git", logo: "git.svg", years: 6 },
+      { key: "github", logo: "git-hub.svg", years: 6 },
+      { key: "gitlab", logo: "git-lab.svg", years: 3 },
       { key: "docker", logo: "docker.svg", years: 2 },
       { key: "jenkins", logo: "jenkins.svg", years: 1 },
+      { key: "argocd", logo: "argo-cd.svg", years: 1 },
+      { key: "postman", logo: "postman.svg", years: 3 },
       { key: "ad", logo: "ad.svg", years: 2 },
       { key: "powershell", logo: "powershell.svg", years: 3 },
       { key: "cisco", logo: "cisco.svg", years: 2 },
@@ -120,6 +130,7 @@ const skillGroups = [
   {
     title: "skills.groups.tools",
     skills: [
+      { key: "androidstudio", logo: "android-studio.svg", years: 2 },
       { key: "c", logo: "c.svg", years: 2 },
       { key: "cpp", logo: "cpp.svg", years: 2 },
       { key: "csharp", logo: "sharp.svg", years: 2 },
