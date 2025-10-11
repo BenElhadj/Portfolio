@@ -23,14 +23,14 @@
       <Skills />
     </section>
 
-    <!-- Page 5 : Soft skills -->
+    <!-- Page 5 : Projets -->
+    <section class="page">
+      <Projects />
+    </section>
+    
+    <!-- Page 6 : Soft skills -->
     <section class="page">
       {{ $t("softSkills.title") }}
-    </section>
-
-    <!-- Page 6 : Projets -->
-    <section class="page">
-      {{ $t("projects.title") }}
     </section>
 
     <!-- Page 7 : Liens utiles -->
@@ -46,6 +46,7 @@ import Timeline from "./components/Timeline.vue";
 import Diplomas from "./components/Diplomas.vue";
 import Experiences from "./components/Experiences.vue";
 import Skills from "./components/Skills.vue";
+import Projects from "./components/Projects.vue";
 
 import { usePageNavigation } from "./composables/usePageNavigation.js";
 usePageNavigation(".pages");

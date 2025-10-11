@@ -50,8 +50,8 @@ const navKeys = [
   "navbar.diplomas",
   "navbar.experiences",
   "navbar.skills",
-  "navbar.softSkills",
   "navbar.projects",
+  "navbar.softSkills",
   "navbar.links"
 ];
 

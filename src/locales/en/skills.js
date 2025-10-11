@@ -51,5 +51,20 @@ export default {
       windows: { name: "Windows", level: "Mastery", info: "Primary OS for IT maintenance." },
       linux: { name: "Linux", level: "Advanced", info: "Used for servers and development." },
       virtualbox: { name: "VirtualBox", level: "Advanced", info: "System testing and virtual environments." },
+
+
+      
+      github: { name: "GitHub", level: "Mastery", info: "Used daily (GitHub, GitLab)."},
+      gitlab: { name: "GitLab", level: "Mastery", info: "Used daily (GitHub, GitLab)."},
+      argocd: { name: "ArgoCD", level: "Mastery", info: "Used a few times for deployment management."},
+      postman: { name: "Postman", level: "Mastery", info: "Used for testing APIs."},
+      androidstudio: { name: "Android Studio", level: "Advanced", info: "Used for Android application development."},
+      dart: { name: "Dart", level: "Advanced", info: "Used for Flutter application development."},
+      quasar: { name: "Quasar", level: "Mastery", info: "Used for Vue.js projects with Quasar Framework."},
+      vuetify: { name: "Vuetify", level: "Mastery", info: "Used for Vue.js projects with Vuetify."},
+      vite: { name: "Vite", level: "Mastery", info: "Used as a bundler in several Vue.js projects."},
+      flutter: { name: "Flutter", level: "Intermediate", info: "Used for cross-platform mobile application development."},
+      firebase: { name: "Firebase", level: "Intermediate", info: "Used for projects with authentication and real-time database."},
+
     },
 };

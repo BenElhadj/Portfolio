@@ -963,3 +963,60 @@ html.rtl .lang-switcher {
     height: 16px;
   }
 }
+
+
+
+
+
+
+
+
+
+/* ========================
+   PROJECTS — VERSION PLEIN ÉCRAN VERTICALE
+======================== */
+
+
+/* Miniature (plus grande, centrée) */
+.preview {
+  display: block;
+  width: 450px; /* Taille fixe pour la miniature */
+  height: 280px;
+  border-radius: 10px;
+  /* overflow: hidden; */
+  /* box-shadow: 0 4px 12px rgba(138, 0, 0, 0.5); */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 0 auto; /* Centrer la miniature */
+}
+.preview:hover {
+  transform: scale(1.05);
+  /* box-shadow: 0 8px 16px rgba(2, 119, 80, 0.2); */
+}
+.iframe {
+  margin: 15px auto;
+  display: block;
+  border-radius: 8px;
+  width: 1920px; /* Taille standard d'une page web */
+  height: 1200px;
+  border: 10px solid var(--border);
+  pointer-events: none; /* Désactive les interactions avec l'iframe */
+  transform: scale(0.234); /* Réduit pour tenir dans 300x200px (300/1280 ≈ 0.234) */
+  transform-origin: top left;
+}
+.preview:hover .iframe {
+  transform: scale(0.245); /* Léger zoom au survol */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .preview {
+    width: 200px; /* Plus petit sur mobile */
+    height: 133px;
+  }
+  .iframe {
+    transform: scale(0.156); /* Ajusté pour 200/1280 ≈ 0.156 */
+  }
+  .preview:hover .iframe {
+    transform: scale(0.165);
+  }
+}
