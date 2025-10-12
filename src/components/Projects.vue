@@ -1,44 +1,49 @@
-```vue
 <template>
   <div class="wrapper">
     <h2 class="title">{{ $t("projects.title") }}</h2>
 
-    <PageLayout :itemCount="projects.length">
-      <template
-        v-for="(project, index) in projects"
-        :key="index"
-        v-slot:[`slot${index+1}`]
-      >
-        <div class="card experience-card">
-          <!-- Nom du projet -->
-          <h3 class="h3" style="text-align: center;">{{ project.name }}</h3>
+    <PageLayout :columns="1" :rows="1">
+      <template v-slot:slot1>
+        <div class="category">
+          <div class="category-header">
+            <h3>{{ $t("projects.webApps") }}</h3>
+            <span class="years">{{ projects.length }} {{ $t("projects.countLabel") }}</span>
+          </div>
 
-          <!-- Miniature du site (cliquable) -->
-          <a
-            :href="project.link"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="preview"
-          >
-            <iframe
-              :src="project.link"
-              class="iframe"
-              loading="lazy"
-              title="aperçu du projet"
-            ></iframe>
-          </a>
+          <!-- Grille des projets -->
+          <div class="grid projects-grid">
+            <div
+              v-for="(project, index) in projects"
+              :key="index"
+              class="card line-card"
+            >
+              <!-- Nom du projet -->
+              <div class="company">{{ project.name }}</div>
 
-          <!-- Description & infos -->
-          <div class="info">
-            <p class="details">{{ project.description }}</p>
-            <p class="details">
-              <strong>{{ $t("projects.labels.stack") }} :</strong>
-              {{ project.stack }}
-            </p>
-            <p class="details">
-              <strong>{{ $t("projects.labels.year") }} :</strong>
-              {{ project.year }}
-            </p>
+              <!-- Miniature (cliquable) -->
+              <a
+                :href="project.link"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="preview-link"
+              >
+                <div class="iframe-container">
+                  <iframe
+                    :src="project.link"
+                    :title="$t('projects.labels.visit') + ' - ' + project.name"
+                    loading="lazy"
+                    class="project-iframe"
+                  ></iframe>
+                </div>
+              </a>
+
+              <!-- Détails -->
+              <ul class="details">
+                <li>{{ project.description }}</li>
+                <li><strong>{{ $t("projects.labels.stack") }} :</strong> {{ project.stack }}</li>
+                <li><strong>{{ $t("projects.labels.year") }} :</strong> {{ project.year }}</li>
+              </ul>
+            </div>
           </div>
         </div>
       </template>
@@ -47,25 +52,15 @@
 </template>
 
 <script setup>
-import PageLayout from "../assets/PageLayout.vue"; // Ajuste le chemin si nécessaire
+import PageLayout from "../assets/PageLayout.vue";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-/* Liste de projets */
-const projects = [
-  {
-    name: "Conception AI",
-    year: "2025",
-    description:
-      "Application d’intelligence artificielle permettant la conception d’interfaces et d’agents interactifs via des modèles d’IA générative.",
-    stack: "Vue.js, Python, FastAPI, Docker",
-    link: "https://conception-ai.vercel.app/"
-  },
-  {
-    name: "Portfolio personnel",
-    year: "2025",
-    description:
-      "Portfolio professionnel présentant mes projets, mes compétences et mon parcours, déployé avec Render.",
-    stack: "Vue.js, Node.js, Docker, Render",
-    link: "https://ben-elhadj-hamdi-portfolio.onrender.com/"
-  }
-];
+const { tm } = useI18n();
+
+// Récupère les projets depuis les fichiers de traduction
+const projects = computed(() => {
+  const list = tm("projects.list");
+  return Array.isArray(list) ? list : [];
+});
 </script>

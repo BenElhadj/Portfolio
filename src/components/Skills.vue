@@ -2,19 +2,19 @@
   <div class="wrapper">
     <h2 class="title">{{ $t("skills.title") }}</h2>
 
-    <PageLayout :columns="2" :rows="2">
+    <PageLayout :columns="2" :rows="2" >
       <template
         v-for="(group, gIndex) in skillGroups"
         :key="gIndex"
         v-slot:[`slot${gIndex+1}`]
       >
-        <div class="group">
+        <div class="category">
           <h3 class="group-title">{{ $t(group.title) }}</h3>
-          <div class="skills-scroll">
+          <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));">
             <div
               v-for="(skill, i) in group.skills"
               :key="i"
-              class="card skill-card"
+              class="card small-card"
               v-observe-visibility="(isVisible) => onVisible(isVisible, skill.key)"
               :class="{ visible: visibleSkills.includes(skill.key) }"
               @click="openPopup(skill)"
@@ -118,13 +118,13 @@ const skillGroups = [
       { key: "github", logo: "git-hub.svg", years: 6 },
       { key: "gitlab", logo: "git-lab.svg", years: 3 },
       { key: "docker", logo: "docker.svg", years: 2 },
-      { key: "jenkins", logo: "jenkins.svg", years: 1 },
-      { key: "argocd", logo: "argo-cd.svg", years: 1 },
       { key: "postman", logo: "postman.svg", years: 3 },
       { key: "ad", logo: "ad.svg", years: 2 },
       { key: "powershell", logo: "powershell.svg", years: 3 },
       { key: "cisco", logo: "cisco.svg", years: 2 },
-      { key: "bash", logo: "bash.svg", years: 2 }
+      { key: "bash", logo: "bash.svg", years: 2 },
+      { key: "argocd", logo: "argo-cd.svg", years: 1 },
+      { key: "jenkins", logo: "jenkins.svg", years: 1 },
     ]
   },
   {

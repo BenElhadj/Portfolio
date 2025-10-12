@@ -38,7 +38,7 @@
                     />
                   </div>
 
-                  <div class="card diploma-card experience-card">
+                  <div class="card line-card">
                     <div class="meta">
                       <span class="year">{{ d.period }}</span>
                       <span class="institution">{{ d.institution }}</span>
