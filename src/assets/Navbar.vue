@@ -9,7 +9,7 @@
     <!-- Navigation Pages -->
     <ul class="nav-links" role="menubar">
       <li
-        v-for="(key, i) in navKeysOrdered"
+        v-for="(key, i) in navKeys"
         :key="key"
         role="menuitem"
         tabindex="0"
@@ -55,13 +55,6 @@ const navKeys = [
   "navbar.links"
 ];
 
-/* 🟢 Liste des liens selon la langue */
-const navKeysOrdered = computed(() => {
-  if (locale.value === "ar") {
-    return [...navKeys].reverse(); // copie inversée
-  }
-  return navKeys; // normal pour fr/en
-});
 
 /* libellés fallback */
 const fallback = {
