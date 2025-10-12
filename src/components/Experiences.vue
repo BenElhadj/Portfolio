@@ -2,7 +2,7 @@
   <div class="wrapper">
     <h2 class="title">{{ $t("experiences.title") }}</h2>
 
-    <PageLayout :columns="1" :rows="categories.length">
+    <PageLayout :columns="1" :rows="categories.length" :gap="24">
       <template
         v-for="(cat, gIndex) in categories"
         :key="gIndex" 
@@ -18,7 +18,7 @@
             <div
               v-for="(exp, i) in cat.experiences"
               :key="i"
-              class="card experience-card"
+              class="card line-card"
             >
               <div class="dates">{{ exp.dates }}</div>
               <div class="company">{{ exp.company }}</div>
