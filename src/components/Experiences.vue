@@ -21,7 +21,19 @@
               class="card line-card"
             >
               <div class="dates">{{ exp.dates }}</div>
-              <div class="company">{{ exp.company }}</div>
+              <!-- Nom de société cliquable -->
+              <div class="company">
+                <a 
+                  v-if="exp.website" 
+                  :href="exp.website" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="company-link"
+                >
+                  {{ exp.company }}
+                </a>
+                <span v-else>{{ exp.company }}</span>
+              </div>
               <div class="role">{{ exp.role }}</div>
               <ul class="details">
                 <li v-for="(d, j) in exp.details" :key="j">{{ d }}</li>

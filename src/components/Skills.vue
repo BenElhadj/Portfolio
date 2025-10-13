@@ -19,7 +19,7 @@
               :class="{ visible: visibleSkills.includes(skill.key) }"
               @click="openPopup(skill)"
             >
-              <img :src="`/logos/${skill.logo}`" :alt="$t(`skills.items.${skill.key}.name`)" class="logo" />
+              <img :src="`/logos/skills/${skill.logo}`" :alt="$t(`skills.items.${skill.key}.name`)" class="logo" />
               <div class="info">
                 <div class="name">{{ $t(`skills.items.${skill.key}.name`) }}</div>
                 <div class="bar">

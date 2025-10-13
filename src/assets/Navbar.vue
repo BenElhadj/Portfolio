@@ -24,9 +24,9 @@
 
     <!-- Sélecteur de langues -->
     <div class="lang-switcher">
-      <img src="/flags/fr.svg" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" />
-      <img src="/flags/en.svg" alt="EN" :class="{ active: locale === 'en' }" @click="changeLang('en')" />
-      <img src="/flags/ar.svg" alt="AR" :class="{ active: locale === 'ar' }" @click="changeLang('ar')" />
+      <img src="/logos/flags/fr.svg" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" />
+      <img src="/logos/flags/en.svg" alt="EN" :class="{ active: locale === 'en' }" @click="changeLang('en')" />
+      <img src="/logos/flags/ar.svg" alt="AR" :class="{ active: locale === 'ar' }" @click="changeLang('ar')" />
     </div>
   </div>
 </template>
