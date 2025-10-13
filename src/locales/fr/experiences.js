@@ -3,220 +3,230 @@ export default {
     yearsLabel: "années d'expérience",
     list: [
         {
-        title: "Développement",
-        years: 4,
-        experiences: [
-            {
-            dates: "juillet 2024 - Present",
-            company: "Indépendant",
-            role: "Développeur IA/ML",
-            details: [
-                "Projets IA : classification d'images/données, détection d'anomalies",
-                "Réseaux neuronaux, NLP, apprentissage supervisé et non supervisé",
-                "Techs : Python, NumPy, Pandas, Scikit-learn, TensorFlow, OpenCV"
+            title: "Développement",
+            years: 4,
+            experiences: [
+                {
+                    dates: "avril 2024 - Présent",
+                    company: "Indépendant",
+                    role: "Développeur IA/ML",
+                    details: [
+                        "Réalisation de projets IA : classification de données et d'images, détection d'anomalies",
+                        "Modélisation de réseaux de neurones et traitement de données à grande échelle",
+                        "Méthodologies : apprentissage supervisé/non supervisé, régression, NLP",
+                        "Projets : DSLR, ft_linear_regression, multilayer-perceptron, total-perspective-vortex",
+                        "Technologies : Python, NumPy, Pandas, Scikit-learn, TensorFlow, OpenCV"
+                    ]
+                },
+                {
+                    dates: "octobre 2022 - octobre 2023",
+                    company: "KEAKR",
+                    role: "Développeur Full-Stack Web/Mobile",
+                    details: [
+                        "Maintenance et amélioration de l'application et du site web KEAKR",
+                        "Intervention sur CI/CD, Back-End et Front-End",
+                        "Conception et développement d'une plateforme Web 3 spécialisée NFT",
+                        "Technologies : CQRS, C#, ArangoDB, AQL, Vue.js, Jenkins, Git, méthode agile"
+                    ]
+                },
+                {
+                    dates: "juin 2021 - juillet 2022",
+                    company: "MULTISERV PLUS",
+                    role: "Développement web full-stack",
+                    details: [
+                        "Conception et développement d'une application web complète pour société de formation",
+                        "Architecture modulaire et API REST pour gestion des données",
+                        "Interface responsive en HTML, CSS et JavaScript",
+                        "Gestion des inscriptions, sessions et évaluations des apprenants",
+                        "Technologies : Java, MySQL, HTML, CSS, JavaScript, Git, méthode Agile"
+                    ]
+                },
+                {
+                    dates: "octobre 2019 - septembre 2020",
+                    company: "Institut du Cerveau et de la Moelle Epinière (ICM)",
+                    role: "Développeur applications mobiles",
+                    details: [
+                        "Conception et développement de l'application CONNECT pour patients AVC",
+                        "Solution collaborative dédiée à la prise en charge des patients",
+                        "Projet issu du 1er prix Hackathon (42, CHU Brest, Pitié-Salpêtrière, ICM)"
+                    ]
+                },
+                {
+                    dates: "janvier 2019 - juillet 2019",
+                    company: "MULTISERV PLUS",
+                    role: "Stagiaire Développeur",
+                    details: [
+                        "Développement et maintenance d'un site web de vente en ligne de films",
+                        "Back-End : fonctionnalités Java pour gestion utilisateurs, commandes et catalogue",
+                        "Front-End : amélioration interface utilisateur avec HTML, CSS, JavaScript",
+                        "Méthodologie Agile avec suivi régulier des tâches et revues de code"
+                    ]
+                },
+                {
+                    dates: "octobre 2021 - décembre 2021",
+                    company: "GRETA METEHOR Paris",
+                    role: "Formation Développeur Android",
+                    details: [
+                        "Formation intensive au développement d'applications Android"
+                    ]
+                }
             ]
-            },
-            {
-            dates: "avril 2022 - avril 2023",
-            company: "KEAKR",
-            role: "Développeur Full Stack",
-            details: [
-                "Maintenance et amélioration de l'appli & site web (Vue.js, C#)",
-                "Mise en place CI/CD avec Jenkins",
-                "Contribution à une plateforme Web3 (NFTs)"
-            ]
-            },
-            {
-            dates: "octobre 2019 - septembre 2020",
-            company: "Institut du Cerveau et de la Moelle Epinière (ICM)",
-            role: "Développeur d'applications mobiles",
-            details: [
-                "Conception et développement de l'application CONNECT (patients AVC)",
-                "Collaboration avec CHU Brest, Pitié-Salpêtrière et école 42"
-            ]
-            },
-            {
-            dates: "janvier 2019 - juillet 2019",
-            company: "Multiserv Plus",
-            role: "Stagiaire Développeur Web",
-            details: [
-                "Création d'un site e-commerce de films",
-                "Travail sur base de données et interface utilisateur"
-            ]
-            }
-        ]
         },
         {
-        title: "Technicien & Maintenance IT",
-        years: 9,
-        experiences: [
-            {
-            dates: "novembre 2020 - juin 2021",
-            company: "AP-HP (Hôpital Charles-Foix)",
-            role: "Technicien de proximité",
-            details: ["Gestion de parc informatique", "Maintenance système et réseau"]
-            },
-            {
-            dates: "octobre 2020 - décembre 2020",
-            company: "LVMH Fragrance Brands",
-            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
-            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
-            },
-            {
-            dates: "septembre 2020 - octobre 2020",
-            company: "DIM",
-            role: "Technicien VIP (HELPLINE)",
-            details: ["Support VIP", "Masterisation des postes et smartphones"]
-            },
-            {
-            dates: "septembre 2019 - octobre 2019",
-            company: "DIM",
-            role: "Technicien VIP (HELPLINE)",
-            details: ["Support VIP", "Masterisation des postes et smartphones"]
-            },
-            {
-            dates: "juillet 2019 - août 2019",
-            company: "LVMH Fragrance Brands",
-            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
-            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
-            },
-            {
-            dates: "février 2019 - avril 2019",
-            company: "LVMH Fragrance Brands",
-            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
-            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
-            },
-            {
-            dates: "décembre 2018 - janvier 2019",
-            company: "ATOUTEK - Usine de Reconditionnement Informatique",
-            role: "Technicien de maintenance informatique KIATOO",
-            details: ["Maintenance software + hardware"]
-            },
-            {
-            dates: "novembre 2018 - décembre 2018",
-            company: "LVMH Fragrance Brands",
-            role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
-            details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention"]
-            },
-            {
-            dates: "juillet 2018 - août 2018",
-            company: "CHANEL",
-            role: "Technicien de proximité VIP (HELPLINE)",
-            details: ["Gestion des plannings d'intervention", "Support VIP", "Masterisation des postes"]
-            },
-            {
-            dates: "juillet 2017 - janvier 2018",
-            company: "Parkeon",
-            role: "Technicien en itinérant",
-            details: [
-                "Maintenance de borne télé-billettique",
-                "Réseaux, électronique, mécanique"
+            title: "Technicien & Maintenance IT",
+            years: 11,
+            experiences: [
+                {
+                    dates: "novembre 2020 - juin 2021",
+                    company: "AP-HP (Hôpital Charles-Foix)",
+                    role: "Technicien de proximité",
+                    details: ["Gestion de parc informatique", "Traitement des demandes d'intervention", "Maintenance système et réseau"]
+                },
+                {
+                    dates: "octobre 2020 - novembre 2020",
+                    company: "LVMH Fragrance Brands",
+                    role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+                    details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
+                },
+                {
+                    dates: "septembre 2020 - octobre 2020",
+                    company: "DIM",
+                    role: "Technicien VIP (HELPLINE)",
+                    details: ["Technicien de proximité VIP", "Masterisation des postes", "Enrôlement smartphones"]
+                },
+                {
+                    dates: "septembre 2019 - octobre 2019",
+                    company: "DIM",
+                    role: "Technicien VIP (HELPLINE)",
+                    details: ["Technicien de proximité VIP", "Masterisation des postes", "Enrôlement smartphones"]
+                },
+                {
+                    dates: "juillet 2019 - août 2019",
+                    company: "LVMH Fragrance Brands",
+                    role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+                    details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
+                },
+                {
+                    dates: "février 2019 - avril 2019",
+                    company: "LVMH Fragrance Brands",
+                    role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+                    details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
+                },
+                {
+                    dates: "décembre 2018 - janvier 2019",
+                    company: "ATOUTEK - Usine de Reconditionnement Informatique",
+                    role: "Technicien de maintenance informatique KIATOO",
+                    details: ["Maintenance software + hardware"]
+                },
+                {
+                    dates: "novembre 2018 - décembre 2018",
+                    company: "LVMH Fragrance Brands",
+                    role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
+                    details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
+                },
+                {
+                    dates: "juillet 2018 - août 2018",
+                    company: "CHANEL",
+                    role: "Technicien de proximité VIP (HELPLINE)",
+                    details: ["Gestion des plannings d'intervention", "Technicien de proximité VIP", "Masterisation des postes"]
+                },
+                {
+                    dates: "juillet 2017 - janvier 2018",
+                    company: "Parkeon",
+                    role: "Technicien en itinérant",
+                    details: [
+                        "Maintenance informatique, réseaux, électronique, pneumatique et mécanique",
+                        "Borne télé-billettique - maintenance curative et préventive"
+                    ]
+                },
+                {
+                    dates: "juillet 2016 - septembre 2016",
+                    company: "Solutions30 France",
+                    role: "Technicien de maintenance informatique (HELP 1FO)",
+                    details: ["SAV itinérant", "Maintenance software + hardware"]
+                },
+                {
+                    dates: "janvier 2016 - mai 2016",
+                    company: "MSS Fnac",
+                    role: "Technicien informatique",
+                    details: ["SAV", "Maintenance software + hardware"]
+                },
+                {
+                    dates: "février 2015 - mai 2015",
+                    company: "EUROPEAN TRADE LA FORCE DE VENTE",
+                    role: "Commercial terrain",
+                    details: ["Commercialisation des contrats GDF"]
+                },
+                {
+                    dates: "janvier 2010 - août 2014",
+                    company: "Global Info",
+                    role: "Propriétaire gérant",
+                    details: [
+                        "Vente et SAV de matériel informatique",
+                        "Montage d'ordinateurs, vente et réparation software + hardware",
+                        "Installation d'imprimantes, photocopieurs, fax, scanners"
+                    ]
+                },
+                {
+                    dates: "août 2008 - novembre 2009",
+                    company: "Salle d'internet et jeux en réseaux",
+                    role: "Associé gérant",
+                    details: [
+                        "Service informatique vente et SAV",
+                        "Traitement de texte, tirage, photocopie",
+                        "Montage d'ordinateurs, vente, réparation software + hardware"
+                    ]
+                },
+                {
+                    dates: "février 2013 - avril 2013",
+                    company: "STIE",
+                    role: "Technicien supérieur en maintenance informatique (Stagiaire)",
+                    details: [
+                        "Assemblage et réparation d'ordinateurs",
+                        "Diagnostic et intervention sur carte mère, disque dur, écran, processeur"
+                    ]
+                },
+                {
+                    dates: "avril 2012 - juin 2012",
+                    company: "TRANSTU TGM",
+                    role: "Technicien supérieur en maintenance industrielle (Stagiaire)",
+                    details: [
+                        "Entretien de métro type Citadis Alstom et Hanovre Siemens",
+                        "Maintenance des portes électriques, pneumatiques et tableaux de bord"
+                    ]
+                },
+                {
+                    dates: "septembre 2011 - novembre 2011",
+                    company: "Retronix Tunisie",
+                    role: "Technicien supérieur en maintenance électronique (Stagiaire)",
+                    details: [
+                        "Réparation de modems, ordinateurs, décodeurs",
+                        "Démontage et montage de composants électroniques et processeurs"
+                    ]
+                },
+                {
+                    dates: "décembre 2007 - février 2008",
+                    company: "Sagemcom",
+                    role: "Technicien en fabrication électronique (Stagiaire)",
+                    details: [
+                        "Suivi du cycle de production électronique",
+                        "Test des cartes fabriquées, dépannage des cartes défectueuses",
+                        "Contrôle qualité"
+                    ]
+                },
+                {
+                    dates: "juin 2007 - juillet 2007",
+                    company: "Microlux-Dimatec",
+                    role: "Stagiaire montage et maintenance d'ordinateur",
+                    details: ["Montage et maintenance d'ordinateur"]
+                },
+                {
+                    dates: "janvier 2007 - février 2007",
+                    company: "TEKNE-TUNISIE",
+                    role: "Stagiaire monteur de câbles électriques",
+                    details: ["Montage des câbles électriques de voiture"]
+                }
             ]
-            },
-            {
-            dates: "juillet 2016 - septembre 2016",
-            company: "Solutions30 France",
-            role: "Technicien de maintenance informatique (HELP 1FO)",
-            details: [
-                "Maintenance software + hardware",
-                "Support client sur site"
-            ]
-            },
-            {
-            dates: "janvier 2016 - mai 2016",
-            company: "MSS Fnac",
-            role: "Technicien informatique",
-            details: [
-                "Maintenance software + hardware",
-                "Support client"
-            ]
-            },
-            {
-            dates: "février 2015 - mai 2015",
-            company: "EUROPEAN TRADE LA FORCE DE VENTE",
-            role: "Commercial terrain",
-            details: ["Commercialisation des contrats GDF"]
-            },
-            {
-            dates: "avril 2012 - août 2014",
-            company: "Global Info",
-            role: "Propriétaire gérant",
-            details: [
-                "Montage et réparation d'ordinateurs",
-                "Vente et SAV",
-                "Installation d'imprimantes, scanners, photocopieurs"
-            ]
-            },
-            {
-            dates: "février 2013 - avril 2013",
-            company: "STIE",
-            role: "Technicien supérieur en maintenance informatique (Stagiaire)",
-            details: [
-                "Assemblage et réparation d'ordinateurs",
-                "Diagnostic et intervention sur carte mère, disque dur, écran, processeur"
-            ]
-            },
-            {
-            dates: "avril 2012 - juin 2012",
-            company: "TRANSTU TGM",
-            role: "Technicien supérieur en maintenance industrielle (Stagiaire)",
-            details: [
-                "Entretien de métro type Citadis Alstom et Hanovre Siemens",
-                "Diagnostic et maintenance des portes électriques, pneumatiques et tableau de bord"
-            ]
-            },
-            {
-            dates: "septembre 2011 - novembre 2011",
-            company: "Retronix Tunisie",
-            role: "Technicien supérieur en maintenance électronique (Stagiaire)",
-            details: [
-                "Réparation de modems, ordinateurs, décodeurs",
-                "Démontage et montage des composants électroniques et processeurs"
-            ]
-            },
-            {
-            dates: "janvier 2010 - mai 2011",
-            company: "Global Info",
-            role: "Propriétaire gérant",
-            details: [
-                "Montage et réparation d'ordinateurs",
-                "Vente et SAV",
-                "Installation d'imprimantes, scanners, photocopieurs"
-            ]
-            },
-            {
-            dates: "août 2008 - novembre 2009",
-            company: "Salle d'internet et jeux en réseaux",
-            role: "Associé gérant",
-            details: [
-                "Montage d'ordinateurs, vente, réparation",
-                "Services de traitement de texte, tirage, photocopie",
-                "Installation d'imprimantes, scanners"
-            ]
-            },
-            {
-            dates: "décembre 2007 - février 2008",
-            company: "Sagemcom",
-            role: "Technicien en fabrication électronique (Stagiaire)",
-            details: [
-                "Suivi d'un cycle de production électronique",
-                "Test des cartes fabriquées",
-                "Dépannage des cartes défectueuses et contrôle qualité"
-            ]
-            },
-            {
-            dates: "juin 2007 - juillet 2007",
-            company: "Microlux-Dimatec",
-            role: "Montage et maintenance d'ordinateur (Stagiaire)",
-            details: ["Montage et maintenance d'ordinateur"]
-            },
-            {
-            dates: "janvier 2007 - février 2007",
-            company: "TEKNE-TUNISIE",
-            role: "Monteur de câbles électriques de voiture (Stagiaire)",
-            details: ["Montage des câbles électriques de voiture"]
-            }
-        ]
         }
     ]
 };
