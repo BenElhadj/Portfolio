@@ -33,7 +33,7 @@
                   >
                     <img
                       v-if="d.image"
-                      :src="`/degrees/${d.image}`"
+                      :src="`/public/logos/degrees/${d.image}`"
                       :alt="d.degree"
                     />
                   </div>
@@ -88,7 +88,7 @@ const popupImage = ref("");
 
 function openPopup(d) {
   popupTitle.value = d.degree;
-  popupImage.value = d.image ? `/degrees/${d.image}` : "";
+  popupImage.value = d.image ? `/public/logos/degrees/${d.image}` : "";
   popupVisible.value = true;
 }
 

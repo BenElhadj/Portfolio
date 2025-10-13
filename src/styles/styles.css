@@ -219,7 +219,13 @@ a:hover { text-decoration: underline; }
 
 .close-btn {
   float: right;
+  background: none;
+  cursor: pointer;
+  border: none;
 }
+
+.close-btn:hover { transform: scale(1.3); }
+.close-btn:active { transform: scale(0.9); }
 
 .popup-body {
   font-size: var(--fs-body);
