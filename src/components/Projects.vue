@@ -24,14 +24,20 @@
               <a
                 :href="project.link"
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 class="preview-link"
+                :aria-label="$t('projects.labels.visit') + ' - ' + project.name"
               >
                 <div class="iframe-container">
                   <iframe
                     :src="project.link"
                     :title="$t('projects.labels.visit') + ' - ' + project.name"
+                    :name="'project-iframe-' + index"
+                    :id="'project-frame-' + index"
+                    sandbox="allow-scripts allow-same-origin"
                     loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    autocomplete="off"
                     class="project-iframe"
                   ></iframe>
                 </div>
