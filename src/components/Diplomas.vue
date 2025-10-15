@@ -35,7 +35,7 @@
                       v-if="d.image"
                       :src="`/logos/degrees/${d.image}`" :alt="d.degree"
                     /> -->
-                    <img v-if="d.image" :src="`/degrees/${d.image}`" :alt="d.degree" />
+                    <img v-if="d.image" :src="getAssetPath(`./degrees/${d.image}`)" :alt="d.degree" />
                   </div>
 
                   <div class="card line-card">
@@ -69,6 +69,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import PageLayout from "../assets/PageLayout.vue";
 import Popup from "./Popup.vue";
+import { getAssetPath } from "../utils/assets.js";
 
 const { tm } = useI18n();
 
@@ -88,7 +89,7 @@ const popupImage = ref("");
 
 function openPopup(d) {
   popupTitle.value = d.degree;
-  popupImage.value = d.image ? `/degrees/${d.image}` : "";
+  popupImage.value = d.image ? getAssetPath(`./degrees/${d.image}`) : "";
   // popupImage.value = d.image ? `/public/logos/degrees/${d.image}` : "";
   popupVisible.value = true;
 }

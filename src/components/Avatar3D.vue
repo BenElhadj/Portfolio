@@ -6,6 +6,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { getAssetPath } from "../utils/assets.js";
 
 const canvas = ref(null);
 
@@ -60,7 +61,8 @@ onMounted(() => {
   });
   renderer.setPixelRatio(window.devicePixelRatio || 1);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.outputEncoding = THREE.sRGBEncoding;
+  // renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   // lights
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1);
@@ -71,7 +73,7 @@ onMounted(() => {
 
   // loader
   const loader = new GLTFLoader();
-  loader.load("/models/avatar.glb", (gltf) => {
+  loader.load(getAssetPath("/models/avatar.glb"), (gltf) => {
     avatar = gltf.scene;
     avatar.traverse((obj) => {
       if (obj.isBone) bones[obj.name] = obj;

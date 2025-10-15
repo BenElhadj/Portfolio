@@ -19,7 +19,7 @@
               :class="{ visible: visibleSkills.includes(skill.key) }"
               @click="openPopup(skill)"
             >
-              <img :src="`/logos/skills/${skill.logo}`" :alt="$t(`skills.items.${skill.key}.name`)" class="logo" />
+              <img :src="getAssetPath(`/logos/skills/${skill.logo}`)" :alt="$t(`skills.items.${skill.key}.name`)" class="logo" />
               <div class="info">
                 <div class="name">{{ $t(`skills.items.${skill.key}.name`) }}</div>
                 <div class="bar">
@@ -59,6 +59,7 @@
 import { ref } from "vue";
 import PageLayout from "../assets/PageLayout.vue";
 import Popup from "./Popup.vue";
+import { getAssetPath } from "../utils/assets.js";
 
 /* Animation visibilité */
 const visibleSkills = ref([]);
