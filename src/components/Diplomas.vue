@@ -35,7 +35,7 @@
                       v-if="d.image"
                       :src="`/logos/degrees/${d.image}`" :alt="d.degree"
                     /> -->
-                    <img v-if="d.image" :src="getAssetPath(`./degrees/${d.image}`)" :alt="d.degree" />
+                    <img v-if="d.image" :src="getAssetPath(`/degrees/${d.image}`)" :alt="d.degree" />
                   </div>
 
                   <div class="card line-card">
@@ -89,8 +89,7 @@ const popupImage = ref("");
 
 function openPopup(d) {
   popupTitle.value = d.degree;
-  popupImage.value = d.image ? getAssetPath(`./degrees/${d.image}`) : "";
-  // popupImage.value = d.image ? `/public/logos/degrees/${d.image}` : "";
+  popupImage.value = d.image ? getAssetPath(`/degrees/${d.image}`) : "";
   popupVisible.value = true;
 }
 
