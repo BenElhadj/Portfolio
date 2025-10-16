@@ -14,14 +14,14 @@ export default {
       year: "2025",
       description: "AI application for designing interfaces and interactive agents using generative models.",
       stack: "Vue.js, Python, FastAPI, Docker",
-      link: "https://conception-ai.vercel.app/"
+      link: "https://benelhadj.github.io/Conception-AI/"
     },
     {
       name: "Personal Portfolio",
       year: "2025",
       description: "Professional portfolio showcasing my projects, skills, and career path, deployed with Render.",
       stack: "Vue.js, Node.js, Docker, Render",
-      link: "https://ben-elhadj-hamdi-portfolio.onrender.com/"
+      link: "https://benelhadj.github.io/Portfolio/"
     }
   ]
 };
