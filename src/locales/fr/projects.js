@@ -14,14 +14,14 @@ export default {
       year: "2025",
       description: "Application d'intelligence artificielle permettant la conception d'interfaces et d'agents interactifs via des modèles d'IA générative.",
       stack: "Vue.js, Python, FastAPI, Docker",
-      link: "https://conception-ai.vercel.app/"
+      link: "https://benelhadj.github.io/Conception-AI/"
     },
     {
       name: "Portfolio personnel",
       year: "2025",
       description: "Portfolio professionnel présentant mes projets, mes compétences et mon parcours, déployé avec Render.",
       stack: "Vue.js, Node.js, Docker, Render",
-      link: "https://ben-elhadj-hamdi-portfolio.onrender.com/"
+      link: "https://benelhadj.github.io/Portfolio/"
     }
   ]
 };

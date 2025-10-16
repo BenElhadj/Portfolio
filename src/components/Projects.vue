@@ -32,13 +32,11 @@
                   <iframe
                     :src="project.link"
                     :title="$t('projects.labels.visit') + ' - ' + project.name"
-                    :name="'project-iframe-' + index"
-                    :id="'project-frame-' + index"
-                    sandbox="allow-scripts allow-same-origin"
                     loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    autocomplete="off"
                     class="project-iframe"
+                    sandbox="allow-scripts allow-same-origin"
+                    allow="autoplay; encrypted-media"
+                    referrerpolicy="no-referrer"
                   ></iframe>
                 </div>
               </a>
