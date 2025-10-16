@@ -34,7 +34,6 @@
                     :title="$t('projects.labels.visit') + ' - ' + project.name"
                     loading="lazy"
                     class="project-iframe"
-                    sandbox="allow-scripts allow-same-origin"
                     allow="autoplay; encrypted-media"
                     referrerpolicy="no-referrer"
                   ></iframe>
