@@ -22,6 +22,14 @@ export default {
       description: "Professional portfolio showcasing my projects, skills, and career path, deployed with Render.",
       stack: "Vue.js, Node.js, Docker, Render",
       link: "https://benelhadj.github.io/Portfolio/"
-    }
+    },
+    {
+      name: "Learn2Slither",
+      year: "2025",
+      description:
+        "An interactive educational game inspired by Snake, designed to help users learn coding basics while having fun.",
+      stack: "Svelte, Vite, GitHub Pages",
+      link: "https://benelhadj.github.io/Learn2Slither/",
+    },
   ]
 };

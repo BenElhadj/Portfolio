@@ -22,6 +22,14 @@ export default {
       description: "ملف شخصي احترافي يعرض مشاريعي ومهاراتي ومساري المهني، تم نشره باستخدام Render.",
       stack: "Vue.js, Node.js, Docker, Render",
       link: "https://benelhadj.github.io/Portfolio/"
-    }
+    },
+    {
+      name: "Learn2Slither",
+      year: "2025",
+      description:
+        "لعبة تعليمية تفاعلية مستوحاة من لعبة Snake الشهيرة، صممت لتعليم أساسيات البرمجة بطريقة ممتعة.",
+      stack: "Svelte, Vite, GitHub Pages",
+      link: "https://benelhadj.github.io/Learn2Slither/",
+    },
   ]
 };
