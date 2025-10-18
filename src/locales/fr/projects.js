@@ -31,5 +31,19 @@ export default {
       stack: "Svelte, Vite, GitHub Pages",
       link: "https://benelhadj.github.io/Learn2Slither/",
     },
+        {
+      name: "Matcha (Frontend)",
+      year: "2025",
+      description: "Application web de réseau social et de rencontre inspirée de Tinder, avec gestion des profils, matching et chat en temps réel.",
+      stack: "Vue.js, Vite, Docker, GitHub Pages",
+      link: "https://benelhadj.github.io/Matcha"
+    },
+    {
+      name: "Matcha (Backend)",
+      year: "2025",
+      description: "API backend du projet Matcha, gérant l’authentification, la base de données, la logique métier et la communication avec le front-end.",
+      stack: "Node.js, Express, PostgreSQL, Docker, Render",
+      link: "https://matcha-backend-t6dr.onrender.com/"
+    },
   ]
 };

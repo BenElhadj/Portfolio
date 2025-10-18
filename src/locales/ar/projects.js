@@ -31,5 +31,19 @@ export default {
       stack: "Svelte, Vite, GitHub Pages",
       link: "https://benelhadj.github.io/Learn2Slither/",
     },
+    {
+      name: "Matcha (الواجهة الأمامية)",
+      year: "2025",
+      description: "تطبيق ويب اجتماعي وتطبيق مواعدة مستوحى من Tinder، مع إدارة الملفات الشخصية والمحادثات الفورية.",
+      stack: "Vue.js، Vite، Docker، GitHub Pages",
+      link: "https://benelhadj.github.io/Matcha"
+    },
+    {
+      name: "Matcha (الواجهة الخلفية)",
+      year: "2025",
+      description: "واجهة برمجة التطبيقات الخلفية لمشروع Matcha، تدير المصادقة وقاعدة البيانات والمنطق التجاري والتواصل مع الواجهة الأمامية.",
+      stack: "Node.js، Express، PostgreSQL، Docker، Render",
+      link: "https://matcha-backend-t6dr.onrender.com/"
+    },
   ]
 };
