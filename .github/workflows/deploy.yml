@@ -5,27 +5,60 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+  name: Deploy to GitHub Pages
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        # cache: 'npm'  # disabled because no lock file (package-lock.json / yarn.lock) is present in the repo
+  on:
+    push:
+      branches: [ main ]
 
-    - name: Install dependencies
-      run: npm install
+  jobs:
+    build-and-deploy:
+      runs-on: ubuntu-latest
 
-    - name: Build
-      run: npm run build
+      # ✅ Ajoutez ces permissions au job
+      permissions:
+        pages: write
+        id-token: write
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
+      steps:
+        - name: Cache node modules
+          uses: actions/cache@v3
+          with:
+            path: node_modules
+            key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+            restore-keys: |
+              ${{ runner.os }}-node-
+        - name: Checkout repository
+          uses: actions/checkout@v3
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: Build project
+          run: |
+            npm run build
+            cp dist/index.html dist/404.html || true
+            touch dist/.nojekyll
+
+        - name: Verify build output
+          run: |
+            if [ ! -f dist/index.html ]; then
+              echo "Build failed: index.html not found in dist."
+              exit 1
+            fi
+
+        - name: Setup Pages
+          uses: actions/configure-pages@v3
+
+        - name: Upload artifact
+          uses: actions/upload-pages-artifact@v3
+          with:
+            path: dist
+
+        - name: Deploy to GitHub Pages
+          uses: actions/deploy-pages@v4
