@@ -33,6 +33,7 @@ let walkClip = null;
 let clock;
 let rafId;
 let lastTime = 0;
+let baseAvatarYaw = 0; // stored after avatar load to keep rotations relative to initial facing
 
 // State for smoother body/head turning
 let prevMouseNDC = new THREE.Vector2(0, 0);
@@ -45,6 +46,12 @@ const HEAD_RESPONSIVENESS = 0.28; // slerp factor for head/neck
 const EYE_RESPONSIVENESS = 0.32;
 const MAX_HEAD_YAW = 0.7;
 const MAX_HEAD_PITCH = 0.6;
+const TURN_EXPONENT = 2.0; // exponent for turn falloff near center: higher -> more centered dead-zone effect
+// Head smoothing state
+let prevHeadYaw = 0;
+let prevHeadPitch = 0;
+const HEAD_LEAD_GAIN = 0.18; // anticipation factor from mouse velocity
+const HEAD_WALK_REDUCTION = 0.6; // reduce head responsiveness while walking
 
 // === Variables pour l'animation de marche ===
 let walkTime = 0;
@@ -221,6 +228,8 @@ onMounted(() => {
   const loader = new GLTFLoader();
   loader.load(getAssetPath("/models/avatar.glb"), (gltf) => {
     avatar = gltf.scene;
+  // remember base yaw so we rotate relative to initial facing (avoid turning back to camera)
+  baseAvatarYaw = avatar.rotation.y || 0;
     
     // Enregistrer la pose de référence (bind) de chaque os
     avatar.traverse((obj) => {
@@ -608,35 +617,34 @@ function animate() {
   mouseVelocity.y = (mouseNDC.y - prevMouseNDC.y) * invDt;
   prevMouseNDC.copy(mouseNDC);
 
-  if (raycaster.ray.intersectPlane(screenPlane, hit)) {
-    const to = new THREE.Vector3(hit.x - aPos.x, 0, hit.z - aPos.z);
-    if (to.lengthSq() > 1e-6) {
-      const desiredYaw = Math.atan2(to.x, to.z);
+  // Map horizontal mouse position to a desired body yaw with asymmetric thresholds:
+  // mouseNormalized in [0,1] where 0 = far left, 0.5 = center, 1 = far right.
+  // We want: <=0.25 => full left (-1), 0.25..0.5 => interpolate -1..0, 0.5..0.75 => interpolate 0..+1, >=0.75 => full right (+1).
+  // This is achieved by factor = clamp(4*mouseNorm - 2, -1, 1)
+  const mouseNorm = (clamp(mouseNDC.x, -1, 1) + 1) * 0.5;
+  let factor = clamp(4 * mouseNorm - 2, -1, 1);
 
-      // angular difference relative to current body yaw
-      const currentYaw = avatar.rotation.y;
-      const diff = wrapPi(desiredYaw - currentYaw);
+  // Keep a small responsiveness adaptation similar to before
+  const currentYaw = avatar.rotation.y;
+  const angNorm = clamp(Math.abs(factor), 0, 1);
+  const baseAlpha = lerp(MAX_BODY_ALPHA, MIN_BODY_ALPHA, angNorm);
+  const bodyAlpha = baseAlpha * (isWalking ? 0.6 : 1.0);
+  const speedBias = clamp(Math.abs(mouseVelocity.x) * 0.5, 0, 0.5);
+  const alphaFinal = clamp(bodyAlpha + speedBias * dt * 10, MIN_BODY_ALPHA, MAX_BODY_ALPHA + 0.15);
 
-      // responsiveness adapts: when small angle -> faster, large angle -> slower (more human)
-      const angNorm = clamp(Math.abs(diff) / (Math.PI / 2), 0, 1);
-      const baseAlpha = lerp(MAX_BODY_ALPHA, MIN_BODY_ALPHA, angNorm);
-      // reduce body responsiveness while walking for stability
-      const bodyAlpha = baseAlpha * (isWalking ? 0.6 : 1.0);
-      // bias speed up a bit if mouse is moving fast
-      const speedBias = clamp(Math.abs(mouseVelocity.x) * 0.5, 0, 0.5);
-      const alphaFinal = clamp(bodyAlpha + speedBias * dt * 10, MIN_BODY_ALPHA, MAX_BODY_ALPHA + 0.15);
+  // maximum yaw delta (how far the body can turn from forward)
+  const MAX_TURN_DELTA = Math.PI / 1.5; // 90° profile
 
-      // Apply partial yaw to the body; rest will be handled by spine/head for natural counter-rotation
-      const bodyYawTarget = currentYaw + diff * TORSO_FOLLOW;
-      avatar.rotation.y = lerpAngle(currentYaw, bodyYawTarget, alphaFinal);
+  // target yaw relative to avatar's initial forward (avoid turning the back to the camera)
+  const baseYaw = typeof baseAvatarYaw === 'number' ? baseAvatarYaw : 0;
+  const bodyYawTarget = baseYaw + factor * MAX_TURN_DELTA * TORSO_FOLLOW;
+  avatar.rotation.y = lerpAngle(currentYaw, bodyYawTarget, alphaFinal);
 
-      // Apply remaining yaw as twist on the spine so torso counter-rotates slightly
-      const Spine = bones["Spine"];
-      if (Spine) {
-        const spineYaw = diff * (1 - TORSO_FOLLOW) * 0.9; // little amplification for visible effect
-        applyBoneOffsetAxis(Spine, 'Y', clamp(spineYaw, -0.6, 0.6), 0.12);
-      }
-    }
+  // apply remaining twist to the spine for natural counter-rotation
+  const Spine = bones["Spine"];
+  if (Spine) {
+    const spineYaw = factor * MAX_TURN_DELTA * (1 - TORSO_FOLLOW) * 0.9;
+    applyBoneOffsetAxis(Spine, 'Y', clamp(spineYaw, -0.6, 0.6), 0.12);
   }
 
   // Bones pour le suivi de la tête
@@ -673,23 +681,40 @@ function animate() {
       EyeR.rotation.x = lerp(EyeR.rotation.x, clamp(pitch, -maxEyePitch, maxEyePitch), EYE_RESPONSIVENESS);
     }
 
-  // ---- Appliquer à la tête + cou (plus naturel, with inertia + clamp) ----
+  // ---- Appliquer à la tête + cou (lissage + anticipation) ----
   // Réduire l'amplitude quand on marche pour un effet plus naturel
   const headReduction = isWalking ? 0.5 : 1.0;
   const maxHeadYaw = Math.min(MAX_HEAD_YAW, 0.9 * headReduction);
   const maxHeadPitch = Math.min(MAX_HEAD_PITCH, 0.9 * headReduction);
 
   if (Neck || Head) {
-    // Use applyBoneOffset to slerp back to bind pose + offset, gives smoother and more stable result
-    const neckYaw = clamp(yaw, -maxHeadYaw, maxHeadYaw) * 0.5; // neck gets half of head yaw
-    const neckPitch = clamp(pitch, -maxHeadPitch, maxHeadPitch) * 0.6;
-    if (Neck) applyBoneOffsetAxis(Neck, 'Y', neckYaw, HEAD_RESPONSIVENESS);
-    if (Neck) applyBoneOffsetAxis(Neck, 'X', neckPitch, HEAD_RESPONSIVENESS);
+    // desired angles clamped
+    const desiredYaw = clamp(yaw, -maxHeadYaw, maxHeadYaw);
+    const desiredPitch = clamp(pitch, -maxHeadPitch, maxHeadPitch);
 
-    const headYaw = clamp(yaw, -maxHeadYaw, maxHeadYaw);
-    const headPitch = clamp(pitch, -maxHeadPitch, maxHeadPitch);
-    if (Head) applyBoneOffsetAxis(Head, 'Y', headYaw, HEAD_RESPONSIVENESS);
-    if (Head) applyBoneOffsetAxis(Head, 'X', headPitch, HEAD_RESPONSIVENESS);
+    // anticipation from horizontal mouse velocity
+    const lead = clamp(mouseVelocity.x * HEAD_LEAD_GAIN, -0.25, 0.25);
+
+    // reduce responsiveness a bit while walking to avoid jitter
+    const respFactor = HEAD_RESPONSIVENESS * (isWalking ? HEAD_WALK_REDUCTION : 1.0);
+
+    // smoothed targets (exponential smoothing via lerp)
+    const smoothedYaw = lerp(prevHeadYaw, desiredYaw + lead, respFactor);
+    const smoothedPitch = lerp(prevHeadPitch, desiredPitch, respFactor);
+
+    // neck gets a fraction of the head rotation for natural motion
+    const neckYaw = smoothedYaw * 0.45;
+    const neckPitch = smoothedPitch * 0.6;
+
+    if (Neck) applyBoneOffsetAxis(Neck, 'Y', neckYaw, respFactor);
+    if (Neck) applyBoneOffsetAxis(Neck, 'X', neckPitch, respFactor);
+
+    if (Head) applyBoneOffsetAxis(Head, 'Y', smoothedYaw, respFactor);
+    if (Head) applyBoneOffsetAxis(Head, 'X', smoothedPitch, respFactor);
+
+    // store for next frame
+    prevHeadYaw = smoothedYaw;
+    prevHeadPitch = smoothedPitch;
   }
   }
 
