@@ -53,6 +53,13 @@ let prevHeadPitch = 0;
 const HEAD_LEAD_GAIN = 0.18; // anticipation factor from mouse velocity
 const HEAD_WALK_REDUCTION = 0.6; // reduce head responsiveness while walking
 
+// Hand tuning: rapprocher les mains du torse et forcer symétrie
+const HAND_ADDUCTION_EXTRA = 0.035; // adduction additionnelle pour rapprocher les mains
+const HAND_YAW_GAIN = 0.35; // gain appliqué du swing au yaw de la main
+const HAND_PITCH_GAIN = 0.18; // gain appliqué du swing au pitch de la main
+const MAX_HAND_YAW = 0.6;
+const MAX_HAND_PITCH = 0.5;
+
 // === Variables pour l'animation de marche ===
 let walkTime = 0;
 let isWalking = false;
@@ -206,7 +213,9 @@ onMounted(() => {
     0.1,
     1000
   );
-  camera.position.set(0, 1.6, 7.2);
+  // Ajuster la caméra pour que l'avatar agrandi tienne entièrement dans le cadre
+  // Reculer davantage (z plus grand) et relever légèrement la caméra pour inclure les pieds
+  camera.position.set(0, 1.6, 13.0);
 
   renderer = new THREE.WebGLRenderer({
     canvas: canvas.value,
@@ -307,7 +316,8 @@ onMounted(() => {
     }
   // Pas de calibration spécifique pour les mains: elles héritent de l'axe du coude si nécessaire
 
-    avatar.scale.set(1.2, 1.2, 1.2);
+  // Increase avatar size slightly more (keep camera position unchanged)
+  avatar.scale.set(3.2, 3.2, 3.2);
     scene.add(avatar);
 
     if (gltf.animations?.length) {
@@ -499,14 +509,48 @@ function updateWalkAnimation(dt, speed, direction) {
   if (Math.abs(tinyZR) > 1e-4) applyBoneOffset(RightArm, 0, 0, tinyZR, 0.25);
 
   // Avant-bras: petite composante de swing + flexion de coude
-  applyBoneOffsetAxis(LeftForeArm, lElbAxis, (leftApplied * GAIT.forearmSwingGain) - leftElbowBend, 0.25);
-  applyBoneOffsetAxis(RightForeArm, rElbAxis, (rightApplied * GAIT.forearmSwingGain) - rightElbowBend, 0.25);
+  if (LeftForeArm) {
+    // calculer l'angle dans l'espace calibré du coude (tenir compte du pitchSign)
+    let leftForeArmAngle = (leftApplied * GAIT.forearmSwingGain) - (lElbSign * leftElbowBend);
+    // éviter l'hyper-extension : clamp strict
+    leftForeArmAngle = clamp(leftForeArmAngle, -GAIT.maxElbowBend, GAIT.maxElbowBend);
+    applyBoneOffsetAxis(LeftForeArm, lElbAxis, leftForeArmAngle, 0.25);
+  }
+  if (RightForeArm) {
+    let rightForeArmAngle = (rightApplied * GAIT.forearmSwingGain) - (rElbSign * rightElbowBend);
+    rightForeArmAngle = clamp(rightForeArmAngle, -GAIT.maxElbowBend, GAIT.maxElbowBend);
+    applyBoneOffsetAxis(RightForeArm, rElbAxis, rightForeArmAngle, 0.25);
+  }
 
-  // Mains: pas de mouvement demandé -> ne pas appliquer de swing aux mains
+  // ---- Mains : appliquer une rotation symétrique et une adduction pour les rapprocher du torse
+  const LeftHand = bones["LeftHand"];
+  const RightHand = bones["RightHand"];
 
-  // Rapprocher les bras du torse (légère adduction/roulis)
-  if (LeftArm) applyBoneOffset(LeftArm, 0, 0, -GAIT.armAdductionRoll, 0.2);
-  if (RightArm) applyBoneOffset(RightArm, 0, 0, GAIT.armAdductionRoll, 0.2);
+  // main yaw/pitch basés sur l'angle appliqué au bras (leftApplied/rightApplied)
+  // on inverse légèrement le yaw pour que la paume tende vers le bas/avant
+  const handYawL = clamp(-leftApplied * HAND_YAW_GAIN, -MAX_HAND_YAW, MAX_HAND_YAW);
+  const handYawR = clamp(-rightApplied * HAND_YAW_GAIN, -MAX_HAND_YAW, MAX_HAND_YAW);
+  const handPitchL = clamp(leftApplied * HAND_PITCH_GAIN, -MAX_HAND_PITCH, MAX_HAND_PITCH);
+  const handPitchR = clamp(rightApplied * HAND_PITCH_GAIN, -MAX_HAND_PITCH, MAX_HAND_PITCH);
+
+  // Appliquer rotations lissées sur les mains (axes calibrés hérités si présents)
+  if (LeftHand) {
+    // pitch
+    applyBoneOffsetAxis(LeftHand, lHandAxis, handPitchL, 0.25);
+    // yaw (Y axis)
+    applyBoneOffsetAxis(LeftHand, 'Y', handYawL, 0.25);
+    // rapprocher du torse (adduction supplémentaire)
+    applyBoneOffset(LeftHand, 0, 0, -(GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA), 0.22);
+  }
+  if (RightHand) {
+    applyBoneOffsetAxis(RightHand, rHandAxis, handPitchR, 0.25);
+    applyBoneOffsetAxis(RightHand, 'Y', handYawR, 0.25);
+    applyBoneOffset(RightHand, 0, 0, (GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA), 0.22);
+  }
+
+  // Rapprocher les bras du torse (légère adduction/roulis) en complément
+  if (LeftArm) applyBoneOffset(LeftArm, 0, 0, -(GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA * 0.6), 0.22);
+  if (RightArm) applyBoneOffset(RightArm, 0, 0, (GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA * 0.6), 0.22);
 
   // === Rotation du torse ===
   if (Spine) {
