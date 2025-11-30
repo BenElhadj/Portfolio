@@ -21,6 +21,7 @@ export default {
                 {
                     dates: "octobre 2022 - octobre 2023",
                     company: "KEAKR",
+                    logo: "KEAKR.png",
                     role: "Développeur Full-Stack Web/Mobile",
                     details: [
                         "Maintenance et amélioration de l'application et du site web KEAKR",
@@ -32,6 +33,7 @@ export default {
                 {
                     dates: "juin 2021 - juillet 2022",
                     company: "MULTISERV PLUS",
+                    logo: "MULTISERV_PLUS.png",
                     role: "Développement web full-stack",
                     details: [
                         "Conception et développement d'une application web complète pour société de formation",
@@ -44,6 +46,7 @@ export default {
                 {
                     dates: "octobre 2019 - septembre 2020",
                     company: "Institut du Cerveau et de la Moelle Epinière (ICM)",
+                    logo: "Institut_du_Cerveau_et_de_la_Moelle_Epinière_ICM.png",
                     role: "Développeur applications mobiles",
                     details: [
                         "Conception et développement de l'application CONNECT pour patients AVC",
@@ -54,6 +57,7 @@ export default {
                 {
                     dates: "janvier 2019 - juillet 2019",
                     company: "MULTISERV PLUS",
+                    logo: "MULTISERV_PLUS.png",
                     role: "Stagiaire Développeur",
                     details: [
                         "Développement et maintenance d'un site web de vente en ligne de films",
@@ -79,24 +83,28 @@ export default {
                 {
                     dates: "novembre 2020 - juin 2021",
                     company: "AP-HP (Hôpital Charles-Foix)",
+                    logo: "AP-HP.png",
                     role: "Technicien de proximité",
                     details: ["Gestion de parc informatique", "Traitement des demandes d'intervention", "Maintenance système et réseau"]
                 },
                 {
                     dates: "octobre 2020 - novembre 2020",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
                 },
                 {
                     dates: "septembre 2020 - octobre 2020",
                     company: "DIM",
+                    logo: "Dim.png",
                     role: "Technicien VIP (HELPLINE)",
                     details: ["Technicien de proximité VIP", "Masterisation des postes", "Enrôlement smartphones"]
                 },
                 {
                     dates: "septembre 2019 - octobre 2019",
                     company: "DIM",
+                    logo: "Dim.png",
                     role: "Technicien VIP (HELPLINE)",
                     details: ["Technicien de proximité VIP", "Masterisation des postes", "Enrôlement smartphones"]
                 },
@@ -115,6 +123,7 @@ export default {
                 {
                     dates: "décembre 2018 - janvier 2019",
                     company: "ATOUTEK - Usine de Reconditionnement Informatique",
+                    logo: "ATOUTEK.png",
                     role: "Technicien de maintenance informatique KIATOO",
                     details: ["Maintenance software + hardware"]
                 },
@@ -127,12 +136,14 @@ export default {
                 {
                     dates: "juillet 2018 - août 2018",
                     company: "CHANEL",
+                    logo: "chanel.png",
                     role: "Technicien de proximité VIP (HELPLINE)",
                     details: ["Gestion des plannings d'intervention", "Technicien de proximité VIP", "Masterisation des postes"]
                 },
                 {
                     dates: "juillet 2017 - janvier 2018",
                     company: "Parkeon",
+                    logo: "Parkeon.png",
                     role: "Technicien en itinérant",
                     details: [
                         "Maintenance informatique, réseaux, électronique, pneumatique et mécanique",
@@ -142,24 +153,28 @@ export default {
                 {
                     dates: "juillet 2016 - septembre 2016",
                     company: "Solutions30 France",
+                    logo: "solutions-30.png",
                     role: "Technicien de maintenance informatique (HELP 1FO)",
                     details: ["SAV itinérant", "Maintenance software + hardware"]
                 },
                 {
                     dates: "janvier 2016 - mai 2016",
                     company: "MSS Fnac",
+                    logo: "MSS_Fnac.png",
                     role: "Technicien informatique",
                     details: ["SAV", "Maintenance software + hardware"]
                 },
                 {
                     dates: "février 2015 - mai 2015",
                     company: "EUROPEAN TRADE LA FORCE DE VENTE",
+                    logo: "EUROPEAN_TRADE_LA_FORCE_DE_VENTE.png",
                     role: "Commercial terrain",
                     details: ["Commercialisation des contrats GDF"]
                 },
                 {
                     dates: "janvier 2010 - août 2014",
                     company: "Global Info",
+                    logo: "Global_Info.png",
                     role: "Propriétaire gérant",
                     details: [
                         "Vente et SAV de matériel informatique",
@@ -170,6 +185,7 @@ export default {
                 {
                     dates: "août 2008 - novembre 2009",
                     company: "Salle d'internet et jeux en réseaux",
+                    // pas de logo
                     role: "Associé gérant",
                     details: [
                         "Service informatique vente et SAV",
@@ -180,6 +196,7 @@ export default {
                 {
                     dates: "février 2013 - avril 2013",
                     company: "STIE",
+                    logo: "STIE.png",
                     role: "Technicien supérieur en maintenance informatique (Stagiaire)",
                     details: [
                         "Assemblage et réparation d'ordinateurs",
@@ -189,6 +206,7 @@ export default {
                 {
                     dates: "avril 2012 - juin 2012",
                     company: "TRANSTU TGM",
+                    logo: "TRANSTU.png",
                     role: "Technicien supérieur en maintenance industrielle (Stagiaire)",
                     details: [
                         "Entretien de métro type Citadis Alstom et Hanovre Siemens",
@@ -198,6 +216,7 @@ export default {
                 {
                     dates: "septembre 2011 - novembre 2011",
                     company: "Retronix Tunisie",
+                    logo: "Retronix.png",
                     role: "Technicien supérieur en maintenance électronique (Stagiaire)",
                     details: [
                         "Réparation de modems, ordinateurs, décodeurs",
@@ -207,6 +226,7 @@ export default {
                 {
                     dates: "décembre 2007 - février 2008",
                     company: "Sagemcom",
+                    logo: "Sagem.png",
                     role: "Technicien en fabrication électronique (Stagiaire)",
                     details: [
                         "Suivi du cycle de production électronique",
@@ -217,12 +237,14 @@ export default {
                 {
                     dates: "juin 2007 - juillet 2007",
                     company: "Microlux-Dimatec",
+                    logo: "Microlux.png",
                     role: "Stagiaire montage et maintenance d'ordinateur",
                     details: ["Montage et maintenance d'ordinateur"]
                 },
                 {
                     dates: "janvier 2007 - février 2007",
                     company: "TEKNE-TUNISIE",
+                    logo: "TEKNE-TUNISIE.png",
                     role: "Stagiaire monteur de câbles électriques",
                     details: ["Montage des câbles électriques de voiture"]
                 }

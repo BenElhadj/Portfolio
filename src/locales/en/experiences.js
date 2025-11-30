@@ -21,6 +21,7 @@ export default {
                 {
                     dates: "October 2022 - October 2023",
                     company: "KEAKR",
+                    logo: "KEAKR.png",
                     role: "Full-Stack Web/Mobile Developer",
                     details: [
                         "Maintenance and improvement of KEAKR application and website",
@@ -32,6 +33,7 @@ export default {
                 {
                     dates: "June 2021 - July 2022",
                     company: "MULTISERV PLUS",
+                    logo: "MULTISERV_PLUS.png",
                     role: "Full-Stack Web Development",
                     details: [
                         "Design and development of a complete web application for a training company",
@@ -44,6 +46,7 @@ export default {
                 {
                     dates: "October 2019 - September 2020",
                     company: "Brain and Spine Institute (ICM)",
+                    logo: "Institut_du_Cerveau_et_de_la_Moelle_Epinière_ICM.png",
                     role: "Mobile Application Developer",
                     details: [
                         "Design and development of CONNECT application for stroke patients",
@@ -54,6 +57,7 @@ export default {
                 {
                     dates: "January 2019 - July 2019",
                     company: "MULTISERV PLUS",
+                    logo: "MULTISERV_PLUS.png",
                     role: "Developer Intern",
                     details: [
                         "Development and maintenance of an online movie sales website",
@@ -79,60 +83,70 @@ export default {
                 {
                     dates: "November 2020 - June 2021",
                     company: "AP-HP (Charles-Foix Hospital)",
+                    logo: "AP-HP.png",
                     role: "On-site Technician",
                     details: ["IT asset management", "Processing intervention requests", "System and network maintenance"]
                 },
                 {
                     dates: "October 2020 - November 2020",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
                 },
                 {
                     dates: "September 2020 - October 2020",
                     company: "DIM",
+                    logo: "Dim.png",
                     role: "VIP Technician (HELPLINE)",
                     details: ["VIP on-site technician", "Workstation imaging", "Smartphone enrollment"]
                 },
                 {
                     dates: "September 2019 - October 2019",
                     company: "DIM",
+                    logo: "Dim.png",
                     role: "VIP Technician (HELPLINE)",
                     details: ["VIP on-site technician", "Workstation imaging", "Smartphone enrollment"]
                 },
                 {
                     dates: "July 2019 - August 2019",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
                 },
                 {
                     dates: "February 2019 - April 2019",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
                 },
                 {
                     dates: "December 2018 - January 2019",
                     company: "ATOUTEK - IT Refurbishment Factory",
+                    logo: "ATOUTEK.png",
                     role: "IT Maintenance Technician (KIATOO)",
                     details: ["Software and hardware maintenance"]
                 },
                 {
                     dates: "November 2018 - December 2018",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
                 },
                 {
                     dates: "July 2018 - August 2018",
                     company: "CHANEL",
+                    logo: "chanel.png",
                     role: "VIP On-site Technician (HELPLINE)",
                     details: ["Intervention scheduling management", "VIP on-site technician", "Workstation imaging"]
                 },
                 {
                     dates: "July 2017 - January 2018",
                     company: "Parkeon",
+                    logo: "Parkeon.png",
                     role: "Field Technician",
                     details: [
                         "IT, network, electronic, pneumatic and mechanical maintenance",
@@ -142,24 +156,28 @@ export default {
                 {
                     dates: "July 2016 - September 2016",
                     company: "Solutions30 France",
+                    logo: "solutions-30.png",
                     role: "IT Maintenance Technician (HELP 1FO)",
                     details: ["Mobile customer service", "Software and hardware maintenance"]
                 },
                 {
                     dates: "January 2016 - May 2016",
                     company: "MSS Fnac",
+                    logo: "MSS_Fnac.png",
                     role: "IT Technician",
                     details: ["Customer service", "Software and hardware maintenance"]
                 },
                 {
                     dates: "February 2015 - May 2015",
                     company: "EUROPEAN TRADE LA FORCE DE VENTE",
+                    logo: "EUROPEAN_TRADE_LA_FORCE_DE_VENTE.png",
                     role: "Field Salesman",
                     details: ["GDF contract marketing"]
                 },
                 {
                     dates: "January 2010 - August 2014",
                     company: "Global Info",
+                    logo: "Global_Info.png",
                     role: "Owner Manager",
                     details: [
                         "IT equipment sales and after-sales service",
@@ -170,6 +188,7 @@ export default {
                 {
                     dates: "August 2008 - November 2009",
                     company: "Internet and Network Gaming Center",
+                    // no logo available
                     role: "Associate Manager",
                     details: [
                         "IT service sales and after-sales",
@@ -180,6 +199,7 @@ export default {
                 {
                     dates: "February 2013 - April 2013",
                     company: "STIE",
+                    logo: "STIE.png",
                     role: "IT Maintenance Technician Intern",
                     details: [
                         "Computer assembly and repair",
@@ -189,6 +209,7 @@ export default {
                 {
                     dates: "April 2012 - June 2012",
                     company: "TRANSTU TGM",
+                    logo: "TRANSTU.png",
                     role: "Industrial Maintenance Technician Intern",
                     details: [
                         "Maintenance of Citadis Alstom and Siemens Hannover metro",
@@ -198,6 +219,7 @@ export default {
                 {
                     dates: "September 2011 - November 2011",
                     company: "Retronix Tunisia",
+                    logo: "Retronix.png",
                     role: "Electronics Maintenance Technician Intern",
                     details: [
                         "Repair of modems, computers, decoders",
@@ -207,6 +229,7 @@ export default {
                 {
                     dates: "December 2007 - February 2008",
                     company: "Sagemcom",
+                    logo: "Sagem.png",
                     role: "Electronics Manufacturing Technician Intern",
                     details: [
                         "Followed electronic production cycle",
@@ -217,12 +240,14 @@ export default {
                 {
                     dates: "June 2007 - July 2007",
                     company: "Microlux-Dimatec",
+                    logo: "Microlux.png",
                     role: "Computer Assembly & Maintenance Intern",
                     details: ["Computer assembly and maintenance"]
                 },
                 {
                     dates: "January 2007 - February 2007",
                     company: "TEKNE-TUNISIA",
+                    logo: "TEKNE-TUNISIE.png",
                     role: "Car Electrical Cable Assembler Intern",
                     details: ["Car electrical cable assembly"]
                 }
