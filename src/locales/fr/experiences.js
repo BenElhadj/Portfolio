@@ -46,7 +46,7 @@ export default {
                 {
                     dates: "octobre 2019 - septembre 2020",
                     company: "Institut du Cerveau et de la Moelle Epinière (ICM)",
-                    logo: "Institut_du_Cerveau_et_de_la_Moelle_Epinière_ICM.png",
+                    logo: "ICM.png",
                     role: "Développeur applications mobiles",
                     details: [
                         "Conception et développement de l'application CONNECT pour patients AVC",
@@ -69,6 +69,7 @@ export default {
                 {
                     dates: "octobre 2021 - décembre 2021",
                     company: "GRETA METEHOR Paris",
+                    logo: "GRETA.png",
                     role: "Formation Développeur Android",
                     details: [
                         "Formation intensive au développement d'applications Android"

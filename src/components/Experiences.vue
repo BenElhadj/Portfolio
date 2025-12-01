@@ -62,9 +62,9 @@
                   title="Voir sur LinkedIn"
                 >
                   <!-- simple inline LinkedIn SVG icon -->
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <!-- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M4.98 3.5C4.98 4.88 3.86 6 2.48 6C1.1 6 0 4.88 0 3.5C0 2.12 1.12 1 2.5 1C3.88 1 4.98 2.12 4.98 3.5ZM0.5 8.99H4.5V24H0.5V8.99ZM8.5 8.99H12.17V10.56H12.23C12.84 9.51 14.22 8.4 16.32 8.4C20.5 8.4 22 10.64 22 14.62V24H18V15.56C18 13.52 17.54 11.9 15.34 11.9C13.14 11.9 12.69 13.4 12.69 15.36V24H8.5V8.99Z" fill="#0A66C2"/>
-                  </svg>
+                  </svg> -->
                 </a>
               </div>
               <div class="role">{{ exp.role }}</div>
@@ -98,29 +98,31 @@ const slugify = (s) => {
     .replace(/^_+|_+$/g, "");
 };
 
-// Construct a probable logo path. Prioritize exp.logo if provided, else try a normalized png under /Logos_png/
+// Construct a probable logo path. Prioritize exp.logo if provided, else try a normalized png under /experiences/
 const logoPath = (exp) => {
   // Use Vite base so paths work both locally and when deployed under a subpath (GitHub Pages)
   const base = import.meta.env.BASE_URL || './';
   if (!exp) return null;
-  if (exp.logo) return `${base}Logos_png/${exp.logo}`;
+  if (exp.logo) return `${base}experiences/${exp.logo}`;
   const slug = slugify(exp.company || "");
   if (!slug) return null;
-  // Try to resolve using a known index to handle case/format differences (built from public/Logos_png)
-  if (LOGO_INDEX[slug]) return `${base}Logos_png/${LOGO_INDEX[slug]}`;
+  // Try to resolve using a known index to handle case/format differences (built from public/experiences)
+  if (LOGO_INDEX[slug]) return `${base}experiences/${LOGO_INDEX[slug]}`;
   // fallback to a generic lowercase png name
-  return `${base}Logos_png/${slug}.png`;
+  return `${base}experiences/${slug}.png`;
 };
 
-// Known logo filenames found in public/Logos_png. This handles case/underscore/hyphen variants
-// Key = normalized slug (lowercase, underscores), value = actual filename in Logos_png
+// Known logo filenames found in public/experiences. This handles case/underscore/hyphen variants
+// Key = normalized slug (lowercase, underscores), value = actual filename in experiences
 const LOGO_INDEX = {
   "ap_hp": "AP-HP.png",
   "chanel": "chanel.png",
   "dim": "Dim.png",
   "dior": "Dior.png",
-  "european_trade": "European_trade.png",
-  "institut_du_cerveau_et_de_la_moelle_epiniere_icm": "Institut_du_Cerveau_et_de_la_Moelle_Epinière_ICM.png",
+  "european_trade": "EUROPEAN_TRADE.png",
+  "european_trade_la_force_de_vente": "EUROPEAN_TRADE.png",
+  "institut_du_cerveau_et_de_la_moelle_epiniere_icm": "ICM.png",
+  "icm": "ICM.png",
   "keakr": "KEAKR.png",
   "kiatoo": "kiatoo.png",
   "lvmh_fragrance_brands": "LVMH.png",
@@ -132,7 +134,10 @@ const LOGO_INDEX = {
   "solutions30_france": "solutions-30.png",
   "stie": "STIE.png",
   "tekne_tunisia": "Tekne.png",
-  "transtu_tgm": "Transtu.png"
+  "transtu_tgm": "Transtu.png",
+  "multiserv_plus": "MULTISERV_PLUS.png",
+  "greta": "GRETA.png",
+  "greta_metehor_paris": "GRETA.png",
 };
 
 // LinkedIn URL: use exp.linkedin if present, else fallback to a LinkedIn search for the company

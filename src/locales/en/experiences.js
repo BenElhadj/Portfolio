@@ -46,7 +46,7 @@ export default {
                 {
                     dates: "October 2019 - September 2020",
                     company: "Brain and Spine Institute (ICM)",
-                    logo: "Institut_du_Cerveau_et_de_la_Moelle_Epinière_ICM.png",
+                    logo: "ICM.png",
                     role: "Mobile Application Developer",
                     details: [
                         "Design and development of CONNECT application for stroke patients",
@@ -69,6 +69,7 @@ export default {
                 {
                     dates: "October 2021 - December 2021",
                     company: "GRETA METEHOR Paris",
+                    logo: "GRETA.png",
                     role: "Android Developer Training",
                     details: [
                         "Intensive training in Android application development"
