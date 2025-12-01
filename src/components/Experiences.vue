@@ -100,14 +100,16 @@ const slugify = (s) => {
 
 // Construct a probable logo path. Prioritize exp.logo if provided, else try a normalized png under /Logos_png/
 const logoPath = (exp) => {
+  // Use Vite base so paths work both locally and when deployed under a subpath (GitHub Pages)
+  const base = import.meta.env.BASE_URL || './';
   if (!exp) return null;
-  if (exp.logo) return `/Logos_png/${exp.logo}`;
+  if (exp.logo) return `${base}Logos_png/${exp.logo}`;
   const slug = slugify(exp.company || "");
   if (!slug) return null;
   // Try to resolve using a known index to handle case/format differences (built from public/Logos_png)
-  if (LOGO_INDEX[slug]) return `/Logos_png/${LOGO_INDEX[slug]}`;
+  if (LOGO_INDEX[slug]) return `${base}Logos_png/${LOGO_INDEX[slug]}`;
   // fallback to a generic lowercase png name
-  return `/Logos_png/${slug}.png`;
+  return `${base}Logos_png/${slug}.png`;
 };
 
 // Known logo filenames found in public/Logos_png. This handles case/underscore/hyphen variants
