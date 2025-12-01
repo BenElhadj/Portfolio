@@ -28,17 +28,24 @@
                   <!-- Remplacement du dot par l'image du diplôme -->
                   <div
                     class="degree-thumb"
-                    @click="openPopup(d)"
-                    title="Cliquez pour agrandir"
+                    role="button"
+                    tabindex="0"
+                    @click.stop.prevent="openLogo(d)"
+                    @keydown.enter.prevent="openLogo(d)"
+                    @keydown.space.prevent="openLogo(d)"
+                    :title="`Voir logo ${d.institution}`"
                   >
-                    <!-- <img
-                      v-if="d.image"
-                      :src="`/logos/degrees/${d.image}`" :alt="d.degree"
-                    /> -->
                     <img v-if="d.image" :src="getAssetPath(`/degrees/${d.image}`)" :alt="d.degree" />
                   </div>
 
-                  <div class="card line-card">
+                  <div
+                    class="card line-card"
+                    role="button"
+                    tabindex="0"
+                    @click="openPopup(d)"
+                    @keydown.enter.prevent="openPopup(d)"
+                    @keydown.space.prevent="openPopup(d)"
+                  >
                     <div class="meta">
                       <span class="year">{{ d.period }}</span>
                       <span class="institution">{{ d.institution }}</span>
@@ -88,8 +95,19 @@ const popupTitle = ref("");
 const popupImage = ref("");
 
 function openPopup(d) {
-  popupTitle.value = d.degree;
-  popupImage.value = d.image ? getAssetPath(`/degrees/${d.image}`) : "";
+  // For diplomas we show only the image (no title text) in the popup
+  popupTitle.value = "";
+  // Show the full diploma image; prefer `d.diplomaImage` (full certificate) and
+  // fall back to the small image if not provided.
+  popupImage.value = d.diplomaImage ? getAssetPath(`/degrees/${d.diplomaImage}`) : (d.image ? getAssetPath(`/degrees/${d.image}`) : "");
+  popupVisible.value = true;
+}
+
+// Open an enlarged school logo with the institution name as title
+function openLogo(d) {
+  popupTitle.value = d.institution || "";
+  // Show the school logo (from /degrees) enlarged in the popup
+  popupImage.value = d.image ? getAssetPath(`/degrees/${d.image}`) : (d.diplomaImage ? getAssetPath(`/degrees/${d.diplomaImage}`) : "");
   popupVisible.value = true;
 }
 
@@ -128,5 +146,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.card[role="button"]{cursor:pointer}
 
 </style>

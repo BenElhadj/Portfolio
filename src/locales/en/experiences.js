@@ -171,7 +171,7 @@ export default {
                 {
                     dates: "February 2015 - May 2015",
                     company: "EUROPEAN TRADE LA FORCE DE VENTE",
-                    logo: "EUROPEAN_TRADE_LA_FORCE_DE_VENTE.png",
+                    logo: "EUROPEAN_TRADE.png",
                     role: "Field Salesman",
                     details: ["GDF contract marketing"]
                 },

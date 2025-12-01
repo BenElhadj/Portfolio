@@ -168,7 +168,7 @@ export default {
                 {
                     dates: "février 2015 - mai 2015",
                     company: "EUROPEAN TRADE LA FORCE DE VENTE",
-                    logo: "EUROPEAN_TRADE_LA_FORCE_DE_VENTE.png",
+                    logo: "EUROPEAN_TRADE.png",
                     role: "Commercial terrain",
                     details: ["Commercialisation des contrats GDF"]
                 },

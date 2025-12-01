@@ -1,12 +1,12 @@
 <template>
   <div v-if="visible" class="popup-overlay" @click.self="close">
-    <div class="popup-content">
-      <button class="close-btn" @click="close">✖</button>
-      <h3 class="group-title">{{ title }}</h3>
-      <div class="popup-body">
-        <slot />
+  <div class="popup-content">
+    <button class="close-btn" @click="close" aria-label="Fermer">✖</button>
+        <h3 v-if="title" class="group-title">{{ title }}</h3>
+        <div class="popup-body">
+          <slot />
+        </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -20,3 +20,24 @@ function close() {
   emit("close");
 }
 </script>
+
+<style scoped>
+.close-btn{
+  float: right;
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  transition: transform 120ms ease;
+}
+.close-btn:hover{ transform: scale(1.08); }
+</style>
