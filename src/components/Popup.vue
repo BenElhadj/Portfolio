@@ -1,7 +1,11 @@
 <template>
   <div v-if="visible" class="popup-overlay" @click.self="close">
-  <div class="popup-content">
+  <div class="popup-content" :class="{ 'popup-large': !title }">
     <button class="close-btn" @click="close" aria-label="Fermer">✖</button>
+    <!-- centered controls slot (e.g. zoom range) -->
+    <div class="popup-controls">
+      <slot name="controls" />
+    </div>
         <h3 v-if="title" class="group-title">{{ title }}</h3>
         <div class="popup-body">
           <slot />
@@ -40,4 +44,24 @@ function close() {
   transition: transform 120ms ease;
 }
 .close-btn:hover{ transform: scale(1.08); }
+.popup-content.popup-large{
+  width: 900px;
+  max-width: 95%;
+}
+.popup-image{
+  max-width: 100%;
+  max-height: 80vh;
+  height: auto;
+}
 </style>
+
+.popup-controls{
+  position:absolute;
+  left:50%;
+  top:10px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  z-index:10;
+}
