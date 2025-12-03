@@ -64,9 +64,9 @@
     <Popup
         :visible="popupVisible"
         :title="popupTitle"
-        @close="popupVisible = false"
+        @close="handleClose"
       >
-    <template #controls>
+    <template #controls v-if="isDiplomaPopup">
       <div class="zoom-control">
         <span class="zoom-icon" aria-hidden="true" title="Zoom">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
@@ -74,45 +74,58 @@
             <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
         </span>
+        <!-- Diplôme name centered next to controls -->
         <input
-          type="range"
-          min="1"
-          max="10"
-          step="0.1"
-          v-model.number="zoomScale"
-          aria-label="Niveau de zoom"
+        type="range"
+        min="1"
+        max="10"
+        step="0.1"
+        v-model.number="zoomScale"
+        aria-label="Niveau de zoom"
         />
         <div class="zoom-value">{{ zoomScale.toFixed(1) }}×</div>
+        <br>
+        <div class="diploma-name" v-if="popupDegree" style="flex:1; text-align:center;">{{ popupDegree }}</div>
       </div>
     </template>
         <div v-if="popupLoading" class="popup-spinner">{{ $t('diplomas.loading') || 'Chargement...' }}</div>
         <div v-else-if="popupImage" class="zoom-wrapper" ref="zoomWrapper">
-                <div
-                  class="pan-wrapper"
-                  :class="{ dragging: dragging }"
-                  :style="{ transform: `translate(${panX}px, ${panY}px)` }"
-                  @pointerdown.prevent="onPointerDown"
-                  @pointermove.prevent="onPointerMove"
-                  @pointerup.prevent="onPointerUp"
-                  @pointercancel.prevent="onPointerUp"
-                  @mouseleave.prevent="onPointerUp"
-                  @wheel.prevent="onWheel"
-                  @contextmenu.prevent
-                  @copy.prevent
-                >
-                  <img
-                    ref="popupImg"
-                    :src="popupImage"
-                    class="popup-image"
-                    :style="{ transform: `scale(${zoomScale})` }"
-                    alt="diploma"
-                    draggable="false"
-                    @dragstart.prevent
-                  />
-                  <!-- watermark to discourage screenshots -->
-                  <div class="diploma-watermark">© BenElhadj</div>
-                </div>
-              </div>
+          <!-- If this is a diploma popup we enable zoom/pan and watermark -->
+          <div
+            v-if="isDiplomaPopup"
+            class="pan-wrapper"
+            :class="{ dragging: dragging }"
+            :style="{ transform: `translate(${panX}px, ${panY}px)` }"
+            @pointerdown.prevent="onPointerDown"
+            @pointermove.prevent="onPointerMove"
+            @pointerup.prevent="onPointerUp"
+            @pointercancel.prevent="onPointerUp"
+            @mouseleave.prevent="onPointerUp"
+            @wheel.prevent="onWheel"
+            @contextmenu.prevent
+            @copy.prevent
+          >
+            <img
+              ref="popupImg"
+              :src="popupImage"
+              class="popup-image"
+              :style="{ transform: `scale(${zoomScale})` }"
+              alt="diploma"
+              draggable="false"
+              @dragstart.prevent
+            />
+            <!-- watermark to discourage screenshots -->
+            <div class="diploma-watermark">© BenElhadj</div>
+          </div>
+          <!-- For logos we show a simple image without zoom/pan/watermark -->
+          <div v-else class="logo-wrapper">
+            <img
+              :src="popupImage"
+              class="popup-image"
+              alt="logo"
+            />
+          </div>
+        </div>
       </Popup>
   </div>
 </template>
@@ -140,10 +153,12 @@ const popupVisible = ref(false);
 const popupTitle = ref("");
 const popupImage = ref("");
 const popupLoading = ref(false);
+const popupDegree = ref("");
 // Map original URL -> dataURL (string) for immediate reuse
 const preloadedCache = new Map();
 const zoomWrapper = ref(null);
 const popupImg = ref(null);
+const isDiplomaPopup = ref(false);
 // continuous zoom scale (1.0 .. 10.0)
 const zoomScale = ref(1);
 // Panning state (px)
@@ -157,6 +172,9 @@ let startPanX = 0;
 let startPanY = 0;
 // Prevent common save/copy shortcuts and PrintScreen detection best-effort
 function keyDownHandler(e) {
+  // Only act when a diploma popup is active
+  if (!isDiplomaPopup.value) return;
+
   // Block Ctrl+S, Ctrl+P, Ctrl+Shift+S
   if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || (e.shiftKey && e.key === 'S'))) {
     e.preventDefault();
@@ -176,7 +194,9 @@ function keyDownHandler(e) {
 
 function openPopup(d) {
   // For diplomas we show only the image (no title text) in the popup
+  isDiplomaPopup.value = true;
   popupTitle.value = "";
+  popupDegree.value = d.degree || "";
   const image = d.diplomaImage || d.image;
   const url = image ? getAssetPath(`/degrees/${image}`) : "";
   if (!url) return;
@@ -227,7 +247,10 @@ function openPopup(d) {
 
 // Open an enlarged school logo with the institution name as title
 function openLogo(d) {
+  // logos open in a simple popup without zoom/pan/watermark
+  isDiplomaPopup.value = false;
   popupTitle.value = d.institution || "";
+  popupDegree.value = "";
   const image = d.image || d.diplomaImage;
   const url = image ? getAssetPath(`/degrees/${image}`) : "";
   if (!url) return;
@@ -272,6 +295,20 @@ function openLogo(d) {
     .finally(() => {
       popupLoading.value = false;
     });
+}
+
+function handleClose() {
+  // Reset popup state
+  popupVisible.value = false;
+  popupTitle.value = "";
+  popupImage.value = "";
+  popupLoading.value = false;
+  popupDegree.value = "";
+  isDiplomaPopup.value = false;
+  zoomScale.value = 1;
+  panX.value = 0;
+  panY.value = 0;
+  dragging.value = false;
 }
 
 function cycleZoom(e) {
@@ -487,5 +524,7 @@ onBeforeUnmount(() => {
 .zoom-value{font-weight:600;padding-left:6px}
 .zoom-icon{display:inline-flex;align-items:center;justify-content:center;color:var(--text);opacity:0.9;margin-right:6px}
 .zoom-icon svg{display:block}
+
+.diploma-name{font-weight:700;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 
 </style>
