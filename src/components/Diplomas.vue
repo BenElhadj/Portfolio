@@ -114,8 +114,12 @@
               draggable="false"
               @dragstart.prevent
             />
-            <!-- watermark to discourage screenshots -->
-            <div class="diploma-watermark">© BenElhadj</div>
+            <!-- repeating SVG watermark (data-URL) -->
+            <div
+              class="diploma-watermark"
+              v-if="watermarkDataUrl"
+              :style="watermarkStyle"
+            ></div>
           </div>
           <!-- For logos we show a simple image without zoom/pan/watermark -->
           <div v-else class="logo-wrapper">
@@ -310,6 +314,52 @@ function handleClose() {
   panY.value = 0;
   dragging.value = false;
 }
+
+// Build a repeating diagonal SVG watermark including the email and diploma name
+const watermarkDataUrl = computed(() => {
+  if (!isDiplomaPopup.value || !popupDegree.value) return "";
+  const email = 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com';
+  const diplomaName = popupDegree.value;
+  // Estimate required pixel width from longest string and desired font sizes
+  const emailFont = 16; // px
+  const dnameFont = 20; // px
+  const approxCharWidth = (fs) => fs * 0.6; // rough estimate
+  const maxLen = Math.max(email.length, diplomaName.length);
+  const estWidth = Math.ceil(maxLen * Math.max(approxCharWidth(emailFont), approxCharWidth(dnameFont)));
+  // Ensure tile is wide enough and repeat density is good
+  const tileWidth = Math.max(4800, estWidth + 1200);
+  const tileHeight = 420;
+  const step = Math.max(500, Math.floor((estWidth + 400) / 2));
+  let texts = '';
+  for (let x = 0; x < tileWidth; x += step) {
+    const ox = x + 60;
+    texts += `  <g transform='translate(${ox},0)'>\n` +
+             `    <text x='0' y='150' transform='rotate(-26 0 130)' class='email'>${email}</text>\n` +
+             `    <text x='0' y='210' transform='rotate(-26 0 190)' class='dname'>${diplomaName}</text>\n` +
+             `  </g>\n`;
+  }
+  const svg = `<?xml version='1.0' encoding='UTF-8'?>\n` +
+    `<svg xmlns='http://www.w3.org/2000/svg' width='${tileWidth}' height='${tileHeight}' viewBox='0 0 ${tileWidth} ${tileHeight}' preserveAspectRatio='xMinYMin meet'>\n` +
+    `  <style> .email{fill:rgba(0,0,0,0.18);font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:${emailFont}px;} .dname{fill:rgba(0,0,0,0.20);font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:${dnameFont}px;} </style>\n` +
+    texts +
+    `</svg>`;
+  return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+});
+
+const watermarkStyle = computed(() => {
+  if (!watermarkDataUrl.value) return {};
+  return {
+    backgroundImage: watermarkDataUrl.value,
+    backgroundRepeat: 'repeat',
+    backgroundPosition: '0 0',
+    backgroundSize: `${3600}px ${300}px`,
+    opacity: 1,
+    pointerEvents: 'none',
+    transformOrigin: 'center center',
+    // scale watermark with image so it stays aligned
+    transform: `scale(${zoomScale.value})`
+  };
+});
 
 function cycleZoom(e) {
   // Multiply zoom by 2 up to 10x, then reset to 1
@@ -518,7 +568,7 @@ onBeforeUnmount(() => {
 .pan-wrapper{cursor:grab}
 .pan-wrapper.dragging{cursor:grabbing}
 .zoom-wrapper .popup-image{transition:transform 320ms cubic-bezier(.2,.8,.2,1);transform-origin:center center;display:block;margin:0 auto;max-width:100%;max-height:80vh}
-.diploma-watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-14deg);font-size:28px;opacity:0.12;color:var(--text);pointer-events:none;white-space:nowrap}
+.diploma-watermark{position:absolute;inset:0;pointer-events:none;}
 .zoom-control{display:flex;align-items:center;gap:8px}
 .zoom-control input[type="range"]{width:220px}
 .zoom-value{font-weight:600;padding-left:6px}
