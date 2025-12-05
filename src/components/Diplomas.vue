@@ -186,6 +186,64 @@ function openPopup(d) {
   const image = d.diplomaImage || d.image;
   const url = image ? getAssetPath(`/degrees/${image}`) : "";
   if (!url) return;
+  // If a base64 variant of the image exists (named like `name_64.txt`), prefer it.
+  // This file should contain either a full data URL or raw base64 of the image bytes.
+  try {
+    const maybeBase64Name = image.replace(/\.svg$/i, "_64.txt");
+    const base64Url = getAssetPath(`/degrees/${maybeBase64Name}`);
+    // attempt to fetch the base64 file synchronously in the flow; if present use it
+    // Note: we don't await here to keep the same promise flow; we perform a fetch
+    // and if it resolves we short-circuit the rest by returning early.
+    fetch(base64Url, { cache: 'force-cache' })
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.text();
+      })
+      .then((txt) => {
+        if (!txt) return;
+        const content = String(txt).trim();
+        let dataUrl;
+        if (content.startsWith('data:')) {
+          dataUrl = content;
+        } else {
+          // assume SVG base64 unless content indicates otherwise
+          dataUrl = `data:image/svg+xml;base64,${content}`;
+        }
+        // cache original URL -> dataURL so existing cache logic can reuse it
+        preloadedCache.set(url, dataUrl);
+        // if a watermarked version already exists, use it
+        const wmKeyExisting = url + '::wm::' + encodeURIComponent(popupDegree.value || '');
+        if (preloadedCache.has(wmKeyExisting)) {
+          popupImage.value = preloadedCache.get(wmKeyExisting) || dataUrl;
+          popupLoading.value = false;
+          popupVisible.value = true;
+          return;
+        }
+        // show original immediately
+        popupImage.value = dataUrl;
+        popupVisible.value = true;
+        if (isDiplomaPopup.value) {
+          popupLoading.value = true;
+          // pick email based on locale (Arabic support)
+          const emailToUse = String(locale.value).startsWith('ar')
+            ? 'بن_الحاج_حمدي_42bhamdi@gmail.com'
+            : 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com';
+          applyWatermarkToImage(dataUrl, popupDegree.value, emailToUse).then((wmData) => {
+            preloadedCache.set(wmKeyExisting, wmData);
+            popupImage.value = wmData;
+          }).catch(() => {
+            popupImage.value = dataUrl;
+          }).finally(() => {
+            popupLoading.value = false;
+          });
+        }
+      })
+      .catch(() => {
+        // ignore and continue with normal logic
+      });
+  } catch (err) {
+    // ignore and continue
+  }
   // We support a cached "watermarked" version to avoid re-drawing repeatedly.
   const wmKey = url + '::wm::' + encodeURIComponent(popupDegree.value || '');
   const emailToUse = String(locale.value).startsWith('ar')
