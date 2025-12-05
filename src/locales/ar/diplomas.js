@@ -1,5 +1,6 @@
 export default {
   title: "الشهادات",
+  loading: "جارٍ التحميل...",
   list: [
     {
       title: "مستوى التعليم : مهندس خبير",

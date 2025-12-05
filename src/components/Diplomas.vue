@@ -25,7 +25,6 @@
                     items[catIndex][i] = el;
                   }"
                 >
-                  <!-- Remplacement du dot par l'image du diplôme -->
                   <div
                     class="degree-thumb"
                     role="button"
@@ -60,7 +59,6 @@
       </PageLayout>
     </div>
 
-    <!-- Popup -->
     <Popup
         :visible="popupVisible"
         :title="popupTitle"
@@ -74,7 +72,6 @@
             <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
         </span>
-        <!-- Diplôme name centered next to controls -->
         <input
         type="range"
         min="1"
@@ -85,12 +82,11 @@
         />
         <div class="zoom-value">{{ zoomScale.toFixed(1) }}×</div>
         <br>
-        <div class="diploma-name" v-if="popupDegree" style="flex:1; text-align:center;">{{ popupDegree }}</div>
+  <div class="diploma-name" v-if="popupDegree" :dir="String(locale.value).startsWith('ar') ? 'rtl' : 'ltr'" style="flex:1; text-align:center;">{{ popupDegree }}</div>
       </div>
     </template>
-        <div v-if="popupLoading" class="popup-spinner">{{ $t('diplomas.loading') || 'Chargement...' }}</div>
-        <div v-else-if="popupImage" class="zoom-wrapper" ref="zoomWrapper">
-          <!-- If this is a diploma popup we enable zoom/pan and watermark -->
+        <div v-if="popupImage" class="zoom-wrapper" ref="zoomWrapper">
+    <div v-if="popupLoading" class="popup-spinner-overlay">{{ $t('diplomas.loading') || 'Chargement...' }}</div>
           <div
             v-if="isDiplomaPopup"
             class="pan-wrapper"
@@ -106,7 +102,6 @@
             @copy.prevent
           >
             <img
-              ref="popupImg"
               :src="popupImage"
               class="popup-image"
               :style="{ transform: `scale(${zoomScale})` }"
@@ -114,14 +109,7 @@
               draggable="false"
               @dragstart.prevent
             />
-            <!-- repeating SVG watermark (data-URL) -->
-            <div
-              class="diploma-watermark"
-              v-if="watermarkDataUrl"
-              :style="watermarkStyle"
-            ></div>
           </div>
-          <!-- For logos we show a simple image without zoom/pan/watermark -->
           <div v-else class="logo-wrapper">
             <img
               :src="popupImage"
@@ -141,7 +129,7 @@ import PageLayout from "../assets/PageLayout.vue";
 import Popup from "./Popup.vue";
 import { getAssetPath } from "../utils/assets.js";
 
-const { tm } = useI18n();
+const { tm, locale } = useI18n();
 
 const diplomas = computed(() => {
   const list = tm("diplomas.list");
@@ -161,7 +149,6 @@ const popupDegree = ref("");
 // Map original URL -> dataURL (string) for immediate reuse
 const preloadedCache = new Map();
 const zoomWrapper = ref(null);
-const popupImg = ref(null);
 const isDiplomaPopup = ref(false);
 // continuous zoom scale (1.0 .. 10.0)
 const zoomScale = ref(1);
@@ -184,15 +171,10 @@ function keyDownHandler(e) {
     e.preventDefault();
     e.stopPropagation();
   }
-  // Best-effort: detect PrintScreen key and briefly flash watermark (can't block OS screenshot)
+  // Best-effort: detect PrintScreen key but we can't reliably block OS screenshot.
+  // No overlay toggling is done because the watermark will be baked into the image.
   if (e.key === 'PrintScreen') {
-    // briefly toggle watermark opacity to make screenshot include it consistently
-    const el = zoomWrapper.value?.querySelector('.diploma-watermark');
-    if (el) {
-      el.style.transition = 'opacity 120ms';
-      el.style.opacity = '0.16';
-      setTimeout(() => (el.style.opacity = '0.12'), 300);
-    }
+    // noop
   }
 }
 
@@ -204,14 +186,48 @@ function openPopup(d) {
   const image = d.diplomaImage || d.image;
   const url = image ? getAssetPath(`/degrees/${image}`) : "";
   if (!url) return;
-  // If already preloaded, show immediately
-  if (preloadedCache.has(url)) {
-    popupImage.value = preloadedCache.get(url) || url;
+  // We support a cached "watermarked" version to avoid re-drawing repeatedly.
+  const wmKey = url + '::wm::' + encodeURIComponent(popupDegree.value || '');
+  const emailToUse = String(locale.value).startsWith('ar')
+    ? 'بن_الحاج_حمدي_42bhamdi@gmail.com'
+    : 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com';
+  // If a watermarked version already exists in cache, reuse it
+  if (preloadedCache.has(wmKey)) {
+    popupImage.value = preloadedCache.get(wmKey) || url;
     popupLoading.value = false;
     popupVisible.value = true;
     return;
   }
-  // otherwise show spinner while fetching and caching the resource
+
+  // If original resource is cached but not watermarked, show it immediately
+  // and generate the watermarked version in background (so the UI is fast).
+  if (preloadedCache.has(url)) {
+    const orig = preloadedCache.get(url) || url;
+    popupImage.value = orig;
+    popupVisible.value = true;
+    // If this is a diploma, start watermark generation in background
+    if (isDiplomaPopup.value) {
+      popupLoading.value = true; // show overlay spinner but keep image visible
+      // choose email based on locale (Arabic locale uses Arabic name/email)
+      const emailToUse = String(locale.value).startsWith('ar')
+        ? 'بن_الحاج_حمدي_42bhamdi@gmail.com'
+        : 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com';
+      applyWatermarkToImage(orig, popupDegree.value, emailToUse).then((wmData) => {
+        preloadedCache.set(wmKey, wmData);
+        popupImage.value = wmData;
+      }).catch(() => {
+        // keep original if watermark fails
+        popupImage.value = orig;
+      }).finally(() => {
+        popupLoading.value = false;
+      });
+    } else {
+      popupLoading.value = false;
+    }
+    return;
+  }
+
+  // otherwise fetch and (if diploma) bake watermark into the fetched data
   popupLoading.value = true;
   popupImage.value = "";
   popupVisible.value = true;
@@ -222,14 +238,44 @@ function openPopup(d) {
         return res.text().then((text) => {
           const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
           preloadedCache.set(url, dataUrl);
+          // show original immediately
           popupImage.value = dataUrl;
+          if (isDiplomaPopup.value) {
+            popupLoading.value = true;
+            return applyWatermarkToImage(dataUrl, popupDegree.value, emailToUse).then((wm) => {
+              preloadedCache.set(wmKey, wm);
+              popupImage.value = wm;
+            }).catch(() => {
+              // keep SVG as-is
+            }).finally(() => {
+              popupLoading.value = false;
+            });
+          }
+          return;
         });
       }
       return res.blob().then((blob) => new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = () => {
-          preloadedCache.set(url, reader.result);
-          popupImage.value = reader.result;
+          const dataUrl = reader.result;
+          preloadedCache.set(url, dataUrl);
+          // show original immediately
+          popupImage.value = dataUrl;
+          if (isDiplomaPopup.value) {
+            popupLoading.value = true;
+            applyWatermarkToImage(dataUrl, popupDegree.value, emailToUse).then((wm) => {
+              preloadedCache.set(wmKey, wm);
+              popupImage.value = wm;
+              resolve();
+            }).catch(() => {
+              // keep original
+              resolve();
+            }).finally(() => {
+              popupLoading.value = false;
+            });
+            return;
+          }
+          popupLoading.value = false;
           resolve();
         };
         reader.onerror = () => {
@@ -315,85 +361,108 @@ function handleClose() {
   dragging.value = false;
 }
 
-// Build a repeating diagonal SVG watermark including the email and diploma name
-const watermarkDataUrl = computed(() => {
-  if (!isDiplomaPopup.value || !popupDegree.value) return "";
-  const email = 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com';
-  const diplomaName = popupDegree.value;
-  // Estimate required pixel width from longest string and desired font sizes
-  const emailFont = 16; // px
-  const dnameFont = 20; // px
-  const approxCharWidth = (fs) => fs * 0.6; // rough estimate
-  const maxLen = Math.max(email.length, diplomaName.length);
-  const estWidth = Math.ceil(maxLen * Math.max(approxCharWidth(emailFont), approxCharWidth(dnameFont)));
-  // Ensure tile is wide enough and repeat density is good
-  const tileWidth = Math.max(4800, estWidth + 1200);
-  const tileHeight = 420;
-  const step = Math.max(500, Math.floor((estWidth + 400) / 2));
-  let texts = '';
-  for (let x = 0; x < tileWidth; x += step) {
-    const ox = x + 60;
-    texts += `  <g transform='translate(${ox},0)'>\n` +
-             `    <text x='0' y='150' transform='rotate(-26 0 130)' class='email'>${email}</text>\n` +
-             `    <text x='0' y='210' transform='rotate(-26 0 190)' class='dname'>${diplomaName}</text>\n` +
-             `  </g>\n`;
-  }
-  const svg = `<?xml version='1.0' encoding='UTF-8'?>\n` +
-    `<svg xmlns='http://www.w3.org/2000/svg' width='${tileWidth}' height='${tileHeight}' viewBox='0 0 ${tileWidth} ${tileHeight}' preserveAspectRatio='xMinYMin meet'>\n` +
-    `  <style> .email{fill:rgba(0,0,0,0.18);font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:${emailFont}px;} .dname{fill:rgba(0,0,0,0.20);font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:${dnameFont}px;} </style>\n` +
-    texts +
-    `</svg>`;
-  return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
-});
+// Draw watermark text directly onto the image using a canvas so the text becomes
+// part of the image (not an overlay). Returns a PNG data URL or the original
+// source if something fails.
+function applyWatermarkToImage(srcDataUrl, diplomaName, email = 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com') {
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        // If image is very large, downscale for watermarking to improve speed and
+        // keep the resulting data-URL reasonably sized. We'll use a max dimension.
+        const origW = img.naturalWidth || img.width || 1200;
+        const origH = img.naturalHeight || img.height || 900;
+        const MAX_DIM = 2000; // max width or height to process
+        let w = origW;
+        let h = origH;
+        let scale = 1;
+        if (Math.max(origW, origH) > MAX_DIM) {
+          scale = MAX_DIM / Math.max(origW, origH);
+          w = Math.round(origW * scale);
+          h = Math.round(origH * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(srcDataUrl);
 
-const watermarkStyle = computed(() => {
-  if (!watermarkDataUrl.value) return {};
-  return {
-    backgroundImage: watermarkDataUrl.value,
-    backgroundRepeat: 'repeat',
-    backgroundPosition: '0 0',
-    backgroundSize: `${3600}px ${300}px`,
-    opacity: 1,
-    pointerEvents: 'none',
-    transformOrigin: 'center center',
-    // scale watermark with image so it stays aligned
-    transform: `scale(${zoomScale.value})`
-  };
-});
+  // Draw original image (scale down if necessary)
+  if (scale === 1) ctx.drawImage(img, 0, 0, w, h);
+  else ctx.drawImage(img, 0, 0, origW, origH, 0, 0, w, h);
 
-function cycleZoom(e) {
-  // Multiply zoom by 2 up to 10x, then reset to 1
-  const sOld = zoomScale.value;
-  let sNew = Math.min(sOld * 2, 10);
-  if (sOld >= 10) sNew = 1;
+  // Font sizes relative to processed width to keep watermark subtle and fast
+  let dnameFont = Math.max(12, Math.floor(w * 0.022));
+  let emailFont = Math.max(10, Math.floor(w * 0.016));
 
-  if (sNew === 1) {
-    zoomScale.value = 1;
-    panX.value = 0;
-    panY.value = 0;
-    return;
-  }
+        // Ensure text fits horizontally; reduce size if needed
+        ctx.font = `bold ${dnameFont}px Arial`;
+        let dWidth = ctx.measureText(diplomaName).width;
+        if (dWidth > w * 0.92 && dWidth > 0) {
+          const scale = (w * 0.92) / dWidth;
+          dnameFont = Math.max(10, Math.floor(dnameFont * scale));
+        }
+        ctx.font = `bold ${emailFont}px Arial`;
+        let eWidth = ctx.measureText(email).width;
+        if (eWidth > w * 0.92 && eWidth > 0) {
+          const scale = (w * 0.92) / eWidth;
+          emailFont = Math.max(8, Math.floor(emailFont * scale));
+        }
 
-  try {
-    const rect = zoomWrapper.value.getBoundingClientRect();
-    const containerCenterX = rect.left + rect.width / 2;
-    const containerCenterY = rect.top + rect.height / 2;
-    const clickX = e.clientX;
-    const clickY = e.clientY;
-    const Cx = clickX - containerCenterX;
-    const Cy = clickY - containerCenterY;
-    const r = sNew / sOld;
-    const deltaX = (1 - r) * (Cx - panX.value);
-    const deltaY = (1 - r) * (Cy - panY.value);
-    panX.value = panX.value + deltaX;
-    panY.value = panY.value + deltaY;
-  } catch (err) {
-    // fallback
-  }
+        // Draw repeated diagonal watermark
+        ctx.save();
+        const angle = -26 * Math.PI / 180;
+        ctx.translate(w / 2, h / 2);
+        ctx.rotate(angle);
+  // Slightly lower opacity so watermark is less dominant
+  // Reduced to 0.08 for a more subtle watermark (can tweak to taste)
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  ctx.textBaseline = 'middle';
+  // detect RTL (Arabic) by presence of Arabic unicode range in email or diploma name
+  const isRtl = /[\u0600-\u06FF]/.test(String(email)) || /[\u0600-\u06FF]/.test(String(diplomaName));
+  // choose font family suitable for Arabic when needed
+  const fontFamily = isRtl ? '"Noto Naskh Arabic", Tahoma, Arial, sans-serif' : 'Arial, Helvetica, sans-serif';
+  ctx.direction = isRtl ? 'rtl' : 'ltr';
+  ctx.textAlign = 'center';
 
-  zoomScale.value = sNew;
-  clampPan();
+  ctx.font = `bold ${emailFont}px ${fontFamily}`;
+  eWidth = ctx.measureText(email).width;
+  ctx.font = `bold ${dnameFont}px ${fontFamily}`;
+  dWidth = ctx.measureText(diplomaName).width;
+        const maxTextWidth = Math.max(eWidth, dWidth);
+  const spacingX = Math.max(maxTextWidth + 160, Math.floor(w * 0.42));
+  const spacingY = Math.max((dnameFont + emailFont) * 2.6, Math.floor(h * 0.14));
+
+        const diag = Math.sqrt(w * w + h * h);
+        for (let y = -diag; y < diag; y += spacingY) {
+          for (let x = -diag; x < diag; x += spacingX) {
+            ctx.font = `bold ${emailFont}px ${fontFamily}`;
+            ctx.fillText(email, x, y);
+            ctx.font = `bold ${dnameFont}px ${fontFamily}`;
+            ctx.fillText(diplomaName, x, y + emailFont * 1.8);
+          }
+        }
+        ctx.restore();
+
+        try {
+          // If we scaled down for processing, we return the scaled watermarked image.
+          // This keeps the data URL size smaller and speeds up rendering.
+          resolve(canvas.toDataURL('image/png'));
+        } catch (err) {
+          resolve(srcDataUrl);
+        }
+      };
+      img.onerror = () => resolve(srcDataUrl);
+      img.src = srcDataUrl;
+    } catch (err) {
+      resolve(srcDataUrl);
+    }
+  });
 }
+
+// cycleZoom removed — not used. Zoom controlled by wheel and range input.
 
 function clampPan() {
   if (!zoomWrapper.value) return;
@@ -554,12 +623,11 @@ onBeforeUnmount(() => {
 .card[role="button"]{cursor:pointer}
 /* Popup image sizing and loading spinner */
 .popup-image{max-width:900px;max-height:80vh;width:100%;height:auto;display:block;margin:0 auto}
-.popup-spinner{display:flex;align-items:center;justify-content:center;padding:40px;font-weight:600;color:var(--text);}
+/* Spinner overlay shown on top of the image while watermark is generated */
+.popup-spinner-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.0);pointer-events:none;font-weight:700;color:var(--text)}
 
-/* Zoom wrapper and lens */
-.zoom-wrapper{position:relative;display:inline-block;max-width:100%}
-.zoom-lens{position:absolute;border-radius:50%;overflow:hidden;border:2px solid rgba(0,0,0,0.12);box-shadow:0 6px 20px rgba(0,0,0,0.25);pointer-events:none}
-.zoom-lens::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02)}
+/* Zoom wrapper */
+/* .zoom-lens removed as it's unused */
 
 /* Keep zoomed image inside the popup frame */
 .zoom-wrapper{position:relative;display:inline-block;max-width:100%;overflow:hidden}
@@ -568,11 +636,10 @@ onBeforeUnmount(() => {
 .pan-wrapper{cursor:grab}
 .pan-wrapper.dragging{cursor:grabbing}
 .zoom-wrapper .popup-image{transition:transform 320ms cubic-bezier(.2,.8,.2,1);transform-origin:center center;display:block;margin:0 auto;max-width:100%;max-height:80vh}
-.diploma-watermark{position:absolute;inset:0;pointer-events:none;}
 .zoom-control{display:flex;align-items:center;gap:8px}
 .zoom-control input[type="range"]{width:220px}
 .zoom-value{font-weight:600;padding-left:6px}
-.zoom-icon{display:inline-flex;align-items:center;justify-content:center;color:var(--text);opacity:0.9;margin-right:6px}
+.zoom-icon{display:inline-flex;align-items:center;justify-content:center;color:var(--text);opacity:0.7;margin-right:6px}
 .zoom-icon svg{display:block}
 
 .diploma-name{font-weight:700;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}

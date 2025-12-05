@@ -1,5 +1,6 @@
 export default {
-    title: "Diplômes",
+  title: "Diplômes",
+  loading: "Chargement...",
     list: [
       {
         title: "Niveau d'études : Bac +5",

@@ -1,5 +1,6 @@
 export default {
   title: "Diplomas",
+  loading: "Loading...",
   list: [
     {
       title: "Level of education : Baccalaureate + 5",
