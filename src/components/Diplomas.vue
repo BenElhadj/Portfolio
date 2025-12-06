@@ -150,6 +150,99 @@ const popupDegree = ref("");
 const preloadedCache = new Map();
 const zoomWrapper = ref(null);
 const isDiplomaPopup = ref(false);
+
+// Try to load a companion "_64" file containing base64 data. If present,
+// return a data URL constructed from that text. Otherwise fall back to
+// fetching the original asset and returning a data URL (SVG text or blob).
+async function fetchAssetAsDataUrl(url) {
+  // compute candidate base64 file by removing extension and appending _64
+  try {
+    const m = url.match(/(.+)\.(svg|png|jpg|jpeg|gif)$/i);
+    const base64Url = m ? `${m[1]}_64` : (url.endsWith('_64') ? url : `${url}_64`);
+    // Support splitting the base64 data into three parts for light obfuscation:
+    // - VITE_START_<NAME> (data:image/...;base64,<start...>)
+    // - the file <name>_64 contains the middle portion (plain base64)
+    // - VITE_END_<NAME> contains the tail portion
+    // If VITE_START_* is provided we will try to fetch the middle file and
+    // assemble start + middle + end. If no env start exists we fall back to
+    // the previous behavior (fetch _64 or fetch original resource).
+    let envStart = '';
+    let envEnd = '';
+    try {
+      const baseNameRaw = base64Url.split('/').pop();
+      const baseName = baseNameRaw.replace(/\.[^/.]+$/, '') || baseNameRaw;
+      const envStartKey = 'VITE_START_' + baseName.replace(/\+/g, '').replace(/-/g, '_').toUpperCase();
+      const envEndKey = 'VITE_END_' + baseName.replace(/\+/g, '').replace(/-/g, '_').toUpperCase();
+      envStart = import.meta.env[envStartKey] || '';
+      envEnd = import.meta.env[envEndKey] || '';
+    } catch (e) {
+      envStart = '';
+      envEnd = '';
+    }
+
+    if (envStart && typeof envStart === 'string' && envStart.startsWith('data:')) {
+      // We have a start; try to fetch middle from the companion file and assemble.
+      try {
+        const resBase = await fetch(base64Url, { cache: 'force-cache' });
+        if (resBase.ok) {
+          const text = (await resBase.text()).trim();
+          if (text) {
+            // If the middle file already contains a full data: URL, use it.
+            if (text.startsWith('data:')) return text;
+            // Assemble start + middle + end (envEnd may be empty string).
+            return envStart + text + (envEnd || '');
+          }
+        }
+      } catch (err) {
+        // network failed; fall back to using envStart alone if it appears complete
+        if (!envEnd) return envStart;
+      }
+      // If we reach here, try to fall back to fetching the companion file below
+    }
+
+    // try to fetch the base64 file first (fallback / normal behavior)
+    const resBase = await fetch(base64Url, { cache: 'force-cache' });
+    if (resBase.ok) {
+      const text = await resBase.text();
+      if (text && text.trim()) {
+        // if file already contains a full data URL, use it
+        if (text.trim().startsWith('data:')) return text.trim();
+        // otherwise infer mime from original extension
+        let mime = 'image/svg+xml';
+        if (m) {
+          const ext = m[2].toLowerCase();
+          if (ext === 'png') mime = 'image/png';
+          else if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
+          else if (ext === 'gif') mime = 'image/gif';
+          else if (ext === 'svg') mime = 'image/svg+xml';
+        }
+        return `data:${mime};base64,${text.trim()}`;
+      }
+    }
+  } catch (err) {
+    // ignore and fall back to original
+  }
+
+  // fallback: fetch original resource and convert to data URL
+  try {
+    const res = await fetch(url, { cache: 'force-cache' });
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('svg') || url.toLowerCase().endsWith('.svg')) {
+      const text = await res.text();
+      return `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
+    }
+    const blob = await res.blob();
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Failed to read blob'));
+      reader.readAsDataURL(blob);
+    });
+  } catch (err) {
+    // as last resort, return original url so the <img> can try to load it
+    return url;
+  }
+}
 // continuous zoom scale (1.0 .. 10.0)
 const zoomScale = ref(1);
 // Panning state (px)
@@ -231,66 +324,32 @@ function openPopup(d) {
   popupLoading.value = true;
   popupImage.value = "";
   popupVisible.value = true;
-  fetch(url, { cache: 'force-cache' })
-    .then((res) => {
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('svg') || url.toLowerCase().endsWith('.svg')) {
-        return res.text().then((text) => {
-          const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
-          preloadedCache.set(url, dataUrl);
-          // show original immediately
-          popupImage.value = dataUrl;
-          if (isDiplomaPopup.value) {
-            popupLoading.value = true;
-            return applyWatermarkToImage(dataUrl, popupDegree.value, emailToUse).then((wm) => {
-              preloadedCache.set(wmKey, wm);
-              popupImage.value = wm;
-            }).catch(() => {
-              // keep SVG as-is
-            }).finally(() => {
-              popupLoading.value = false;
-            });
-          }
-          return;
-        });
+  // Try to fetch either a companion "_64" base64 file or the original asset
+  fetchAssetAsDataUrl(url)
+    .then((dataUrl) => {
+      preloadedCache.set(url, dataUrl);
+      // show original (or base64) immediately
+      popupImage.value = dataUrl;
+      if (isDiplomaPopup.value) {
+        popupLoading.value = true;
+        applyWatermarkToImage(dataUrl, popupDegree.value, emailToUse)
+          .then((wm) => {
+            preloadedCache.set(wmKey, wm);
+            popupImage.value = wm;
+          })
+          .catch(() => {
+            // keep dataUrl if watermarking fails
+          })
+          .finally(() => {
+            popupLoading.value = false;
+          });
+      } else {
+        popupLoading.value = false;
       }
-      return res.blob().then((blob) => new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const dataUrl = reader.result;
-          preloadedCache.set(url, dataUrl);
-          // show original immediately
-          popupImage.value = dataUrl;
-          if (isDiplomaPopup.value) {
-            popupLoading.value = true;
-            applyWatermarkToImage(dataUrl, popupDegree.value, emailToUse).then((wm) => {
-              preloadedCache.set(wmKey, wm);
-              popupImage.value = wm;
-              resolve();
-            }).catch(() => {
-              // keep original
-              resolve();
-            }).finally(() => {
-              popupLoading.value = false;
-            });
-            return;
-          }
-          popupLoading.value = false;
-          resolve();
-        };
-        reader.onerror = () => {
-          preloadedCache.set(url, url);
-          popupImage.value = url;
-          resolve();
-        };
-        reader.readAsDataURL(blob);
-      }));
     })
     .catch(() => {
       preloadedCache.set(url, url);
       popupImage.value = url;
-    })
-    .finally(() => {
       popupLoading.value = false;
     });
 }
@@ -313,30 +372,10 @@ function openLogo(d) {
   popupLoading.value = true;
   popupImage.value = "";
   popupVisible.value = true;
-  fetch(url, { cache: 'force-cache' })
-    .then((res) => {
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('svg') || url.toLowerCase().endsWith('.svg')) {
-        return res.text().then((text) => {
-          const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
-          preloadedCache.set(url, dataUrl);
-          popupImage.value = dataUrl;
-        });
-      }
-      return res.blob().then((blob) => new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          preloadedCache.set(url, reader.result);
-          popupImage.value = reader.result;
-          resolve();
-        };
-        reader.onerror = () => {
-          preloadedCache.set(url, url);
-          popupImage.value = url;
-          resolve();
-        };
-        reader.readAsDataURL(blob);
-      }));
+  fetchAssetAsDataUrl(url)
+    .then((dataUrl) => {
+      preloadedCache.set(url, dataUrl);
+      popupImage.value = dataUrl;
     })
     .catch(() => {
       preloadedCache.set(url, url);
@@ -580,29 +619,10 @@ onMounted(() => {
     });
   });
   toPreload.forEach((url) => {
-    // attempt to fetch SVG text and convert to data-uri for instant reuse
-    fetch(url, { cache: 'force-cache' })
-      .then((res) => {
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('svg') || url.toLowerCase().endsWith('.svg')) {
-          return res.text().then((text) => {
-            const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
-            preloadedCache.set(url, dataUrl);
-          });
-        }
-        // for raster images, fallback to blob -> dataURL
-        return res.blob().then((blob) => new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            preloadedCache.set(url, reader.result);
-            resolve();
-          };
-          reader.onerror = () => {
-            preloadedCache.set(url, url);
-            resolve();
-          };
-          reader.readAsDataURL(blob);
-        }));
+    // attempt to fetch either a companion _64 base64 file or the original asset
+    fetchAssetAsDataUrl(url)
+      .then((dataUrl) => {
+        preloadedCache.set(url, dataUrl);
       })
       .catch(() => {
         // if fetch fails, still mark the original url so we attempt to use it
