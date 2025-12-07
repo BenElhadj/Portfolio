@@ -151,73 +151,86 @@ const preloadedCache = new Map();
 const zoomWrapper = ref(null);
 const isDiplomaPopup = ref(false);
 
-// Try to load a companion "_64" file containing base64 data. If present,
-// return a data URL constructed from that text. Otherwise fall back to
-// fetching the original asset and returning a data URL (SVG text or blob).
+// Try to load a companion base64 file (middle portion of a split data URI).
+// If present, return a data URL constructed from that text. Otherwise
+// fall back to fetching the original asset and returning a data URL
+// (SVG text or blob).
 async function fetchAssetAsDataUrl(url) {
-  // compute candidate base64 file by removing extension and appending _64
+  // Enhanced behavior (Option 2): only attempt to assemble start+middle+end
+  // from env vars when the base name begins with 'bac' (case-insensitive).
+  // Prefer companion files using the normalized filename; avoid relying on
+  // legacy suffixes.
   try {
     const m = url.match(/(.+)\.(svg|png|jpg|jpeg|gif)$/i);
-    const base64Url = m ? `${m[1]}_64` : (url.endsWith('_64') ? url : `${url}_64`);
-    // Support splitting the base64 data into three parts for light obfuscation:
-    // - VITE_START_<NAME> (data:image/...;base64,<start...>)
-    // - the file <name>_64 contains the middle portion (plain base64)
-    // - VITE_END_<NAME> contains the tail portion
-    // If VITE_START_* is provided we will try to fetch the middle file and
-    // assemble start + middle + end. If no env start exists we fall back to
-    // the previous behavior (fetch _64 or fetch original resource).
-    let envStart = '';
-    let envEnd = '';
-    try {
-      const baseNameRaw = base64Url.split('/').pop();
-      const baseName = baseNameRaw.replace(/\.[^/.]+$/, '') || baseNameRaw;
-      const envStartKey = 'VITE_START_' + baseName.replace(/\+/g, '').replace(/-/g, '_').toUpperCase();
-      const envEndKey = 'VITE_END_' + baseName.replace(/\+/g, '').replace(/-/g, '_').toUpperCase();
-      envStart = import.meta.env[envStartKey] || '';
-      envEnd = import.meta.env[envEndKey] || '';
-    } catch (e) {
-      envStart = '';
-      envEnd = '';
-    }
+  const basePath = m ? m[1] : url;
+    const baseNameRaw = basePath.split('/').pop() || '';
+    const baseName = baseNameRaw.replace(/\.[^/.]+$/, '') || baseNameRaw;
 
-    if (envStart && typeof envStart === 'string' && envStart.startsWith('data:')) {
-      // We have a start; try to fetch middle from the companion file and assemble.
-      try {
-        const resBase = await fetch(base64Url, { cache: 'force-cache' });
-        if (resBase.ok) {
-          const text = (await resBase.text()).trim();
-          if (text) {
-            // If the middle file already contains a full data: URL, use it.
+    const isBac = /^bac/i.test(baseName);
+
+    // compute normalized env key base (no +, - replaced by _ ; uppercased)
+    const norm = baseName.replace(/\+/g, '').replace(/-/g, '_').toUpperCase();
+  const envStartKey = 'VITE_START_' + norm;
+  const envEndKey = 'VITE_END_' + norm;
+
+    // Only attempt env-based assembly for 'bac*' assets
+    if (isBac) {
+  const envStart = import.meta.env[envStartKey] || '';
+  const envEnd = import.meta.env[envEndKey] || '';
+      if (envStart && typeof envStart === 'string' && envStart.startsWith('data:')) {
+        // Try companion files using the normalized filename
+        const candidates = [];
+        // basePath already has no extension; try it first (matches renamed files)
+        candidates.push(basePath);
+
+        for (const candidate of candidates) {
+          try {
+            const res = await fetch(candidate, { cache: 'force-cache' });
+            if (!res.ok) continue;
+            const text = (await res.text()).trim();
+            if (!text) continue;
             if (text.startsWith('data:')) return text;
-            // Assemble start + middle + end (envEnd may be empty string).
             return envStart + text + (envEnd || '');
+          } catch (err) {
+            // try next candidate
           }
         }
-      } catch (err) {
-        // network failed; fall back to using envStart alone if it appears complete
+
+        // network failed or no candidate had content; as a fallback, if envEnd
+        // is empty we can still return envStart (it may be a full data URL).
         if (!envEnd) return envStart;
       }
-      // If we reach here, try to fall back to fetching the companion file below
     }
 
-    // try to fetch the base64 file first (fallback / normal behavior)
-    const resBase = await fetch(base64Url, { cache: 'force-cache' });
-    if (resBase.ok) {
-      const text = await resBase.text();
-      if (text && text.trim()) {
-        // if file already contains a full data URL, use it
-        if (text.trim().startsWith('data:')) return text.trim();
-        // otherwise infer mime from original extension
-        let mime = 'image/svg+xml';
-        if (m) {
-          const ext = m[2].toLowerCase();
-          if (ext === 'png') mime = 'image/png';
-          else if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
-          else if (ext === 'gif') mime = 'image/gif';
-          else if (ext === 'svg') mime = 'image/svg+xml';
+  // If we reach here, try to fetch companion base64 files as fallback.
+  // Prefer the normalized candidate.
+    try {
+      const tryCandidates = [];
+    if (m) tryCandidates.push(basePath);
+
+      for (const candidate of tryCandidates) {
+        try {
+          const resBase = await fetch(candidate, { cache: 'force-cache' });
+          if (!resBase.ok) continue;
+          const text = (await resBase.text()).trim();
+          if (!text) continue;
+          if (text.startsWith('data:')) return text;
+          // infer mime from original extension
+          let mime = 'image/svg+xml';
+          if (m) {
+            const ext = m[2].toLowerCase();
+            if (ext === 'png') mime = 'image/png';
+            else if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
+            else if (ext === 'gif') mime = 'image/gif';
+            else if (ext === 'svg') mime = 'image/svg+xml';
+          }
+          return `data:${mime};base64,${text}`;
+        } catch (err) {
+          // try next candidate
         }
-        return `data:${mime};base64,${text.trim()}`;
       }
+    } catch (err) {
+      // ignore and fall back
     }
   } catch (err) {
     // ignore and fall back to original
