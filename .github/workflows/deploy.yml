@@ -91,23 +91,24 @@ jobs:
             esac
           done < <(printenv)
 
-      - name: "Debug (runtime): list VITE_* from job environment (names + lengths)"
+      - name: Force-write known VITE_* keys from shell environment into .env.production
         run: |
-          echo "Listing VITE_* variables from the runner environment (safe: names + lengths)"
-          found=0
-          while IFS='=' read -r name val; do
-            case "$name" in
-              VITE_*)
-                len=$(echo -n "$val" | wc -c)
-                echo "$name len=$len"
-                found=1
-                ;;
-            esac
-          done < <(printenv)
-          if [ "$found" -eq 0 ]; then
-            echo "No VITE_* variables found in runner environment"
-            exit 0
-          fi
+          echo "Force-writing known VITE_* keys into .env.production from shell env"
+          touch .env.production
+          keys=(
+            VITE_START_BAC5_42 VITE_END_BAC5_42
+            VITE_START_BAC2_GRETA VITE_END_BAC2_GRETA
+            VITE_START_BAC2_CSFIEE VITE_END_BAC2_CSFIEE
+            VITE_START_BAC_CSFIEE VITE_END_BAC_CSFIEE
+            VITE_START_BAC_IPH VITE_END_BAC_IPH
+          )
+          for k in "${keys[@]}"; do
+            # remove existing
+            sed -i "/^${k}=/d" .env.production || true
+            # indirect expansion to get value of variable named in $k
+            val="${!k}"
+            printf '%s=%s\n' "$k" "$val" >> .env.production
+          done
 
       - name: "Debug (safe): show VITE_* keys and lengths in .env.production"
         run: |
