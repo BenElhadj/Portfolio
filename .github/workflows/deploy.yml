@@ -1,78 +1,95 @@
-name: Deploy to GitHub Pages (Vite optimized)
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
     inputs:
-      use_dotenv_secret:
-        description: 'Set to true to write DOTENV_GITHUB_PAGES secret into .env.github-pages before loading (optional)'
+      dotenv:
+        description: 'Optional .env content to use for this run (ignored if DOTENV_GITHUB_PAGES secret is set)'
         required: false
-        default: 'false'
 
+# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow only one deployment at a time
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js (with npm cache)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          # Use a stable LTS version; adjust if your project needs a different one
+          node-version: '18.x'
           cache: 'npm'
 
-      - name: Write DOTENV secret to file (if provided)
+      # If a DOTENV_GITHUB_PAGES secret is provided, write it to .env.github-pages (overrides repo file)
+      - name: Restore DOTENV_GITHUB_PAGES secret
         if: ${{ secrets.DOTENV_GITHUB_PAGES != '' }}
         run: |
           printf '%s\n' "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
 
-      - name: Ensure .env.github-pages exists (optional)
+      # Allow manually passing dotenv via workflow_dispatch input if secret is not set
+      - name: Use workflow_dispatch dotenv input
+        if: ${{ secrets.DOTENV_GITHUB_PAGES == '' && github.event.inputs.dotenv != '' }}
         run: |
-          if [ -f .env.github-pages ]; then echo "Found .env.github-pages"; else echo "No .env.github-pages file"; fi
+          printf '%s\n' "${{ github.event.inputs.dotenv }}" > .env.github-pages
 
+      # Load .env.github-pages into the job environment (safe: comments and empty lines are ignored)
       - name: Load .env.github-pages into environment
-        if: ${{ secrets.DOTENV_GITHUB_PAGES != '' || (exists('.env.github-pages')) }}
-        shell: bash
         run: |
-          echo "Loading .env.github-pages into GITHUB_ENV"
-          # Read file line by line, ignore comments and empty lines, export to GITHUB_ENV
-          while IFS= read -r line || [ -n "$line" ]; do
-            # strip leading/trailing whitespace and inline comments
-            line="$(echo "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]*#.*$//')"
-            [ -z "$line" ] && continue
-            [[ "$line" != *=* ]] && continue
-            name="${line%%=*}"
-            value="${line#*=}"
-            # remove surrounding quotes
-            if [[ ("${value:0:1}" == '"' && "${value: -1}" == '"') || ("${value:0:1}" == "'" && "${value: -1}" == "'") ]]; then
-              value="${value:1:-1}"
-            fi
-            echo "$name=$value" >> "$GITHUB_ENV"
-          done < .env.github-pages
+          if [ -f .env.github-pages ]; then
+            echo "Loading .env.github-pages into job environment"
+            # Filter out comments and empty lines, then append to GITHUB_ENV for subsequent steps
+            grep -v '^\s*#' .env.github-pages | sed -E '/^\s*$/d' >> $GITHUB_ENV
+          else
+            echo "No .env.github-pages file found; continuing without it"
+          fi
+
+      - name: Configure GitHub Pages action (prepares deployment target)
+        uses: actions/configure-pages@v5
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
-      - name: Build (Vite optimized)
+      - name: Optimized Vite build
         env:
           NODE_ENV: production
+          CI: true
         run: |
-          # Run Vite build in production mode. Ensure your package.json has a "build" script.
-          npm run build --if-present
+          # Prefer the project's build script if present (allows custom optimizations),
+          # otherwise fall back to a direct Vite production build.
+          if npm run | grep -q " build"; then
+            npm run build --if-present
+          else
+            npx vite build --mode production
+          fi
 
-      - name: Upload artifact for GitHub Pages
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
@@ -84,9 +101,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download artifact
-        uses: actions/download-pages-artifact@v1
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
