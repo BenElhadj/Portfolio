@@ -1,104 +1,78 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (Vite optimized)
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      use_dotenv_secret:
+        description: 'Set to true to write DOTENV_GITHUB_PAGES secret into .env.github-pages before loading (optional)'
+        required: false
+        default: 'false'
 
-# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one deployment at a time
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug: environment & repo
-        run: |
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          echo "Runner: $(uname -a)"
-          node -v || true
-          npm -v || true
-          pwd
-          echo "Top-level files:"; ls -la || true
-          echo "package.json scripts:"; node -e "console.log(JSON.stringify(require('./package.json').scripts, null, 2))" || cat package.json
-          if [ -f .env.github-pages ]; then
-            echo ".env.github-pages present (showing first 10 lines but masking values)"
-            sed -n '1,10p' .env.github-pages | sed -E 's/(=).*/=***MASKED***/'
-          else
-            echo ".env.github-pages not present"
-          fi
-
-      - name: Setup Node.js (with cache)
+      - name: Setup Node.js (with npm cache)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
           cache: 'npm'
 
-      - name: Install dependencies (with lockfile)
-        if: hashFiles('**/package-lock.json') != ''
-        run: npm ci
-
-      - name: Install dependencies (no lockfile)
-        if: hashFiles('**/package-lock.json') == ''
-        run: npm i
-
-      - name: Restore .env from secret (optional)
-        env:
-          DOTENV_GITHUB_PAGES: ${{ secrets.DOTENV_GITHUB_PAGES }}
+      - name: Write DOTENV secret to file (if provided)
+        if: ${{ secrets.DOTENV_GITHUB_PAGES != '' }}
         run: |
-          if [ -n "$DOTENV_GITHUB_PAGES" ]; then
-            echo "Writing .env.github-pages from secret DOTENV_GITHUB_PAGES"
-            printf '%s\n' "$DOTENV_GITHUB_PAGES" > .env.github-pages
-          else
-            echo "DOTENV_GITHUB_PAGES secret not set; skipping"
-          fi
+          printf '%s\n' "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
 
-      - name: Source .env.github-pages if present
+      - name: Ensure .env.github-pages exists (optional)
         run: |
-          if [ -f .env.github-pages ]; then
-            echo "Sourcing .env.github-pages"
-            # Normalize line endings then export all variables into environment
-            sed 's/\r$//' .env.github-pages > .env.github-pages.clean || true
-            set -o allexport
-            # shellcheck disable=SC1091
-            . .env.github-pages.clean
-            set +o allexport
-            rm -f .env.github-pages.clean
-          else
-            echo ".env.github-pages not found — continuing"
-          fi
+          if [ -f .env.github-pages ]; then echo "Found .env.github-pages"; else echo "No .env.github-pages file"; fi
+
+      - name: Load .env.github-pages into environment
+        if: ${{ secrets.DOTENV_GITHUB_PAGES != '' || (exists('.env.github-pages')) }}
+        shell: bash
+        run: |
+          echo "Loading .env.github-pages into GITHUB_ENV"
+          # Read file line by line, ignore comments and empty lines, export to GITHUB_ENV
+          while IFS= read -r line || [ -n "$line" ]; do
+            # strip leading/trailing whitespace and inline comments
+            line="$(echo "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]*#.*$//')"
+            [ -z "$line" ] && continue
+            [[ "$line" != *=* ]] && continue
+            name="${line%%=*}"
+            value="${line#*=}"
+            # remove surrounding quotes
+            if [[ ("${value:0:1}" == '"' && "${value: -1}" == '"') || ("${value:0:1}" == "'" && "${value: -1}" == "'") ]]; then
+              value="${value:1:-1}"
+            fi
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done < .env.github-pages
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
       - name: Build (Vite optimized)
         env:
           NODE_ENV: production
-          CI: true
         run: |
-          echo "Running Vite build with increased memory limit"
-          export NODE_OPTIONS="--max-old-space-size=4096"
-          # Try passing a Vite mode (github-pages) to allow using .env.github-pages as .env.<mode>
-          npm run build -- --mode github-pages || npm run build
+          # Run Vite build in production mode. Ensure your package.json has a "build" script.
+          npm run build --if-present
 
-      - name: SPA fallback for GitHub Pages
-        run: |
-          if [ -d dist ]; then
-            cp dist/index.html dist/404.html || true
-          fi
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
+      - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
@@ -106,15 +80,13 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-      contents: read
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-pages-artifact@v1
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
