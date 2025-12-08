@@ -72,6 +72,24 @@ jobs:
             echo "No .env.github-pages or .env found; .env.production will not be created"
           fi
 
+      # Append any runtime environment variables starting with VITE_ (e.g. those defined
+      # in Settings → Environments → github-pages) into .env.production so Vite picks them up.
+      - name: Inject runtime VITE_* env vars into .env.production
+        run: |
+          echo "Injecting runtime VITE_* variables into .env.production (merge/replace)"
+          touch .env.production
+          # Iterate over current environment variables and add/replace VITE_* entries
+          while IFS='=' read -r name value; do
+            case "$name" in
+              VITE_*)
+                # Remove any existing entry for this key
+                sed -i "/^${name}=/d" .env.production || true
+                # Append the key=value without exposing it in logs
+                printf '%s=%s\n' "$name" "$value" >> .env.production
+                ;;
+            esac
+          done < <(printenv)
+
       # Optional debug: list VITE_* keys and their lengths (does not print values)
       - name: "Debug: list VITE_* keys and lengths (only prints lengths, not values)"
         run: |
