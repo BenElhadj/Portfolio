@@ -58,6 +58,39 @@ jobs:
             echo ".env.github-pages not found; skipping env injection"
           fi
 
+      # Ensure Vite picks up env variables at build time by creating an .env.production file
+      - name: Create .env.production for Vite build (from .env.github-pages or .env)
+        run: |
+          # Prefer secret-created .env.github-pages, fallback to repo .env
+          if [ -f .env.github-pages ]; then
+            echo "Using .env.github-pages to create .env.production"
+            cp .env.github-pages .env.production
+          elif [ -f .env ]; then
+            echo "Using .env to create .env.production"
+            cp .env .env.production
+          else
+            echo "No .env.github-pages or .env found; .env.production will not be created"
+          fi
+
+      # Optional debug: list VITE_* keys and their lengths (does not print values)
+      - name: "Debug: list VITE_* keys and lengths (only prints lengths, not values)"
+        run: |
+          echo "Listing VITE_* keys and their length in .env.production (if exists)"
+          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "Skipping debug (not manually dispatched)"
+            exit 0
+          fi
+          if [ -f .env.production ]; then
+            sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
+              key=$(echo "$kv" | sed -E 's/=.*//')
+              val=$(echo "$kv" | sed -E 's/^[^=]*=//')
+              len=$(echo -n "$val" | wc -c)
+              echo "$key len=$len"
+            done
+          else
+            echo ".env.production not found"
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
