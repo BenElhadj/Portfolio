@@ -23,14 +23,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug: environment & repo
+        run: |
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          echo "Runner: $(uname -a)"
+          node -v || true
+          npm -v || true
+          pwd
+          echo "Top-level files:"; ls -la || true
+          echo "package.json scripts:"; node -e "console.log(JSON.stringify(require('./package.json').scripts, null, 2))" || cat package.json
+          if [ -f .env.github-pages ]; then
+            echo ".env.github-pages present (showing first 10 lines but masking values)"
+            sed -n '1,10p' .env.github-pages | sed -E 's/(=).*/=***MASKED***/'
+          else
+            echo ".env.github-pages not present"
+          fi
+
       - name: Setup Node.js (with cache)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies (with lockfile)
+        if: hashFiles('**/package-lock.json') != ''
         run: npm ci
+
+      - name: Install dependencies (no lockfile)
+        if: hashFiles('**/package-lock.json') == ''
+        run: npm i
 
       - name: Restore .env from secret (optional)
         env:
