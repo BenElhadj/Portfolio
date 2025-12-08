@@ -182,8 +182,17 @@ async function fetchAssetAsDataUrl(url) {
 
     // Only attempt env-based assembly for 'bac*' assets
     if (isBac) {
-  const envStart = import.meta.env[envStartKey] || '';
-  const envEnd = import.meta.env[envEndKey] || '';
+      const envStart = import.meta.env[envStartKey] || '';
+      const envEnd = import.meta.env[envEndKey] || '';
+
+      // Debug: show minimal info about env variables when used (length + short preview)
+      // This log is intentionally minimal to help debugging in the browser console.
+      try {
+        const preview = (s) => (s && s.length ? s.replace(/\s+/g, '').slice(0, 30) + (s.length > 30 ? '...' : '') : '(empty)');
+        console.log('[Diplomas] env keys:', envStartKey, 'len=', (envStart && envStart.length) || 0, 'preview=', preview(envStart), ';', envEndKey, 'len=', (envEnd && envEnd.length) || 0, 'preview=', preview(envEnd));
+      } catch (e) {
+        // ignore logging errors
+      }
       if (envStart && typeof envStart === 'string' && envStart.startsWith('data:')) {
         // Try companion files using the normalized filename
         const candidates = [];
