@@ -29,6 +29,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Safe debug — list VITE_* env names and lengths (no values)
+        run: |
+          echo "Checking job environment for VITE_* variables (name and value length only)"
+          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
+            len=$(echo -n "$value" | wc -c)
+            echo "$name len=$len"
+          done || true
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
