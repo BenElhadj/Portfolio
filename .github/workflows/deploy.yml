@@ -2,51 +2,191 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
+# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow only one deployment at a time
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest
+  build:
     environment: github-pages
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'npm'
+          node-version: 22.12.0
 
-      - name: Install dependencies
+      # If a DOTENV_GITHUB_PAGES secret is set, write it to .env.github-pages
+      - name: Create .env.github-pages from secret (if provided)
+        run: |
+          # Guard inside the shell to avoid using secrets in the 'if:' expression (some validators reject that)
+          if [ -n "${{ secrets.DOTENV_GITHUB_PAGES }}" ]; then
+            echo "Creating .env.github-pages from DOTENV_GITHUB_PAGES secret"
+            printf "%s" "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
+          else
+            echo "DOTENV_GITHUB_PAGES secret not set; skipping creation of .env.github-pages"
+          fi
+
+      # Load .env.github-pages (if present) into the GitHub Actions environment
+      - name: Load .env.github-pages into workflow environment
+        run: |
+          if [ -f .env.github-pages ]; then
+            echo "Loading .env.github-pages into workflow environment (GITHUB_ENV)"
+            # Normalize CRLF, skip empty lines and comments, and append KEY=VALUE lines to GITHUB_ENV
+            sed -e 's/\r$//' .env.github-pages |
+            while IFS= read -r line || [ -n "$line" ]; do
+              case "$line" in
+                ''|\#*) continue ;;
+              esac
+              # If the line begins with 'export ', strip it
+              line_no_export="${line#export }"
+              echo "$line_no_export" >> "$GITHUB_ENV"
+            done
+          else
+            echo ".env.github-pages not found; skipping env injection"
+          fi
+
+      # Ensure Vite picks up env variables at build time by creating an .env.production file
+      - name: Create .env.production for Vite build (from .env.github-pages or .env)
+        run: |
+          # Prefer secret-created .env.github-pages, fallback to repo .env
+          if [ -f .env.github-pages ]; then
+            echo "Using .env.github-pages to create .env.production"
+            cp .env.github-pages .env.production
+          elif [ -f .env ]; then
+            echo "Using .env to create .env.production"
+            cp .env .env.production
+          else
+            echo "No .env.github-pages or .env found; .env.production will not be created"
+          fi
+
+      # Append any runtime environment variables starting with VITE_ (e.g. those defined
+      # in Settings → Environments → github-pages) into .env.production so Vite picks them up.
+      - name: Inject runtime VITE_* env vars into .env.production
+        run: |
+          echo "Injecting runtime VITE_* variables into .env.production (merge/replace)"
+          touch .env.production
+          # Iterate over current environment variables and add/replace VITE_* entries
+          while IFS='=' read -r name value; do
+            case "$name" in
+              VITE_*)
+                # Remove any existing entry for this key
+                sed -i "/^${name}=/d" .env.production || true
+                # Append the key=value without exposing it in logs
+                printf '%s=%s\n' "$name" "$value" >> .env.production
+                ;;
+            esac
+          done < <(printenv)
+
+      - name: "Debug (safe): show VITE_* keys and lengths in .env.production"
+        run: |
+          echo "Debug: listing VITE_* keys and value lengths from .env.production"
+          if [ ! -f .env.production ]; then
+            echo ".env.production not found"
+            exit 0
+          fi
+          sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
+            key=$(echo "$kv" | sed -E 's/=.*//')
+            val=$(echo "$kv" | sed -E 's/^[^=]*=//')
+            len=$(echo -n "$val" | wc -c)
+            echo "$key len=$len"
+          done
+
+      # Optional debug: list VITE_* keys and their lengths (does not print values)
+      - name: "Debug: list VITE_* keys and lengths (only prints lengths, not values)"
+        run: |
+          echo "Listing VITE_* keys and their length in .env.production (if exists)"
+          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "Skipping debug (not manually dispatched)"
+            exit 0
+          fi
+          if [ -f .env.production ]; then
+            sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
+              key=$(echo "$kv" | sed -E 's/=.*//')
+              val=$(echo "$kv" | sed -E 's/^[^=]*=//')
+              len=$(echo -n "$val" | wc -c)
+              echo "$key len=$len"
+            done
+          else
+            echo ".env.production not found"
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies (with lockfile)
+        if: hashFiles('**/package-lock.json') != ''
         run: npm ci
 
-      - name: Create .env.production (auto)
+      - name: Install dependencies (no lockfile)
+        if: hashFiles('**/package-lock.json') == ''
+        run: npm i
+
+      - name: Build
+        # Ensure a production build (Vite will pick up env vars present in the environment)
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    environment:
+      name: github-pages
+    runs-on: ubuntu-latest
+    # Run the build inside the deploy job so environment variables defined on the
+    # 'github-pages' environment are available at build time and will be embedded
+    # in the production bundle (Vite must see them during build).
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+
+      - name: Create .env.production from environment variables (merge)
         run: |
-          echo "# Auto-generated by workflow" > .env.production
-          echo "NODE_ENV=production" >> .env.production
-          echo "VITE_BASE=/${{ github.event.repository.name }}/" >> .env.production
-          echo "VITE_API_URL=${{ vars.VITE_API_URL || '' }}" >> .env.production
-          echo "VITE_LINKEDIN_TOKEN=${{ secrets.VITE_LINKEDIN_TOKEN || '' }}" >> .env.production
+          echo "Creating .env.production from repo .env (if present) and environment VITE_* vars"
+          if [ -f .env ]; then
+            cp .env .env.production
+          else
+            touch .env.production
+          fi
+          # Merge environment VITE_* vars (Environment-level variables are injected into the job)
+          while IFS='=' read -r name value; do
+            case "$name" in
+              VITE_*)
+                sed -i "/^${name}=/d" .env.production || true
+                printf '%s=%s\n' "$name" "$value" >> .env.production
+                ;;
+            esac
+          done < <(printenv)
 
-          echo "Generated .env.production:"
-          cat .env.production
+      - name: Install dependencies (with lockfile)
+        if: hashFiles('**/package-lock.json') != ''
+        run: npm ci
 
-      - name: Build project (Vite)
-        env:
-          NODE_ENV: production
+      - name: Install dependencies (no lockfile)
+        if: hashFiles('**/package-lock.json') == ''
+        run: npm i
+
+      - name: Build
         run: npm run build
 
       - name: Upload artifact
@@ -57,3 +197,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with: {}
+      - name: Set environment URL output
+        if: ${{ steps.deployment.outputs.page_url != '' }}
+        run: echo "Deployed to ${{ steps.deployment.outputs.page_url }}"
