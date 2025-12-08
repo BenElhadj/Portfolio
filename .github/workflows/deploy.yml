@@ -30,10 +30,14 @@ jobs:
 
       # If a DOTENV_GITHUB_PAGES secret is set, write it to .env.github-pages
       - name: Create .env.github-pages from secret (if provided)
-        if: ${{ secrets.DOTENV_GITHUB_PAGES != '' }}
         run: |
-          echo "Creating .env.github-pages from DOTENV_GITHUB_PAGES secret"
-          printf "%s" "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
+          # Guard inside the shell to avoid using secrets in the 'if:' expression (some validators reject that)
+          if [ -n "${{ secrets.DOTENV_GITHUB_PAGES }}" ]; then
+            echo "Creating .env.github-pages from DOTENV_GITHUB_PAGES secret"
+            printf "%s" "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
+          else
+            echo "DOTENV_GITHUB_PAGES secret not set; skipping creation of .env.github-pages"
+          fi
 
       # Load .env.github-pages (if present) into the GitHub Actions environment
       - name: Load .env.github-pages into workflow environment
