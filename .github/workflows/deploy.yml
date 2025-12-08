@@ -2,160 +2,49 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
-# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one deployment at a time
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
-    environment: github-pages
+  build_and_deploy:
     runs-on: ubuntu-latest
+    environment: github-pages
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12.0
+          node-version: 18
+          cache: 'npm'
 
-      # If a DOTENV_GITHUB_PAGES secret is set, write it to .env.github-pages
-      - name: Create .env.github-pages from secret (if provided)
-        run: |
-          # Guard inside the shell to avoid using secrets in the 'if:' expression (some validators reject that)
-          if [ -n "${{ secrets.DOTENV_GITHUB_PAGES }}" ]; then
-            echo "Creating .env.github-pages from DOTENV_GITHUB_PAGES secret"
-            printf "%s" "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
-          else
-            echo "DOTENV_GITHUB_PAGES secret not set; skipping creation of .env.github-pages"
-          fi
-
-      # Load .env.github-pages (if present) into the GitHub Actions environment
-      - name: Load .env.github-pages into workflow environment
-        run: |
-          if [ -f .env.github-pages ]; then
-            echo "Loading .env.github-pages into workflow environment (GITHUB_ENV)"
-            # Normalize CRLF, skip empty lines and comments, and append KEY=VALUE lines to GITHUB_ENV
-            sed -e 's/\r$//' .env.github-pages |
-            while IFS= read -r line || [ -n "$line" ]; do
-              case "$line" in
-                ''|\#*) continue ;;
-              esac
-              # If the line begins with 'export ', strip it
-              line_no_export="${line#export }"
-              echo "$line_no_export" >> "$GITHUB_ENV"
-            done
-          else
-            echo ".env.github-pages not found; skipping env injection"
-          fi
-
-      # Ensure Vite picks up env variables at build time by creating an .env.production file
-      - name: Create .env.production for Vite build (from .env.github-pages or .env)
-        run: |
-          # Prefer secret-created .env.github-pages, fallback to repo .env
-          if [ -f .env.github-pages ]; then
-            echo "Using .env.github-pages to create .env.production"
-            cp .env.github-pages .env.production
-          elif [ -f .env ]; then
-            echo "Using .env to create .env.production"
-            cp .env .env.production
-          else
-            echo "No .env.github-pages or .env found; .env.production will not be created"
-          fi
-
-      # Append any runtime environment variables starting with VITE_ (e.g. those defined
-      # in Settings → Environments → github-pages) into .env.production so Vite picks them up.
-      - name: Inject runtime VITE_* env vars into .env.production
-        run: |
-          echo "Injecting runtime VITE_* variables into .env.production (merge/replace)"
-          touch .env.production
-          # Iterate over current environment variables and add/replace VITE_* entries
-          while IFS='=' read -r name value; do
-            case "$name" in
-              VITE_*)
-                # Remove any existing entry for this key
-                sed -i "/^${name}=/d" .env.production || true
-                # Append the key=value without exposing it in logs
-                printf '%s=%s\n' "$name" "$value" >> .env.production
-                ;;
-            esac
-          done < <(printenv)
-
-      - name: Force-write known VITE_* keys from shell environment into .env.production
-        run: |
-          echo "Force-writing known VITE_* keys into .env.production from shell env"
-          touch .env.production
-          keys=(
-            VITE_START_BAC5_42 VITE_END_BAC5_42
-            VITE_START_BAC2_GRETA VITE_END_BAC2_GRETA
-            VITE_START_BAC2_CSFIEE VITE_END_BAC2_CSFIEE
-            VITE_START_BAC_CSFIEE VITE_END_BAC_CSFIEE
-            VITE_START_BAC_IPH VITE_END_BAC_IPH
-          )
-          for k in "${keys[@]}"; do
-            # remove existing
-            sed -i "/^${k}=/d" .env.production || true
-            # indirect expansion to get value of variable named in $k
-            val="${!k}"
-            printf '%s=%s\n' "$k" "$val" >> .env.production
-          done
-
-      - name: "Debug (safe): show VITE_* keys and lengths in .env.production"
-        run: |
-          echo "Debug: listing VITE_* keys and value lengths from .env.production"
-          if [ ! -f .env.production ]; then
-            echo ".env.production not found"
-            exit 0
-          fi
-          sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
-            key=$(echo "$kv" | sed -E 's/=.*//')
-            val=$(echo "$kv" | sed -E 's/^[^=]*=//')
-            len=$(echo -n "$val" | wc -c)
-            echo "$key len=$len"
-          done
-
-      # Optional debug: list VITE_* keys and their lengths (does not print values)
-      - name: "Debug: list VITE_* keys and lengths (only prints lengths, not values)"
-        run: |
-          echo "Listing VITE_* keys and their length in .env.production (if exists)"
-          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
-            echo "Skipping debug (not manually dispatched)"
-            exit 0
-          fi
-          if [ -f .env.production ]; then
-            sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
-              key=$(echo "$kv" | sed -E 's/=.*//')
-              val=$(echo "$kv" | sed -E 's/^[^=]*=//')
-              len=$(echo -n "$val" | wc -c)
-              echo "$key len=$len"
-            done
-          else
-            echo ".env.production not found"
-          fi
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Install dependencies (with lockfile)
-        if: hashFiles('**/package-lock.json') != ''
+      - name: Install dependencies
         run: npm ci
 
-      - name: Install dependencies (no lockfile)
-        if: hashFiles('**/package-lock.json') == ''
-        run: npm i
+      - name: Create .env.production (auto)
+        run: |
+          echo "# Auto-generated by workflow" > .env.production
+          echo "NODE_ENV=production" >> .env.production
+          echo "VITE_BASE=/${{ github.event.repository.name }}/" >> .env.production
 
-      - name: Build
-        # Ensure a production build (Vite will pick up env vars present in the environment)
+          echo "Generated .env.production:"
+          cat .env.production
+
+      - name: Build project (Vite)
+        env:
+          NODE_ENV: production
         run: npm run build
 
       - name: Upload artifact
@@ -163,13 +52,6 @@ jobs:
         with:
           path: ./dist
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
