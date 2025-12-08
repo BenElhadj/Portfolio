@@ -28,6 +28,32 @@ jobs:
         with:
           node-version: 22.12.0
 
+      # If a DOTENV_GITHUB_PAGES secret is set, write it to .env.github-pages
+      - name: Create .env.github-pages from secret (if provided)
+        if: ${{ secrets.DOTENV_GITHUB_PAGES != '' }}
+        run: |
+          echo "Creating .env.github-pages from DOTENV_GITHUB_PAGES secret"
+          printf "%s" "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
+
+      # Load .env.github-pages (if present) into the GitHub Actions environment
+      - name: Load .env.github-pages into workflow environment
+        run: |
+          if [ -f .env.github-pages ]; then
+            echo "Loading .env.github-pages into workflow environment (GITHUB_ENV)"
+            # Normalize CRLF, skip empty lines and comments, and append KEY=VALUE lines to GITHUB_ENV
+            sed -e 's/\r$//' .env.github-pages |
+            while IFS= read -r line || [ -n "$line" ]; do
+              case "$line" in
+                ''|\#*) continue ;;
+              esac
+              # If the line begins with 'export ', strip it
+              line_no_export="${line#export }"
+              echo "$line_no_export" >> "$GITHUB_ENV"
+            done
+          else
+            echo ".env.github-pages not found; skipping env injection"
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
@@ -40,6 +66,7 @@ jobs:
         run: npm i
 
       - name: Build
+        # Ensure a production build (Vite will pick up env vars present in the environment)
         run: npm run build
 
       - name: Upload artifact
