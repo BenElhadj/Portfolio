@@ -168,6 +168,13 @@ async function fetchAssetAsDataUrl(url) {
 
     const isBac = /^bac/i.test(baseName);
 
+    // If this is an SVG logo and not a 'bac' diploma, return the original URL
+    // so the browser loads the file directly (preserves external SVG behavior
+    // and avoids unnecessary data-URL conversions).
+    if (m && m[2] && m[2].toLowerCase() === 'svg' && !isBac) {
+      return url;
+    }
+
     // compute normalized env key base (no +, - replaced by _ ; uppercased)
     const norm = baseName.replace(/\+/g, '').replace(/-/g, '_').toUpperCase();
   const envStartKey = 'VITE_START_' + norm;
