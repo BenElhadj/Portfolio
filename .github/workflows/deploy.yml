@@ -4,10 +4,6 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
-    inputs:
-      dotenv:
-        description: 'Optional .env content to use for this run (ignored if DOTENV_GITHUB_PAGES secret is set)'
-        required: false
 
 # Required permissions for GitHub Pages deployment
 permissions:
@@ -30,76 +26,33 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          # Use a stable LTS version; adjust if your project needs a different one
-          node-version: '18.x'
-          cache: 'npm'
+          node-version: 22.12.0
 
-      # If a DOTENV_GITHUB_PAGES secret is provided, write it to .env.github-pages (overrides repo file)
-      - name: Restore DOTENV_GITHUB_PAGES secret
-        if: ${{ secrets.DOTENV_GITHUB_PAGES != '' }}
-        run: |
-          printf '%s\n' "${{ secrets.DOTENV_GITHUB_PAGES }}" > .env.github-pages
-
-      # Allow manually passing dotenv via workflow_dispatch input if secret is not set
-      - name: Use workflow_dispatch dotenv input
-        if: ${{ secrets.DOTENV_GITHUB_PAGES == '' && github.event.inputs.dotenv != '' }}
-        run: |
-          printf '%s\n' "${{ github.event.inputs.dotenv }}" > .env.github-pages
-
-      # Load .env.github-pages into the job environment (safe: comments and empty lines are ignored)
-      - name: Load .env.github-pages into environment
-        run: |
-          if [ -f .env.github-pages ]; then
-            echo "Loading .env.github-pages into job environment"
-            # Filter out comments and empty lines, then append to GITHUB_ENV for subsequent steps
-            grep -v '^\s*#' .env.github-pages | sed -E '/^\s*$/d' >> $GITHUB_ENV
-          else
-            echo "No .env.github-pages file found; continuing without it"
-          fi
-
-      - name: Configure GitHub Pages action (prepares deployment target)
+      - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Cache npm
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Install dependencies (with lockfile)
+        if: hashFiles('**/package-lock.json') != ''
+        run: npm ci
 
-      - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+      - name: Install dependencies (no lockfile)
+        if: hashFiles('**/package-lock.json') == ''
+        run: npm i
 
-      - name: Optimized Vite build
-        env:
-          NODE_ENV: production
-          CI: true
-        run: |
-          # Prefer the project's build script if present (allows custom optimizations),
-          # otherwise fall back to a direct Vite production build.
-          if npm run | grep -q " build"; then
-            npm run build --if-present
-          else
-            npx vite build --mode production
-          fi
+      - name: Build
+        run: npm run build
 
-      - name: Upload Pages artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
