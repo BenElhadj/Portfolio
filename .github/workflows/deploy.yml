@@ -90,6 +90,20 @@ jobs:
             esac
           done < <(printenv)
 
+      - name: "Debug (safe): show VITE_* keys and lengths in .env.production"
+        run: |
+          echo "Debug: listing VITE_* keys and value lengths from .env.production"
+          if [ ! -f .env.production ]; then
+            echo ".env.production not found"
+            exit 0
+          fi
+          sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
+            key=$(echo "$kv" | sed -E 's/=.*//')
+            val=$(echo "$kv" | sed -E 's/^[^=]*=//')
+            len=$(echo -n "$val" | wc -c)
+            echo "$key len=$len"
+          done
+
       # Optional debug: list VITE_* keys and their lengths (does not print values)
       - name: "Debug: list VITE_* keys and lengths (only prints lengths, not values)"
         run: |
