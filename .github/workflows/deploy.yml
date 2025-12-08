@@ -23,24 +23,56 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (with cache)
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12.0
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Install dependencies (with lockfile)
-        if: hashFiles('**/package-lock.json') != ''
+      - name: Install dependencies
         run: npm ci
 
-      - name: Install dependencies (no lockfile)
-        if: hashFiles('**/package-lock.json') == ''
-        run: npm i
+      - name: Restore .env from secret (optional)
+        env:
+          DOTENV_GITHUB_PAGES: ${{ secrets.DOTENV_GITHUB_PAGES }}
+        run: |
+          if [ -n "$DOTENV_GITHUB_PAGES" ]; then
+            echo "Writing .env.github-pages from secret DOTENV_GITHUB_PAGES"
+            printf '%s\n' "$DOTENV_GITHUB_PAGES" > .env.github-pages
+          else
+            echo "DOTENV_GITHUB_PAGES secret not set; skipping"
+          fi
 
-      - name: Build
-        run: npm run build
+      - name: Source .env.github-pages if present
+        run: |
+          if [ -f .env.github-pages ]; then
+            echo "Sourcing .env.github-pages"
+            # Normalize line endings then export all variables into environment
+            sed 's/\r$//' .env.github-pages > .env.github-pages.clean || true
+            set -o allexport
+            # shellcheck disable=SC1091
+            . .env.github-pages.clean
+            set +o allexport
+            rm -f .env.github-pages.clean
+          else
+            echo ".env.github-pages not found — continuing"
+          fi
+
+      - name: Build (Vite optimized)
+        env:
+          NODE_ENV: production
+          CI: true
+        run: |
+          echo "Running Vite build with increased memory limit"
+          export NODE_OPTIONS="--max-old-space-size=4096"
+          # Try passing a Vite mode (github-pages) to allow using .env.github-pages as .env.<mode>
+          npm run build -- --mode github-pages || npm run build
+
+      - name: SPA fallback for GitHub Pages
+        run: |
+          if [ -d dist ]; then
+            cp dist/index.html dist/404.html || true
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -48,12 +80,17 @@ jobs:
           path: ./dist
 
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
