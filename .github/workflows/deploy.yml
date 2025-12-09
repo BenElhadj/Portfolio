@@ -60,6 +60,19 @@ jobs:
             esac
           done < <(printenv)
 
+      # Generic merge: append every VITE_* environment variable visible to the job into .env.production
+      # This avoids manually enumerating keys; any new VITE_ variable added in the GitHub Environment
+      # or repository variables will automatically be included in the build.
+      - name: Merge all VITE_* runtime variables into .env.production
+        run: |
+          echo "Merging all VITE_* variables from the job environment into .env.production"
+          # For safety, remove any existing VITE_ entries then append current ones from printenv
+          sed -i '/^VITE_/d' .env.production || true
+          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
+            # Append without printing the value to logs
+            printf '%s=%s\n' "$name" "$value" >> .env.production
+          done || true
+
       - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
         run: |
           echo "Debug: listing VITE_* keys and value lengths from .env.production"
