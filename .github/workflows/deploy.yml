@@ -60,83 +60,40 @@ jobs:
             esac
           done < <(printenv)
 
-      # - name: Ensure specific VITE_* keys are present in .env.production (read from vars/secrets/printenv)
-      #   run: |
-      #     # Explicitly write known keys pulling from (in order) repo vars, secrets, then runtime env
-      #     set -euo pipefail
-      #     keys=(
-      #       VITE_START_BAC5_42 VITE_END_BAC5_42
-      #       VITE_START_BAC2_GRETA VITE_END_BAC2_GRETA
-      #       VITE_START_BAC2_CSFIEE VITE_END_BAC2_CSFIEE
-      #       VITE_START_BAC_CSFIEE VITE_END_BAC_CSFIEE
-      #       VITE_START_BAC_IPH VITE_END_BAC_IPH
-      #     )
-      #     for k in "${keys[@]}"; do
-      #       # try workflow vars context, then secrets, then process env
-      #       val=""
-      #       # The following expansions will be empty if the context variable doesn't exist
-      #       case "$k" in
-      #         VITE_START_BAC5_42) val="${{ vars.VITE_START_BAC5_42 }}" ;; 
-      #         VITE_END_BAC5_42) val="${{ vars.VITE_END_BAC5_42 }}" ;; 
-      #         VITE_START_BAC2_GRETA) val="${{ vars.VITE_START_BAC2_GRETA }}" ;; 
-      #         VITE_END_BAC2_GRETA) val="${{ vars.VITE_END_BAC2_GRETA }}" ;; 
-      #         VITE_START_BAC2_CSFIEE) val="${{ vars.VITE_START_BAC2_CSFIEE }}" ;; 
-      #         VITE_END_BAC2_CSFIEE) val="${{ vars.VITE_END_BAC2_CSFIEE }}" ;; 
-      #         VITE_START_BAC_CSFIEE) val="${{ vars.VITE_START_BAC_CSFIEE }}" ;; 
-      #         VITE_END_BAC_CSFIEE) val="${{ vars.VITE_END_BAC_CSFIEE }}" ;; 
-      #         VITE_START_BAC_IPH) val="${{ vars.VITE_START_BAC_IPH }}" ;; 
-      #         VITE_END_BAC_IPH) val="${{ vars.VITE_END_BAC_IPH }}" ;; 
-      #       esac
-      #       if [ -z "$val" ]; then
-      #         case "$k" in
-      #           VITE_START_BAC5_42) val="${{ secrets.VITE_START_BAC5_42 }}" ;; 
-      #           VITE_END_BAC5_42) val="${{ secrets.VITE_END_BAC5_42 }}" ;; 
-      #           VITE_START_BAC2_GRETA) val="${{ secrets.VITE_START_BAC2_GRETA }}" ;; 
-      #           VITE_END_BAC2_GRETA) val="${{ secrets.VITE_END_BAC2_GRETA }}" ;; 
-      #           VITE_START_BAC2_CSFIEE) val="${{ secrets.VITE_START_BAC2_CSFIEE }}" ;; 
-      #           VITE_END_BAC2_CSFIEE) val="${{ secrets.VITE_END_BAC2_CSFIEE }}" ;; 
-      #           VITE_START_BAC_CSFIEE) val="${{ secrets.VITE_START_BAC_CSFIEE }}" ;; 
-      #           VITE_END_BAC_CSFIEE) val="${{ secrets.VITE_END_BAC_CSFIEE }}" ;; 
-      #           VITE_START_BAC_IPH) val="${{ secrets.VITE_START_BAC_IPH }}" ;; 
-      #           VITE_END_BAC_IPH) val="${{ secrets.VITE_END_BAC_IPH }}" ;; 
-      #         esac
-      #       fi
-      #       if [ -z "$val" ]; then
-      #         # final fallback: process env (this will catch values injected as runtime env vars)
-      #         val="$(printenv "$k" || true)"
-      #       fi
-      #       # Remove existing and write final value
-      #       sed -i "/^${k}=/d" .env.production || true
-      #       printf '%s=%s\n' "$k" "$val" >> .env.production
-      #     done
 
-      - name: Auto-inject all VITE_* from vars/secrets/runtime into .env.production
-        env:
-          # On "touche" toutes les vars/secrets possibles via une expression dummy
-          # GitHub va alors les injecter dans l'env Unix
-          DUMMY_VARS: ${{ toJSON(vars) }}
-          DUMMY_SECRETS: ${{ toJSON(secrets) }}
+          
+      - name: Auto-inject ALL VITE_* environment variables
         run: |
-          set -euo pipefail
-
-          # Nettoie ou crée le fichier
-          > .env.production
-
-          # Parcourt toutes les variables d'environnement qui commencent par VITE_
-          printenv | grep '^VITE_' | while IFS= read -r line; do
-            key="${line%%=*}"
-            value="${line#*=}"
-
-            # Si vide (cas improbable), on skip
-            [[ -z "$value" ]] && continue
-
-            # Supprime l'ancienne ligne si existe
-            sed -i "/^${key}=/d" .env.production 2>/dev/null || true
-            echo "$line" >> .env.production
+          echo "Auto-injecting ALL VITE_* variables from all sources..."
+          
+          # Crée .env.production s'il n'existe pas
+          touch .env.production
+          
+          # Récupère toutes les variables VITE_* disponibles dans le runner
+          # Ceci inclut automatiquement:
+          # 1. Les variables d'environnement GitHub (Settings > Environments > github-pages)
+          # 2. Les variables de repository (Settings > Secrets and variables > Variables)
+          # 3. Les secrets (Settings > Secrets and variables > Actions secrets)
+          # 4. Les variables définies dans le workflow avec 'env:'
+          
+          # Utilise printenv pour lister TOUTES les variables VITE_*
+          printenv | grep -E '^VITE_' | while IFS='=' read -r var_name var_value; do
+            # Échappe les caractères spéciaux dans le nom de variable pour sed
+            safe_var_name=$(printf '%s\n' "$var_name" | sed 's/[\/&]/\\&/g')
+            
+            # Supprime l'ancienne entrée si elle existe
+            sed -i "/^${safe_var_name}=/d" .env.production 2>/dev/null || true
+            
+            # Ajoute la nouvelle valeur
+            # Note: Utilise printf pour éviter les problèmes d'interprétation
+            printf '%s=%s\n' "$var_name" "$var_value" >> .env.production
+            
+            # Log (sans la valeur pour la sécurité)
+            echo "✓ Injected: $var_name"
           done
+          
+          echo "✅ Auto-injection completed!"
 
-          # Optionnel : trier pour lisibilité
-          sort -o .env.production .env.production
 
 
 
