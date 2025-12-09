@@ -41,16 +41,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22.12.0
-      - name: Create .env.production (merge repo .env + runtime VITE_* envs)
+      - name: Create .env.production (merge repo .env + environment + runtime VITE_* vars)
         run: |
-          echo "Creating .env.production from repo .env (if present) and merging all VITE_* environment variables"
+          echo "Creating .env.production from repo .env (if present) and merging VITE_* variables"
           if [ -f .env ]; then
             cp .env .env.production
           else
             : > .env.production
           fi
-          # Dynamically take all VITE_* variables from the job environment and merge them.
-          # This avoids editing the workflow when new VITE_ variables are added.
+
+          # 1) Try to fetch variables defined in the GitHub Environment via the REST API
+          #    (covers values configured in Settings -> Environments -> github-pages)
+          echo "Fetching environment variables from GitHub Environments API (github-pages)"
+          api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/environments/github-pages/variables"
+          resp=$(curl -sS -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GITHUB_TOKEN}" "$api_url" || true)
+          if [ -n "$resp" ]; then
+            echo "$resp" | node -e "const fs=require('fs');const s=fs.readFileSync(0,'utf8');try{const j=JSON.parse(s);const vars=j.variables||j.environment||[];for(const v of vars){if(v && v.name && v.name.startsWith('VITE_')) console.log(\`${'${v.name}'}=${'${v.value}'}\`);}}catch(e){}" > .env.from_environment || true
+          fi > .env.from_environment || true
+          if [ -s .env.from_environment ]; then
+            # Merge environment-derived VITE_* variables (env values take precedence)
+            while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              key="$(echo "$line" | cut -d'=' -f1)"
+              sed -i "/^${key}=/d" .env.production || true
+              printf '%s\n' "$line" >> .env.production
+            done < .env.from_environment
+          fi
+
+          # 2) Fallback: merge any VITE_* variables already present in the runner environment
           printenv | grep -E '^VITE_' || true | while IFS= read -r line; do
             [ -z "$line" ] && continue
             key="$(echo "$line" | cut -d'=' -f1)"
