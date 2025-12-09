@@ -170,6 +170,14 @@ async function fetchAssetAsDataUrl(url) {
     if (isBac) {
       const envStart = import.meta.env[envStartKey] || '';
       const envEnd = import.meta.env[envEndKey] || '';
+      
+      // try {
+        const preview = (s) => (s && s.length ? s.replace(/\s+/g, '').slice(0, 30) + (s.length > 30 ? '...' : '') : '(empty)');
+        console.log('[Diplomas] env keys:', envStartKey, 'len=', (envStart && envStart.length) || 0, 'preview=', preview(envStart), ';', envEndKey, 'len=', (envEnd && envEnd.length) || 0, 'preview=', preview(envEnd));
+      // } catch (e) {
+      //   // ignore logging errors
+      // }
+
 
       if (envStart && typeof envStart === 'string' && envStart.startsWith('data:')) {
         const candidates = [];
