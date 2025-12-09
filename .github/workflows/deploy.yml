@@ -24,27 +24,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate .env.production with VITE_* vars
+
+        
+      - name: Generate .env.production
         run: |
           echo "Generating .env.production with VITE_* vars"
 
-          # Start fresh (or copy local .env)
+          # Start from .env if exists
           if [ -f .env ]; then
             cp .env .env.production
           else
             touch .env.production
           fi
 
-          # Collect and append VITE_* vars safely
-          # ADDING "|| true" => prevents job failure when no variable exists
+          # Append VITE_* variables (no error if none exists)
           printenv | grep -E '^VITE_' || true | while IFS='=' read -r name value; do
-            [ -z "$name" ] && continue
             sed -i "/^${name}=/d" .env.production || true
             printf '%s="%s"\n' "$name" "$value" >> .env.production
           done
 
           echo "Final .env.production contains:"
           sed -n 's/\r$//; /^VITE_/p' .env.production | sed 's/=.*$/=***hidden***/'
+
+
+
+
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
