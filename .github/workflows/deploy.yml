@@ -110,37 +110,31 @@ jobs:
       #       printf '%s=%s\n' "$k" "$val" >> .env.production
       #     done
 
-      - name: Auto-inject all VITE_* from vars + secrets → .env.production
+      - name: Inject all VITE_* automatically (pure bash)
+        env:
+          # On passe tout le contexte vars et secrets comme variables d’environnement temporaires
+          VARS_JSON: ${{ toJSON(vars) }}
+          SECRETS_JSON: ${{ toJSON(secrets) }}
         run: |
           set -euo pipefail
 
-          # Fichier temporaire pour construire le .env final
-          tmp=$(mktemp)
-          touch .env.production
+          # On extrait toutes les clés VITE_* de vars puis de secrets
+          keys=$(echo "$VARS_JSON"   | jq -r 'keys[] | select(startswith("VITE_"))')
+          keys+=$'\n'$(echo "$SECRETS_JSON" | jq -r 'keys[] | select(startswith("VITE_"))')
 
-          # 1. On récupère toutes les vars et secrets qui commencent par VITE_
-          #    et on les fusionne dans l'ordre : repo vars > secrets > runtime env
-          jq -r '
-            to_entries[]
-            | select(.key | startswith("VITE_"))
-            | "\(.key)=\(.value // "")"
-          ' <<< "${{ toJSON(vars) }}" > "$tmp"
+          # Déduplication + tri pour stabilité
+          mapfile -t keys < <(printf '%s\n' $keys | sort -u)
 
-          jq -r '
-            to_entries[]
-            | select(.key | startswith("VITE_"))
-            | "\(.key)=\(.value // "")"
-          ' <<< "${{ toJSON(secrets) }}" >> "$tmp"
-
-          # 2. On ajoute les variables d’environnement runtime qui pourraient écraser
-          printenv | grep '^VITE_' | sort -u >> "$tmp"
-
-          # 3. On supprime les doublons tout en gardant le dernier (priorité correcte)
-          awk -F= '!seen[$1]++' "$tmp" > .env.production
-
-          echo "=== .env.production final ==="
-          cat .env.production
-          echo "==============================="
+          for k in "${keys[@]}"; do
+            # Priorité : vars > secrets > env runtime
+            val="${!k}"  # indirection bash : récupère la valeur de la variable $k si elle existe
+            # Si vide, fallback sur printenv (cas où injectée autrement)
+            [ -z "$val" ] && val="$(printenv "$k" || true)"
+            
+            # Supprime l'ancienne ligne et ajoute la nouvelle
+            sed -i "/^${k}=/d" .env.production 2>/dev/null || true
+            printf '%s=%s\n' "$k" "$val" >> .env.production
+          done
 
 
 
