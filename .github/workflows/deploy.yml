@@ -110,31 +110,33 @@ jobs:
       #       printf '%s=%s\n' "$k" "$val" >> .env.production
       #     done
 
-      - name: Inject all VITE_* automatically (pure bash)
+      - name: Auto-inject all VITE_* from vars/secrets/runtime into .env.production
         env:
-          # On passe tout le contexte vars et secrets comme variables d’environnement temporaires
-          VARS_JSON: ${{ toJSON(vars) }}
-          SECRETS_JSON: ${{ toJSON(secrets) }}
+          # On "touche" toutes les vars/secrets possibles via une expression dummy
+          # GitHub va alors les injecter dans l'env Unix
+          DUMMY_VARS: ${{ toJSON(vars) }}
+          DUMMY_SECRETS: ${{ toJSON(secrets) }}
         run: |
           set -euo pipefail
 
-          # On extrait toutes les clés VITE_* de vars puis de secrets
-          keys=$(echo "$VARS_JSON"   | jq -r 'keys[] | select(startswith("VITE_"))')
-          keys+=$'\n'$(echo "$SECRETS_JSON" | jq -r 'keys[] | select(startswith("VITE_"))')
+          # Nettoie ou crée le fichier
+          > .env.production
 
-          # Déduplication + tri pour stabilité
-          mapfile -t keys < <(printf '%s\n' $keys | sort -u)
+          # Parcourt toutes les variables d'environnement qui commencent par VITE_
+          printenv | grep '^VITE_' | while IFS= read -r line; do
+            key="${line%%=*}"
+            value="${line#*=}"
 
-          for k in "${keys[@]}"; do
-            # Priorité : vars > secrets > env runtime
-            val="${!k}"  # indirection bash : récupère la valeur de la variable $k si elle existe
-            # Si vide, fallback sur printenv (cas où injectée autrement)
-            [ -z "$val" ] && val="$(printenv "$k" || true)"
-            
-            # Supprime l'ancienne ligne et ajoute la nouvelle
-            sed -i "/^${k}=/d" .env.production 2>/dev/null || true
-            printf '%s=%s\n' "$k" "$val" >> .env.production
+            # Si vide (cas improbable), on skip
+            [[ -z "$value" ]] && continue
+
+            # Supprime l'ancienne ligne si existe
+            sed -i "/^${key}=/d" .env.production 2>/dev/null || true
+            echo "$line" >> .env.production
           done
+
+          # Optionnel : trier pour lisibilité
+          sort -o .env.production .env.production
 
 
 
