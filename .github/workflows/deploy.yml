@@ -16,52 +16,61 @@ concurrency:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
-    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Create .env.production from all VITE_* variables
-        shell: bash
+      - name: Generate .env.production with VITE_* vars
         run: |
           echo "Generating .env.production with VITE_* vars"
 
-          # Start fresh (or copy .env if it exists)
+          # Start fresh (or copy local .env)
           if [ -f .env ]; then
             cp .env .env.production
           else
             touch .env.production
           fi
 
-          # Collect all VITE_ variables (from secrets, vars, env)
-          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
-            # Remove old value if exists
+          # Collect and append VITE_* vars safely
+          # ADDING "|| true" => prevents job failure when no variable exists
+          printenv | grep -E '^VITE_' || true | while IFS='=' read -r name value; do
+            [ -z "$name" ] && continue
             sed -i "/^${name}=/d" .env.production || true
-            # Append securely
             printf '%s="%s"\n' "$name" "$value" >> .env.production
           done
 
           echo "Final .env.production contains:"
           sed -n 's/\r$//; /^VITE_/p' .env.production | sed 's/=.*$/=***hidden***/'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
 
-      - name: Build project
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Build
         run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: ./dist
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Output deployed URL
+        if: ${{ steps.deployment.outputs.page_url != '' }}
+        run: echo "Deployed to ${{ steps.deployment.outputs.page_url }}"
