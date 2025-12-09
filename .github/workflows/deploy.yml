@@ -110,40 +110,46 @@ jobs:
       #       printf '%s=%s\n' "$k" "$val" >> .env.production
       #     done
 
-      - name: Auto-populate .env.production with all VITE_* from vars → secrets → runtime env
+      - name: Export all VITE_* vars and secrets to environment
+        run: |
+          # Cette étape exporte toutes les variables correspondant au pattern
+          # Note: Cette méthode utilise gh si disponible pour lister les secrets
+          # Sinon, elle se base sur les variables déjà définies dans env
+          
+          # Définir les patterns
+          patterns="VITE_START_* VITE_END_*"
+          
+          # Pour chaque pattern, exporter les variables d'environnement existantes
+          for pattern in $patterns; do
+            for var_name in $(env | grep -E "^${pattern//\*/.*}=" | cut -d= -f1); do
+              echo "Found environment variable: $var_name"
+              # Elles sont déjà dans l'environnement
+            done
+          done
+
+      - name: Generate .env.production with all VITE_* variables
         run: |
           set -euo pipefail
-
-          # 1. On charge toutes les variables d'environnement du runner
-          # 2. On garde uniquement celles qui commencent par VITE_
-          # 3. Priorité : repo vars > secrets > env runtime (l'ordre naturel de GitHub)
-          # 4. On écrit proprement dans .env.production sans doublons
-
-          {
-            # Entête pour bien voir ce qu'on fait (optionnel)
-            echo "# === Auto-generated VITE_* env from GitHub vars/secrets ==="
-
-            # On liste toutes les vars d'env qui commencent par VITE_
-            printenv | grep -E '^VITE_' | sed -E 's/^(VITE_.*)=.*/\1/' | sort | while read -r key; do
-              # La valeur est déjà dans l'environnement, avec la bonne priorité
-              value="${!key}"
-              printf '%s=%s\n' "$key" "$value"
-            done
-
-          } > .env.production.new
-
-          # Optionnel : garder les lignes déjà présentes dans .env.production qui ne sont PAS des VITE_ (ex: autres configs)
-          grep -v -E '^VITE_' .env.production 2>/dev/null || true > .env.production.tmp
-
-          # Fusion : anciennes non-VITE + nouvelles VITE
-          cat .env.production.tmp .env.production.new > .env.production
-
-          # Nettoyage
-          rm -f .env.production.tmp .env.production.new
-
-          echo "✓ .env.production mis à jour avec $(grep -c '^VITE_' .env.production || echo 0) variables VITE_*"
-
           
+          # Patterns pour identifier les variables VITE
+          patterns=("VITE_START_" "VITE_END_")
+          
+          # Collecter toutes les variables d'environnement VITE_*
+          for pattern in "${patterns[@]}"; do
+            while IFS= read -r line; do
+              var_name="${line%%=*}"
+              var_value="${line#*=}"
+              
+              # Supprimer la ligne existante et ajouter la nouvelle
+              sed -i "/^${var_name}=/d" .env.production || true
+              printf '%s=%s\n' "$var_name" "$var_value" >> .env.production
+              echo "✓ $var_name ajouté"
+            done < <(env | grep "^${pattern}")
+          done
+          
+          echo "Fichier .env.production mis à jour avec toutes les variables VITE_*"
+
+
             
       - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
         run: |
