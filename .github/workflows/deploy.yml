@@ -62,37 +62,51 @@ jobs:
 
 
           
-      - name: Auto-inject ALL VITE_* environment variables
+      - name: Smart auto-injection of VITE_* variables
         run: |
-          echo "Auto-injecting ALL VITE_* variables from all sources..."
+          set -euo pipefail
           
-          # Crée .env.production s'il n'existe pas
-          touch .env.production
+          echo "🚀 Smart injection of ALL VITE_* variables..."
           
-          # Récupère toutes les variables VITE_* disponibles dans le runner
-          # Ceci inclut automatiquement:
-          # 1. Les variables d'environnement GitHub (Settings > Environments > github-pages)
-          # 2. Les variables de repository (Settings > Secrets and variables > Variables)
-          # 3. Les secrets (Settings > Secrets and variables > Actions secrets)
-          # 4. Les variables définies dans le workflow avec 'env:'
+          # Fichier source et destination
+          ENV_FILE=".env.production"
+          touch "$ENV_FILE"
           
-          # Utilise printenv pour lister TOUTES les variables VITE_*
-          printenv | grep -E '^VITE_' | while IFS='=' read -r var_name var_value; do
-            # Échappe les caractères spéciaux dans le nom de variable pour sed
-            safe_var_name=$(printf '%s\n' "$var_name" | sed 's/[\/&]/\\&/g')
-            
-            # Supprime l'ancienne entrée si elle existe
-            sed -i "/^${safe_var_name}=/d" .env.production 2>/dev/null || true
-            
-            # Ajoute la nouvelle valeur
-            # Note: Utilise printf pour éviter les problèmes d'interprétation
-            printf '%s=%s\n' "$var_name" "$var_value" >> .env.production
-            
-            # Log (sans la valeur pour la sécurité)
-            echo "✓ Injected: $var_name"
-          done
+          # Compteurs
+          INJECTED_COUNT=0
+          SKIPPED_COUNT=0
           
-          echo "✅ Auto-injection completed!"
+          # Récupère toutes les variables VITE_* de l'environnement
+          # Le runner GitHub expose déjà TOUTES les variables configurées
+          while IFS='=' read -r var_name var_value; do
+            # Vérifie que c'est une variable VITE_
+            if [[ "$var_name" =~ ^VITE_ ]]; then
+              # Vérifie si la variable a une valeur
+              if [ -n "${var_value:-}" ]; then
+                # Nettoie l'entrée existante
+                grep -v "^$var_name=" "$ENV_FILE" > "${ENV_FILE}.tmp" 2>/dev/null || true
+                mv "${ENV_FILE}.tmp" "$ENV_FILE"
+                
+                # Ajoute la nouvelle valeur (échappement sécurisé)
+                echo "$var_name=$var_value" >> "$ENV_FILE"
+                
+                INJECTED_COUNT=$((INJECTED_COUNT + 1))
+                echo "  ↳ ✅ $var_name"
+              else
+                SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+                echo "  ↳ ⚠️  $var_name (empty)"
+              fi
+            fi
+          done < <(printenv)
+          
+          echo ""
+          echo "📊 Résumé:"
+          echo "  - Variables injectées: $INJECTED_COUNT"
+          echo "  - Variables ignorées: $SKIPPED_COUNT"
+          echo ""
+          echo "🎉 Fini! Vous pouvez maintenant ajouter des variables dans:"
+          echo "   GitHub → Repository → Settings → Environments → github-pages"
+          echo "   OU dans les Repository Variables/Secrets"
 
 
 
