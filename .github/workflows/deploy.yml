@@ -5,82 +5,145 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow only one deployment at a time
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
+
   deploy:
     environment:
       name: github-pages
     runs-on: ubuntu-latest
-
+    # Run the build inside the deploy job so environment variables defined on the
+    # 'github-pages' environment are available at build time and will be embedded
+    # in the production bundle (Vite must see them during build).
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Safe debug — list VITE_* env names and lengths (no values)
+        run: |
+          echo "Checking job environment for VITE_* variables (name and value length only)"
+          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
+            len=$(echo -n "$value" | wc -c)
+            echo "$name len=$len"
+          done || true
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: npm
+          node-version: 22.12.0
 
-      # Debug safe: check available VITE_* variables without showing content
-      - name: Debug environment VITE_* (names only)
+      - name: Create .env.production from environment variables (merge)
         run: |
-          echo "VITE_* variables in job environment :"
-          printenv | grep -E '^VITE_' | sed 's/\(=.*\)/=***hidden***/'
-
-      # AUTO GENERATION OF .env.production
-      - name: Auto-generate .env.production
-        run: |
-          echo "# Auto-generated .env.production" > .env.production
-
-          # Load base env (.env) if present
+          echo "Creating .env.production from repo .env (if present) and environment VITE_* vars"
           if [ -f .env ]; then
-            echo "Merging .env → .env.production"
-            cat .env >> .env.production
+            cp .env .env.production
+          else
+            touch .env.production
           fi
+          # Merge environment VITE_* vars (Environment-level variables are injected into the job)
+          while IFS='=' read -r name value; do
+            case "$name" in
+              VITE_*)
+                sed -i "/^${name}=/d" .env.production || true
+                printf '%s=%s\n' "$name" "$value" >> .env.production
+                ;;
+            esac
+          done < <(printenv)
 
-          echo "" >> .env.production
-          echo "# Injected from GitHub Environment" >> .env.production
-
-          # Append all VITE_* from GitHub env (vars or secrets)
-          printenv | grep -E '^VITE_' | while IFS='=' read -r key value; do
-            sed -i "/^${key}=/d" .env.production || true
-            printf "%s=%s\n" "$key" "$value" >> .env.production
+      - name: Ensure specific VITE_* keys are present in .env.production (read from vars/secrets/printenv)
+        run: |
+          # Explicitly write known keys pulling from (in order) repo vars, secrets, then runtime env
+          set -euo pipefail
+          keys=(
+            VITE_START_BAC5_42 VITE_END_BAC5_42
+            VITE_START_BAC2_GRETA VITE_END_BAC2_GRETA
+            VITE_START_BAC2_CSFIEE VITE_END_BAC2_CSFIEE
+            VITE_START_BAC_CSFIEE VITE_END_BAC_CSFIEE
+            VITE_START_BAC_IPH VITE_END_BAC_IPH
+          )
+          for k in "${keys[@]}"; do
+            # try workflow vars context, then secrets, then process env
+            val=""
+            # The following expansions will be empty if the context variable doesn't exist
+            case "$k" in
+              VITE_START_BAC5_42) val="${{ vars.VITE_START_BAC5_42 }}" ;; 
+              VITE_END_BAC5_42) val="${{ vars.VITE_END_BAC5_42 }}" ;; 
+              VITE_START_BAC2_GRETA) val="${{ vars.VITE_START_BAC2_GRETA }}" ;; 
+              VITE_END_BAC2_GRETA) val="${{ vars.VITE_END_BAC2_GRETA }}" ;; 
+              VITE_START_BAC2_CSFIEE) val="${{ vars.VITE_START_BAC2_CSFIEE }}" ;; 
+              VITE_END_BAC2_CSFIEE) val="${{ vars.VITE_END_BAC2_CSFIEE }}" ;; 
+              VITE_START_BAC_CSFIEE) val="${{ vars.VITE_START_BAC_CSFIEE }}" ;; 
+              VITE_END_BAC_CSFIEE) val="${{ vars.VITE_END_BAC_CSFIEE }}" ;; 
+              VITE_START_BAC_IPH) val="${{ vars.VITE_START_BAC_IPH }}" ;; 
+              VITE_END_BAC_IPH) val="${{ vars.VITE_END_BAC_IPH }}" ;; 
+            esac
+            if [ -z "$val" ]; then
+              case "$k" in
+                VITE_START_BAC5_42) val="${{ secrets.VITE_START_BAC5_42 }}" ;; 
+                VITE_END_BAC5_42) val="${{ secrets.VITE_END_BAC5_42 }}" ;; 
+                VITE_START_BAC2_GRETA) val="${{ secrets.VITE_START_BAC2_GRETA }}" ;; 
+                VITE_END_BAC2_GRETA) val="${{ secrets.VITE_END_BAC2_GRETA }}" ;; 
+                VITE_START_BAC2_CSFIEE) val="${{ secrets.VITE_START_BAC2_CSFIEE }}" ;; 
+                VITE_END_BAC2_CSFIEE) val="${{ secrets.VITE_END_BAC2_CSFIEE }}" ;; 
+                VITE_START_BAC_CSFIEE) val="${{ secrets.VITE_START_BAC_CSFIEE }}" ;; 
+                VITE_END_BAC_CSFIEE) val="${{ secrets.VITE_END_BAC_CSFIEE }}" ;; 
+                VITE_START_BAC_IPH) val="${{ secrets.VITE_START_BAC_IPH }}" ;; 
+                VITE_END_BAC_IPH) val="${{ secrets.VITE_END_BAC_IPH }}" ;; 
+              esac
+            fi
+            if [ -z "$val" ]; then
+              # final fallback: process env (this will catch values injected as runtime env vars)
+              val="$(printenv "$k" || true)"
+            fi
+            # Remove existing and write final value
+            sed -i "/^${k}=/d" .env.production || true
+            printf '%s=%s\n' "$k" "$val" >> .env.production
           done
 
-          echo ""
-          echo "Final .env.production keys:"
-          grep -E '^VITE_' .env.production | sed 's/\(=.*\)/=***hidden***/'
+      - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
+        run: |
+          echo "Debug: listing VITE_* keys and value lengths from .env.production"
+          if [ ! -f .env.production ]; then
+            echo ".env.production not found"
+            exit 0
+          fi
+          sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
+            key=$(echo "$kv" | sed -E 's/=.*//')
+            val=$(echo "$kv" | sed -E 's/^[^=]*=//')
+            len=$(echo -n "$val" | wc -c)
+            echo "$key len=$len"
+          done
 
-      # Install dependencies
-      - name: Install dependencies
+      - name: Install dependencies (with lockfile)
+        if: hashFiles('**/package-lock.json') != ''
         run: npm ci
 
-      # Build project with Vite
+      - name: Install dependencies (no lockfile)
+        if: hashFiles('**/package-lock.json') == ''
+        run: npm i
+
       - name: Build
-        env:
-          NODE_ENV: production
         run: npm run build
 
-      # Upload build output to Pages artifact
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
-      # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Deployment URL
+        with: {}
+      - name: Set environment URL output
         if: ${{ steps.deployment.outputs.page_url != '' }}
         run: echo "Deployed to ${{ steps.deployment.outputs.page_url }}"
