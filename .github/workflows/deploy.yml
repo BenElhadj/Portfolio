@@ -110,19 +110,40 @@ jobs:
       #       printf '%s=%s\n' "$k" "$val" >> .env.production
       #     done
 
-      - name: Add all VITE_* environment variables to .env.production
+      - name: Auto-populate .env.production with all VITE_* from vars → secrets → runtime env
         run: |
           set -euo pipefail
-          
-          # Vider le fichier .env.production des anciennes variables VITE_*
-          sed -i '/^VITE_/d' .env.production 2>/dev/null || true
-          
-          # Ajouter toutes les variables VITE_* de l'environnement
-          printenv | grep '^VITE_' >> .env.production || true
-          
-          echo "Added all VITE_* environment variables to .env.production"
-          grep '^VITE_' .env.production || echo "No VITE_* variables found"
 
+          # 1. On charge toutes les variables d'environnement du runner
+          # 2. On garde uniquement celles qui commencent par VITE_
+          # 3. Priorité : repo vars > secrets > env runtime (l'ordre naturel de GitHub)
+          # 4. On écrit proprement dans .env.production sans doublons
+
+          {
+            # Entête pour bien voir ce qu'on fait (optionnel)
+            echo "# === Auto-generated VITE_* env from GitHub vars/secrets ==="
+
+            # On liste toutes les vars d'env qui commencent par VITE_
+            printenv | grep -E '^VITE_' | sed -E 's/^(VITE_.*)=.*/\1/' | sort | while read -r key; do
+              # La valeur est déjà dans l'environnement, avec la bonne priorité
+              value="${!key}"
+              printf '%s=%s\n' "$key" "$value"
+            done
+
+          } > .env.production.new
+
+          # Optionnel : garder les lignes déjà présentes dans .env.production qui ne sont PAS des VITE_ (ex: autres configs)
+          grep -v -E '^VITE_' .env.production 2>/dev/null || true > .env.production.tmp
+
+          # Fusion : anciennes non-VITE + nouvelles VITE
+          cat .env.production.tmp .env.production.new > .env.production
+
+          # Nettoyage
+          rm -f .env.production.tmp .env.production.new
+
+          echo "✓ .env.production mis à jour avec $(grep -c '^VITE_' .env.production || echo 0) variables VITE_*"
+
+          
             
       - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
         run: |
