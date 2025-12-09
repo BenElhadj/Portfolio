@@ -16,55 +16,33 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
     runs-on: ubuntu-latest
+    environment: github-pages
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug — Show VITE_* variable names + lengths (safe)
-        run: |
-          echo "Listing all VITE_* env vars available in this job:"
-          printenv | grep '^VITE_' | while IFS='=' read -r n v; do
-            echo "$n len=$(echo -n "$v" | wc -c)"
-          done || true
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12.0
+          node-version: 22
 
-      ############################################################
-      # 🔥 AUTO-GENERATION .env.production — FULLY AUTOMATIC 🔥
-      # - Merge repo .env (optional)
-      # - Append ALL VITE_* from vars, secrets, and runtime env
-      ############################################################
-      - name: Generate .env.production (auto-detect all VITE_* vars)
+      - name: Create .env.production (auto)
         run: |
-          echo "Generating .env.production automatically"
+          echo "Generating .env.production from all VITE_* variables"
 
-          # Start with repo .env if present
-          if [ -f .env ]; then
-            cp .env .env.production
-          else
-            touch .env.production
-          fi
+          # Start fresh
+          rm -f .env.production
+          touch .env.production
 
-          echo "Appending ALL VITE_* variables from environment:"
-          printenv | grep '^VITE_' | while IFS='=' read -r key val; do
-            # Remove existing
-            sed -i "/^${key}=/d" .env.production || true
-            # Append securely
-            printf '%s="%s"\n' "$key" "$val" >> .env.production
-            echo "→ Added $key"
+          # Loop over ALL VITE_* variables coming from environment
+          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
+            echo "$name=$value" >> .env.production
           done
 
-          echo "Final .env.production VITE_* content (value length only):"
-          sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS='=' read -r n v; do
-            echo "$n len=$(echo -n "$v" | wc -c)"
-          done
+          echo "Final .env.production keys:"
+          sed -n 's/\r$//; /^VITE_/p' .env.production | sed 's/=.*/=<hidden>/' || true
 
       - name: Install dependencies (lockfile)
         if: hashFiles('**/package-lock.json') != ''
@@ -85,7 +63,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Set environment URL output
-        if: ${{ steps.deployment.outputs.page_url != '' }}
-        run: echo "Deployed to ${{ steps.deployment.outputs.page_url }}"
