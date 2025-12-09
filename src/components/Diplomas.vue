@@ -146,20 +146,11 @@ const popupTitle = ref("");
 const popupImage = ref("");
 const popupLoading = ref(false);
 const popupDegree = ref("");
-// Map original URL -> dataURL (string) for immediate reuse
 const preloadedCache = new Map();
 const zoomWrapper = ref(null);
 const isDiplomaPopup = ref(false);
 
-// Try to load a companion base64 file (middle portion of a split data URI).
-// If present, return a data URL constructed from that text. Otherwise
-// fall back to fetching the original asset and returning a data URL
-// (SVG text or blob).
 async function fetchAssetAsDataUrl(url) {
-  // Enhanced behavior (Option 2): only attempt to assemble start+middle+end
-  // from env vars when the base name begins with 'bac' (case-insensitive).
-  // Prefer companion files using the normalized filename; avoid relying on
-  // legacy suffixes.
   try {
     const m = url.match(/(.+)\.(svg|png|jpg|jpeg|gif)$/i);
   const basePath = m ? m[1] : url;
@@ -168,35 +159,20 @@ async function fetchAssetAsDataUrl(url) {
 
     const isBac = /^bac/i.test(baseName);
 
-    // If this is an SVG logo and not a 'bac' diploma, return the original URL
-    // so the browser loads the file directly (preserves external SVG behavior
-    // and avoids unnecessary data-URL conversions).
     if (m && m[2] && m[2].toLowerCase() === 'svg' && !isBac) {
       return url;
     }
 
-    // compute normalized env key base (no +, - replaced by _ ; uppercased)
     const norm = baseName.replace(/\+/g, '').replace(/-/g, '_').toUpperCase();
   const envStartKey = 'VITE_START_' + norm;
   const envEndKey = 'VITE_END_' + norm;
 
-    // Only attempt env-based assembly for 'bac*' assets
     if (isBac) {
       const envStart = import.meta.env[envStartKey] || '';
       const envEnd = import.meta.env[envEndKey] || '';
 
-      // Debug: show minimal info about env variables when used (length + short preview)
-      // This log is intentionally minimal to help debugging in the browser console.
-      try {
-        const preview = (s) => (s && s.length ? s.replace(/\s+/g, '').slice(0, 30) + (s.length > 30 ? '...' : '') : '(empty)');
-        console.log('[Diplomas] env keys:', envStartKey, 'len=', (envStart && envStart.length) || 0, 'preview=', preview(envStart), ';', envEndKey, 'len=', (envEnd && envEnd.length) || 0, 'preview=', preview(envEnd));
-      } catch (e) {
-        // ignore logging errors
-      }
       if (envStart && typeof envStart === 'string' && envStart.startsWith('data:')) {
-        // Try companion files using the normalized filename
         const candidates = [];
-        // basePath already has no extension; try it first (matches renamed files)
         candidates.push(basePath);
 
         for (const candidate of candidates) {
@@ -208,18 +184,13 @@ async function fetchAssetAsDataUrl(url) {
             if (text.startsWith('data:')) return text;
             return envStart + text + (envEnd || '');
           } catch (err) {
-            // try next candidate
           }
         }
 
-        // network failed or no candidate had content; as a fallback, if envEnd
-        // is empty we can still return envStart (it may be a full data URL).
         if (!envEnd) return envStart;
       }
     }
 
-  // If we reach here, try to fetch companion base64 files as fallback.
-  // Prefer the normalized candidate.
     try {
       const tryCandidates = [];
     if (m) tryCandidates.push(basePath);
@@ -231,7 +202,6 @@ async function fetchAssetAsDataUrl(url) {
           const text = (await resBase.text()).trim();
           if (!text) continue;
           if (text.startsWith('data:')) return text;
-          // infer mime from original extension
           let mime = 'image/svg+xml';
           if (m) {
             const ext = m[2].toLowerCase();
@@ -242,17 +212,13 @@ async function fetchAssetAsDataUrl(url) {
           }
           return `data:${mime};base64,${text}`;
         } catch (err) {
-          // try next candidate
         }
       }
     } catch (err) {
-      // ignore and fall back
     }
   } catch (err) {
-    // ignore and fall back to original
   }
 
-  // fallback: fetch original resource and convert to data URL
   try {
     const res = await fetch(url, { cache: 'force-cache' });
     const ct = res.headers.get('content-type') || '';
@@ -268,13 +234,11 @@ async function fetchAssetAsDataUrl(url) {
       reader.readAsDataURL(blob);
     });
   } catch (err) {
-    // as last resort, return original url so the <img> can try to load it
     return url;
   }
 }
 // continuous zoom scale (1.0 .. 10.0)
 const zoomScale = ref(1);
-// Panning state (px)
 const panX = ref(0);
 const panY = ref(0);
 const dragging = ref(false);
@@ -283,37 +247,28 @@ let startClientX = 0;
 let startClientY = 0;
 let startPanX = 0;
 let startPanY = 0;
-// Prevent common save/copy shortcuts and PrintScreen detection best-effort
 function keyDownHandler(e) {
-  // Only act when a diploma popup is active
-  if (!isDiplomaPopup.value) return;
+if (!isDiplomaPopup.value) return;
 
-  // Block Ctrl+S, Ctrl+P, Ctrl+Shift+S
-  if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || (e.shiftKey && e.key === 'S'))) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  // Best-effort: detect PrintScreen key but we can't reliably block OS screenshot.
-  // No overlay toggling is done because the watermark will be baked into the image.
-  if (e.key === 'PrintScreen') {
-    // noop
-  }
+if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || (e.shiftKey && e.key === 'S'))) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+if (e.key === 'PrintScreen') {
+}
 }
 
 function openPopup(d) {
-  // For diplomas we show only the image (no title text) in the popup
   isDiplomaPopup.value = true;
   popupTitle.value = "";
   popupDegree.value = d.degree || "";
   const image = d.diplomaImage || d.image;
   const url = image ? getAssetPath(`/degrees/${image}`) : "";
   if (!url) return;
-  // We support a cached "watermarked" version to avoid re-drawing repeatedly.
   const wmKey = url + '::wm::' + encodeURIComponent(popupDegree.value || '');
   const emailToUse = String(locale.value).startsWith('ar')
     ? 'بن_الحاج_حمدي_42bhamdi@gmail.com'
     : 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com';
-  // If a watermarked version already exists in cache, reuse it
   if (preloadedCache.has(wmKey)) {
     popupImage.value = preloadedCache.get(wmKey) || url;
     popupLoading.value = false;
@@ -321,16 +276,12 @@ function openPopup(d) {
     return;
   }
 
-  // If original resource is cached but not watermarked, show it immediately
-  // and generate the watermarked version in background (so the UI is fast).
   if (preloadedCache.has(url)) {
     const orig = preloadedCache.get(url) || url;
     popupImage.value = orig;
     popupVisible.value = true;
-    // If this is a diploma, start watermark generation in background
     if (isDiplomaPopup.value) {
-      popupLoading.value = true; // show overlay spinner but keep image visible
-      // choose email based on locale (Arabic locale uses Arabic name/email)
+      popupLoading.value = true;
       const emailToUse = String(locale.value).startsWith('ar')
         ? 'بن_الحاج_حمدي_42bhamdi@gmail.com'
         : 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com';
@@ -338,7 +289,6 @@ function openPopup(d) {
         preloadedCache.set(wmKey, wmData);
         popupImage.value = wmData;
       }).catch(() => {
-        // keep original if watermark fails
         popupImage.value = orig;
       }).finally(() => {
         popupLoading.value = false;
@@ -349,11 +299,9 @@ function openPopup(d) {
     return;
   }
 
-  // otherwise fetch and (if diploma) bake watermark into the fetched data
   popupLoading.value = true;
   popupImage.value = "";
   popupVisible.value = true;
-  // Try to fetch either a companion "_64" base64 file or the original asset
   fetchAssetAsDataUrl(url)
     .then((dataUrl) => {
       preloadedCache.set(url, dataUrl);
@@ -367,7 +315,6 @@ function openPopup(d) {
             popupImage.value = wm;
           })
           .catch(() => {
-            // keep dataUrl if watermarking fails
           })
           .finally(() => {
             popupLoading.value = false;
@@ -383,9 +330,7 @@ function openPopup(d) {
     });
 }
 
-// Open an enlarged school logo with the institution name as title
 function openLogo(d) {
-  // logos open in a simple popup without zoom/pan/watermark
   isDiplomaPopup.value = false;
   popupTitle.value = d.institution || "";
   popupDegree.value = "";
@@ -416,7 +361,6 @@ function openLogo(d) {
 }
 
 function handleClose() {
-  // Reset popup state
   popupVisible.value = false;
   popupTitle.value = "";
   popupImage.value = "";
@@ -429,20 +373,15 @@ function handleClose() {
   dragging.value = false;
 }
 
-// Draw watermark text directly onto the image using a canvas so the text becomes
-// part of the image (not an overlay). Returns a PNG data URL or the original
-// source if something fails.
 function applyWatermarkToImage(srcDataUrl, diplomaName, email = 'BEN_ELHADJ_Hamdi_42bhamdi@gmail.com') {
   return new Promise((resolve) => {
     try {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        // If image is very large, downscale for watermarking to improve speed and
-        // keep the resulting data-URL reasonably sized. We'll use a max dimension.
         const origW = img.naturalWidth || img.width || 1200;
         const origH = img.naturalHeight || img.height || 900;
-        const MAX_DIM = 2000; // max width or height to process
+        const MAX_DIM = 2000;
         let w = origW;
         let h = origH;
         let scale = 1;
@@ -457,40 +396,33 @@ function applyWatermarkToImage(srcDataUrl, diplomaName, email = 'BEN_ELHADJ_Hamd
         const ctx = canvas.getContext('2d');
         if (!ctx) return resolve(srcDataUrl);
 
-  // Draw original image (scale down if necessary)
   if (scale === 1) ctx.drawImage(img, 0, 0, w, h);
   else ctx.drawImage(img, 0, 0, origW, origH, 0, 0, w, h);
 
-  // Font sizes relative to processed width to keep watermark subtle and fast
   let dnameFont = Math.max(12, Math.floor(w * 0.022));
   let emailFont = Math.max(10, Math.floor(w * 0.016));
 
-        // Ensure text fits horizontally; reduce size if needed
-        ctx.font = `bold ${dnameFont}px Arial`;
-        let dWidth = ctx.measureText(diplomaName).width;
-        if (dWidth > w * 0.92 && dWidth > 0) {
-          const scale = (w * 0.92) / dWidth;
-          dnameFont = Math.max(10, Math.floor(dnameFont * scale));
-        }
-        ctx.font = `bold ${emailFont}px Arial`;
-        let eWidth = ctx.measureText(email).width;
-        if (eWidth > w * 0.92 && eWidth > 0) {
-          const scale = (w * 0.92) / eWidth;
-          emailFont = Math.max(8, Math.floor(emailFont * scale));
-        }
+  ctx.font = `bold ${dnameFont}px Arial`;
+  let dWidth = ctx.measureText(diplomaName).width;
+  if (dWidth > w * 0.92 && dWidth > 0) {
+    const scale = (w * 0.92) / dWidth;
+    dnameFont = Math.max(10, Math.floor(dnameFont * scale));
+  }
+  ctx.font = `bold ${emailFont}px Arial`;
+  let eWidth = ctx.measureText(email).width;
+  if (eWidth > w * 0.92 && eWidth > 0) {
+    const scale = (w * 0.92) / eWidth;
+    emailFont = Math.max(8, Math.floor(emailFont * scale));
+  }
 
-        // Draw repeated diagonal watermark
-        ctx.save();
-        const angle = -26 * Math.PI / 180;
-        ctx.translate(w / 2, h / 2);
-        ctx.rotate(angle);
-  // Slightly lower opacity so watermark is less dominant
-  // Reduced to 0.08 for a more subtle watermark (can tweak to taste)
+  ctx.save();
+  const angle = -26 * Math.PI / 180;
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate(angle);
+
   ctx.fillStyle = 'rgba(0,0,0,0.05)';
   ctx.textBaseline = 'middle';
-  // detect RTL (Arabic) by presence of Arabic unicode range in email or diploma name
   const isRtl = /[\u0600-\u06FF]/.test(String(email)) || /[\u0600-\u06FF]/.test(String(diplomaName));
-  // choose font family suitable for Arabic when needed
   const fontFamily = isRtl ? '"Noto Naskh Arabic", Tahoma, Arial, sans-serif' : 'Arial, Helvetica, sans-serif';
   ctx.direction = isRtl ? 'rtl' : 'ltr';
   ctx.textAlign = 'center';
@@ -515,8 +447,6 @@ function applyWatermarkToImage(srcDataUrl, diplomaName, email = 'BEN_ELHADJ_Hamd
         ctx.restore();
 
         try {
-          // If we scaled down for processing, we return the scaled watermarked image.
-          // This keeps the data URL size smaller and speeds up rendering.
           resolve(canvas.toDataURL('image/png'));
         } catch (err) {
           resolve(srcDataUrl);
@@ -529,8 +459,6 @@ function applyWatermarkToImage(srcDataUrl, diplomaName, email = 'BEN_ELHADJ_Hamd
     }
   });
 }
-
-// cycleZoom removed — not used. Zoom controlled by wheel and range input.
 
 function clampPan() {
   if (!zoomWrapper.value) return;
@@ -545,7 +473,6 @@ function clampPan() {
 }
 
 function onPointerDown(e) {
-  // start dragging only when zoomed (>1)
   if (zoomScale.value <= 1) return;
   dragging.value = true;
   pointerId = e.pointerId;
@@ -573,13 +500,10 @@ function onPointerUp(e) {
   }
 }
 function onWheel(e) {
-  // Zoom around cursor position. Use an exponential scale factor for smoothness.
   const sOld = zoomScale.value;
-  // scale factor from wheel delta; tuned for comfortable speed
   const factor = Math.exp(-e.deltaY * 0.002);
   let sNew = Math.max(1, Math.min(10, sOld * factor));
 
-  // If nearly equal, do nothing
   if (Math.abs(sNew - sOld) < 0.0001) return;
 
   try {
@@ -591,25 +515,21 @@ function onWheel(e) {
     const Cx = clickX - containerCenterX;
     const Cy = clickY - containerCenterY;
     const r = sNew / sOld;
-    // deltaPan = (1 - r) * (C - pan)
     const deltaX = (1 - r) * (Cx - panX.value);
     const deltaY = (1 - r) * (Cy - panY.value);
     panX.value = panX.value + deltaX;
     panY.value = panY.value + deltaY;
   } catch (err) {
-    // ignore
   }
 
   zoomScale.value = sNew;
   clampPan();
 }
-// Keep pan/clamping in sync when zoomStep is changed via the range input
 watch(zoomScale, (newVal, oldVal) => {
   if (newVal === 1) {
     panX.value = 0;
     panY.value = 0;
   }
-  // ensure pan within bounds for the new zoom
   clampPan();
 });
 onMounted(() => {
@@ -639,7 +559,6 @@ onMounted(() => {
     });
   }, 100);
 
-  // Preload diploma images and institution icons and cache their data-URIs
   const toPreload = new Set();
   diplomas.value.forEach((cat) => {
     cat.diplomes.forEach((d) => {
@@ -648,17 +567,14 @@ onMounted(() => {
     });
   });
   toPreload.forEach((url) => {
-    // attempt to fetch either a companion _64 base64 file or the original asset
     fetchAssetAsDataUrl(url)
       .then((dataUrl) => {
         preloadedCache.set(url, dataUrl);
       })
       .catch(() => {
-        // if fetch fails, still mark the original url so we attempt to use it
         preloadedCache.set(url, url);
       });
   });
-  // register keydown handler to block common save/print shortcuts
   window.addEventListener('keydown', keyDownHandler, { passive: false });
 });
 
@@ -670,15 +586,8 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .card[role="button"]{cursor:pointer}
-/* Popup image sizing and loading spinner */
 .popup-image{max-width:900px;max-height:80vh;width:100%;height:auto;display:block;margin:0 auto}
-/* Spinner overlay shown on top of the image while watermark is generated */
 .popup-spinner-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.0);pointer-events:none;font-weight:700;color:var(--text)}
-
-/* Zoom wrapper */
-/* .zoom-lens removed as it's unused */
-
-/* Keep zoomed image inside the popup frame */
 .zoom-wrapper{position:relative;display:inline-block;max-width:100%;overflow:hidden}
 .pan-wrapper{display:block}
 .pan-wrapper{touch-action:none}
