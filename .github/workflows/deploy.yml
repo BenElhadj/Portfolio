@@ -35,10 +35,11 @@ jobs:
           # Start fresh
           rm -f .env.production
           touch .env.production
-
-          # Loop over ALL VITE_* variables coming from environment
-          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
-            echo "$name=$value" >> .env.production
+          printenv | grep '^VITE_' | while IFS='=' read -r name value; do
+              # remove CR/LF éventuels
+              value=$(echo "$value" | tr -d '\r')
+              # write raw value (pas de guillemets)
+              echo "${name}=${value}" >> .env.production
           done
 
           echo "Final .env.production keys:"
