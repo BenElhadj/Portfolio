@@ -110,47 +110,59 @@ jobs:
       #       printf '%s=%s\n' "$k" "$val" >> .env.production
       #     done
 
-      - name: Export all VITE_* vars and secrets to environment
-        run: |
-          # Cette étape exporte toutes les variables correspondant au pattern
-          # Note: Cette méthode utilise gh si disponible pour lister les secrets
-          # Sinon, elle se base sur les variables déjà définies dans env
-          
-          # Définir les patterns
-          patterns="VITE_START_* VITE_END_*"
-          
-          # Pour chaque pattern, exporter les variables d'environnement existantes
-          for pattern in $patterns; do
-            for var_name in $(env | grep -E "^${pattern//\*/.*}=" | cut -d= -f1); do
-              echo "Found environment variable: $var_name"
-              # Elles sont déjà dans l'environnement
-            done
-          done
-
-      - name: Generate .env.production with all VITE_* variables
+      - name: Ensure specific VITE_* keys are present in .env.production (read from vars/secrets/printenv)
         run: |
           set -euo pipefail
           
-          # Patterns pour identifier les variables VITE
-          patterns=("VITE_START_" "VITE_END_")
+          # Définir les patterns pour les clés
+          prefixes=("VITE_START_" "VITE_END_")
+          suffixes=("BAC5_42" "BAC2_GRETA" "BAC2_CSFIEE" "BAC_CSFIEE" "BAC_IPH")
           
-          # Collecter toutes les variables d'environnement VITE_*
-          for pattern in "${patterns[@]}"; do
-            while IFS= read -r line; do
-              var_name="${line%%=*}"
-              var_value="${line#*=}"
-              
-              # Supprimer la ligne existante et ajouter la nouvelle
-              sed -i "/^${var_name}=/d" .env.production || true
-              printf '%s=%s\n' "$var_name" "$var_value" >> .env.production
-              echo "✓ $var_name ajouté"
-            done < <(env | grep "^${pattern}")
+          # Générer dynamiquement toutes les combinaisons
+          keys=()
+          for prefix in "${prefixes[@]}"; do
+            for suffix in "${suffixes[@]}"; do
+              keys+=("${prefix}${suffix}")
+            done
           done
           
-          echo "Fichier .env.production mis à jour avec toutes les variables VITE_*"
-
-
+          echo "Clés à traiter: ${keys[*]}"
+          
+          # Traiter chaque clé
+          for k in "${keys[@]}"; do
+            # Nettoyer le nom pour les expansions (remplacer les caractères spéciaux)
+            clean_k=$(echo "$k" | sed 's/[^a-zA-Z0-9_]/_/g')
             
+            # Essayer dans l'ordre: vars -> secrets -> env
+            val=""
+            
+            # Utiliser eval pour accéder dynamiquement aux variables (attention à la sécurité)
+            # Dans GitHub Actions, les secrets ne sont pas dans l'environnement par défaut
+            # Nous allons essayer d'abord avec les expansions GitHub
+            
+            # Note: Nous ne pouvons pas utiliser des expansions dynamiques ${{ }} dans le script run
+            # car elles sont évaluées avant l'exécution. Nous allons donc passer par les variables d'environnement
+            
+            # Essayer d'abord depuis l'environnement (si les vars/secrets ont été définis comme env)
+            val="$(printenv "$k" || true)"
+            
+            if [ -z "$val" ]; then
+              # Si vide, on peut aussi essayer de lire depuis un fichier temporaire
+              # où les vars et secrets auraient été préalablement exportés
+              echo "Warning: Variable $k non trouvée dans l'environnement"
+              continue
+            fi
+            
+            # Supprimer la ligne existante et ajouter la nouvelle valeur
+            sed -i "/^${k}=/d" .env.production || true
+            if [ -n "$val" ]; then
+              printf '%s=%s\n' "$k" "$val" >> .env.production
+              echo "✓ $k ajouté"
+            fi
+          done
+
+
+
       - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
         run: |
           echo "Debug: listing VITE_* keys and value lengths from .env.production"
