@@ -5,109 +5,82 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one deployment at a time
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-
   deploy:
     environment:
       name: github-pages
     runs-on: ubuntu-latest
-    # Run the build inside the deploy job so environment variables defined on the
-    # 'github-pages' environment are available at build time and will be embedded
-    # in the production bundle (Vite must see them during build).
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Safe debug — list VITE_* env names and lengths (no values)
-        run: |
-          echo "Checking job environment for VITE_* variables (name and value length only)"
-          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
-            len=$(echo -n "$value" | wc -c)
-            echo "$name len=$len"
-          done || true
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12.0
+          node-version: 18
+          cache: npm
 
-      - name: Create .env.production from environment variables (merge)
+      # Debug safe: check available VITE_* variables without showing content
+      - name: Debug environment VITE_* (names only)
         run: |
-          echo "Creating .env.production from repo .env (if present) and merging runtime VITE_* vars"
-          set -euo pipefail
-          # Start from repo .env if present so non-VITE vars are preserved
+          echo "VITE_* variables in job environment :"
+          printenv | grep -E '^VITE_' | sed 's/\(=.*\)/=***hidden***/'
+
+      # AUTO GENERATION OF .env.production
+      - name: Auto-generate .env.production
+        run: |
+          echo "# Auto-generated .env.production" > .env.production
+
+          # Load base env (.env) if present
           if [ -f .env ]; then
-            cp .env .env.production
-          else
-            : > .env.production
+            echo "Merging .env → .env.production"
+            cat .env >> .env.production
           fi
 
-          # Collect runtime VITE_* variables (from Environment, repository vars, secrets exposed to job)
-          printenv | grep -E '^VITE_' > .runtime_vite_env || true
+          echo "" >> .env.production
+          echo "# Injected from GitHub Environment" >> .env.production
 
-          # If there are runtime VITE_* variables, merge them into .env.production, overriding existing keys
-          if [ -s .runtime_vite_env ]; then
-            while IFS= read -r line || [ -n "$line" ]; do
-              key="${line%%=*}"
-              # Remove any existing entry for this key in .env.production
-              sed -i "/^${key}=/d" .env.production || true
-              # Append key=value preserving characters safely
-              printf '%s\n' "$line" >> .env.production
-            done < .runtime_vite_env
-            rm -f .runtime_vite_env
-            echo "Merged runtime VITE_* variables into .env.production"
-          else
-            echo "No runtime VITE_* variables found to merge"
-            rm -f .runtime_vite_env || true
-          fi
-
-      # (No per-key hardcoding required - runtime VITE_* variables are merged above)
-
-      - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
-        run: |
-          echo "Debug: listing VITE_* keys and value lengths from .env.production"
-          if [ ! -f .env.production ]; then
-            echo ".env.production not found"
-            exit 0
-          fi
-          sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
-            key=$(echo "$kv" | sed -E 's/=.*//')
-            val=$(echo "$kv" | sed -E 's/^[^=]*=//')
-            len=$(echo -n "$val" | wc -c)
-            echo "$key len=$len"
+          # Append all VITE_* from GitHub env (vars or secrets)
+          printenv | grep -E '^VITE_' | while IFS='=' read -r key value; do
+            sed -i "/^${key}=/d" .env.production || true
+            printf "%s=%s\n" "$key" "$value" >> .env.production
           done
 
-      - name: Install dependencies (with lockfile)
-        if: hashFiles('**/package-lock.json') != ''
+          echo ""
+          echo "Final .env.production keys:"
+          grep -E '^VITE_' .env.production | sed 's/\(=.*\)/=***hidden***/'
+
+      # Install dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Install dependencies (no lockfile)
-        if: hashFiles('**/package-lock.json') == ''
-        run: npm i
-
+      # Build project with Vite
       - name: Build
+        env:
+          NODE_ENV: production
         run: npm run build
 
+      # Upload build output to Pages artifact
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
+      # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with: {}
-      - name: Set environment URL output
+
+      - name: Deployment URL
         if: ${{ steps.deployment.outputs.page_url != '' }}
         run: echo "Deployed to ${{ steps.deployment.outputs.page_url }}"
