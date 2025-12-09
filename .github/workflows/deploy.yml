@@ -110,56 +110,37 @@ jobs:
       #       printf '%s=%s\n' "$k" "$val" >> .env.production
       #     done
 
-      - name: Ensure specific VITE_* keys are present in .env.production (read from vars/secrets/printenv)
+      - name: Auto-inject all VITE_* from vars + secrets → .env.production
         run: |
           set -euo pipefail
-          
-          # Définir les patterns pour les clés
-          prefixes=("VITE_START_" "VITE_END_")
-          suffixes=("BAC5_42" "BAC2_GRETA" "BAC2_CSFIEE" "BAC_CSFIEE" "BAC_IPH")
-          
-          # Générer dynamiquement toutes les combinaisons
-          keys=()
-          for prefix in "${prefixes[@]}"; do
-            for suffix in "${suffixes[@]}"; do
-              keys+=("${prefix}${suffix}")
-            done
-          done
-          
-          echo "Clés à traiter: ${keys[*]}"
-          
-          # Traiter chaque clé
-          for k in "${keys[@]}"; do
-            # Nettoyer le nom pour les expansions (remplacer les caractères spéciaux)
-            clean_k=$(echo "$k" | sed 's/[^a-zA-Z0-9_]/_/g')
-            
-            # Essayer dans l'ordre: vars -> secrets -> env
-            val=""
-            
-            # Utiliser eval pour accéder dynamiquement aux variables (attention à la sécurité)
-            # Dans GitHub Actions, les secrets ne sont pas dans l'environnement par défaut
-            # Nous allons essayer d'abord avec les expansions GitHub
-            
-            # Note: Nous ne pouvons pas utiliser des expansions dynamiques ${{ }} dans le script run
-            # car elles sont évaluées avant l'exécution. Nous allons donc passer par les variables d'environnement
-            
-            # Essayer d'abord depuis l'environnement (si les vars/secrets ont été définis comme env)
-            val="$(printenv "$k" || true)"
-            
-            if [ -z "$val" ]; then
-              # Si vide, on peut aussi essayer de lire depuis un fichier temporaire
-              # où les vars et secrets auraient été préalablement exportés
-              echo "Warning: Variable $k non trouvée dans l'environnement"
-              continue
-            fi
-            
-            # Supprimer la ligne existante et ajouter la nouvelle valeur
-            sed -i "/^${k}=/d" .env.production || true
-            if [ -n "$val" ]; then
-              printf '%s=%s\n' "$k" "$val" >> .env.production
-              echo "✓ $k ajouté"
-            fi
-          done
+
+          # Fichier temporaire pour construire le .env final
+          tmp=$(mktemp)
+          touch .env.production
+
+          # 1. On récupère toutes les vars et secrets qui commencent par VITE_
+          #    et on les fusionne dans l'ordre : repo vars > secrets > runtime env
+          jq -r '
+            to_entries[]
+            | select(.key | startswith("VITE_"))
+            | "\(.key)=\(.value // "")"
+          ' <<< "${{ toJSON(vars) }}" > "$tmp"
+
+          jq -r '
+            to_entries[]
+            | select(.key | startswith("VITE_"))
+            | "\(.key)=\(.value // "")"
+          ' <<< "${{ toJSON(secrets) }}" >> "$tmp"
+
+          # 2. On ajoute les variables d’environnement runtime qui pourraient écraser
+          printenv | grep '^VITE_' | sort -u >> "$tmp"
+
+          # 3. On supprime les doublons tout en gardant le dernier (priorité correcte)
+          awk -F= '!seen[$1]++' "$tmp" > .env.production
+
+          echo "=== .env.production final ==="
+          cat .env.production
+          echo "==============================="
 
 
 
