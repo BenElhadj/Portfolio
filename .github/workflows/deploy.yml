@@ -112,60 +112,38 @@ jobs:
 
 
 
-      - name: AUTO-INJECT ALL VARIABLES (Final solution)
+      - name: Auto-inject ALL VITE_* (vars → secrets → runtime env) into .env.production
         run: |
           set -euo pipefail
-          
-          echo "=== ULTIMATE AUTO-INJECTION ==="
-          echo "This will inject ALL variables from GitHub Environment automatically"
-          echo ""
-          
-          # ÉTAPE 1: Récupérer TOUTES les variables disponibles
-          # Le secret: GitHub injecte AUTOMATIQUEMENT toutes les variables de l'environnement
-          # dans les variables d'environnement du runner !
-          
-          # Liste de toutes les variables qui commencent par VITE_
-          VITE_VARS=$(printenv | grep -E '^VITE_' || true)
-          
-          if [ -z "$VITE_VARS" ]; then
-              echo "⚠️  No VITE_* variables found in environment!"
-              echo "Please add them in: Settings → Environments → github-pages"
-              exit 0
-          fi
-          
-          echo "Found $(echo "$VITE_VARS" | wc -l) VITE_* variables"
-          echo ""
-          
-          # ÉTAPE 2: Mettre à jour .env.production
-          if [ ! -f .env.production ]; then
-              touch .env.production
-          fi
-          
-          # Créer un nouveau .env.production
-          {
-              # Garder tout ce qui n'est pas VITE_
-              grep -v '^VITE_' .env.production 2>/dev/null || true
-              
-              echo ""
-              echo "# ==========================================="
-              echo "# AUTO-INJECTED FROM GITHUB ENVIRONMENT"
-              echo "# Add/remove variables in:"
-              echo "# Settings → Environments → github-pages"
-              echo "# ==========================================="
-              echo ""
-              
-              # Ajouter toutes les variables VITE_
-              echo "$VITE_VARS"
-          } > .env.production.new
-          
-          mv .env.production.new .env.production
-          
-          echo "✅ DONE! Variables automatically injected."
-          echo ""
-          echo "📋 To add new variables in the future:"
-          echo "   1. Go to GitHub → Settings → Environments → github-pages"
-          echo "   2. Add your VITE_* variable"
-          echo "   3. That's it! It will be auto-injected next deployment"
+
+          # On force GitHub à évaluer TOUTES les vars et secrets en les mettant dans l'env
+          # toJSON() force l'évaluation complète des contextes vars et secrets
+          eval "$(echo '${{ toJSON(vars) }}' | jq -r 'to_entries[] | "export \(.key)=\(.value|@sh)"')"
+          eval "$(echo '${{ toJSON(secrets) }}' | jq -r 'to_entries[] | "export \(.key)=\(.value|@sh)"')"
+
+          # Maintenant TOUTES les VITE_* (vars + secrets) sont dans l'environnement bash
+          # On parcourt uniquement celles qui commencent par VITE_
+          printenv | grep '^VITE_' | while IFS= read -r line; do
+            key="${line%%=*}"
+            val="${line#*=}"
+
+            # Si la valeur est vide ou "null" (cas secrets non définis), on skip
+            [[ -z "$val" || "$val" == "null" ]] && continue
+
+            # On garde quand même le fallback runtime env (au cas où injecté manuellement)
+            runtime_val="$(printenv "$key" || echo "____NONEXISTENT____")"
+            if [[ "$runtime_val" != "____NONEXISTENT____" ]]; then
+              val="$runtime_val"
+            fi
+
+            # Écrase proprement dans .env.production
+            sed -i "/^${key}=/d" .env.production 2>/dev/null || true
+            printf '%s=%s\n' "$key" "$val" >> .env.production
+          done
+
+          # Optionnel : trier pour avoir un fichier propre et prévisible
+          sort -o .env.production .env.production
+
 
 
 
