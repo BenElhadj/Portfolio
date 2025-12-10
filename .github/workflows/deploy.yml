@@ -62,51 +62,49 @@ jobs:
 
 
           
-      - name: Smart auto-injection of VITE_* variables
+      - name: Universal VITE_* variables injection
         run: |
-          set -euo pipefail
+          echo "=== Universal VITE Variables Injection ==="
+          echo "This will automatically inject ALL VITE_* variables found"
+          echo "No need to edit workflow file for new variables!"
+          echo ""
           
-          echo "🚀 Smart injection of ALL VITE_* variables..."
+          # Fichier de destination
+          TARGET_FILE=".env.production"
           
-          # Fichier source et destination
-          ENV_FILE=".env.production"
-          touch "$ENV_FILE"
+          # Backup du fichier original
+          if [ -f "$TARGET_FILE" ]; then
+            cp "$TARGET_FILE" "${TARGET_FILE}.backup"
+          fi
           
-          # Compteurs
-          INJECTED_COUNT=0
-          SKIPPED_COUNT=0
-          
-          # Récupère toutes les variables VITE_* de l'environnement
-          # Le runner GitHub expose déjà TOUTES les variables configurées
-          while IFS='=' read -r var_name var_value; do
-            # Vérifie que c'est une variable VITE_
-            if [[ "$var_name" =~ ^VITE_ ]]; then
-              # Vérifie si la variable a une valeur
-              if [ -n "${var_value:-}" ]; then
-                # Nettoie l'entrée existante
-                grep -v "^$var_name=" "$ENV_FILE" > "${ENV_FILE}.tmp" 2>/dev/null || true
-                mv "${ENV_FILE}.tmp" "$ENV_FILE"
-                
-                # Ajoute la nouvelle valeur (échappement sécurisé)
-                echo "$var_name=$var_value" >> "$ENV_FILE"
-                
-                INJECTED_COUNT=$((INJECTED_COUNT + 1))
-                echo "  ↳ ✅ $var_name"
-              else
-                SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
-                echo "  ↳ ⚠️  $var_name (empty)"
-              fi
+          # Crée un nouveau fichier .env.production
+          {
+            # Garde les lignes qui ne sont pas VITE_*
+            if [ -f "$TARGET_FILE" ]; then
+              grep -v '^VITE_' "$TARGET_FILE" || true
             fi
-          done < <(printenv)
+            
+            echo ""
+            echo "# ========================================"
+            echo "# AUTO-INJECTED VITE VARIABLES"
+            echo "# Generated automatically from GitHub environment"
+            echo "# ========================================"
+            echo ""
+            
+            # Injecte toutes les variables VITE_*
+            printenv | sort | grep -E '^VITE_' | while IFS='=' read -r key value; do
+              # Échappe les retours à la ligne dans les valeurs
+              clean_value=$(echo "$value" | sed ':a;N;$!ba;s/\n/\\n/g')
+              echo "${key}=${clean_value}"
+            done
+          } > "${TARGET_FILE}.new"
+          
+          # Remplace l'ancien fichier
+          mv "${TARGET_FILE}.new" "$TARGET_FILE"
           
           echo ""
-          echo "📊 Résumé:"
-          echo "  - Variables injectées: $INJECTED_COUNT"
-          echo "  - Variables ignorées: $SKIPPED_COUNT"
-          echo ""
-          echo "🎉 Fini! Vous pouvez maintenant ajouter des variables dans:"
-          echo "   GitHub → Repository → Settings → Environments → github-pages"
-          echo "   OU dans les Repository Variables/Secrets"
+          echo "✅ Successfully injected $(printenv | grep -c '^VITE_') VITE_* variables"
+          echo "📁 File updated: $TARGET_FILE"
 
 
 
