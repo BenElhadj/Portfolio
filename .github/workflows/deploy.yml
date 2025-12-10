@@ -5,145 +5,176 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow only one deployment at a time
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
+
   deploy:
     environment:
       name: github-pages
     runs-on: ubuntu-latest
-    
-    # ÉTAPE CLÉ: Définir TOUTES les variables d'environnement disponibles
-    # Cela permet à printenv de les voir
-    env:
-      # Ces variables seront automatiquement disponibles via printenv
-      # sans avoir à les lister une par une
-      INJECT_ALL_ENV_VARS: true
-    
+    # Run the build inside the deploy job so environment variables defined on the
+    # 'github-pages' environment are available at build time and will be embedded
+    # in the production bundle (Vite must see them during build).
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Safe debug — list VITE_* env names and lengths (no values)
+        run: |
+          echo "Checking job environment for VITE_* variables (name and value length only)"
+          printenv | grep -E '^VITE_' | while IFS='=' read -r name value; do
+            len=$(echo -n "$value" | wc -c)
+            echo "$name len=$len"
+          done || true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22.12.0
 
-      - name: Create initial .env.production
+      - name: Create .env.production from environment variables (merge)
         run: |
-          # Crée le fichier .env.production initial
+          echo "Creating .env.production from repo .env (if present) and environment VITE_* vars"
           if [ -f .env ]; then
             cp .env .env.production
           else
             touch .env.production
           fi
+          # Merge environment VITE_* vars (Environment-level variables are injected into the job)
+          while IFS='=' read -r name value; do
+            case "$name" in
+              VITE_*)
+                sed -i "/^${name}=/d" .env.production || true
+                printf '%s=%s\n' "$name" "$value" >> .env.production
+                ;;
+            esac
+          done < <(printenv)
 
-      - name: Auto-inject ALL environment variables (VITE_* only)
+      # - name: Ensure specific VITE_* keys are present in .env.production (read from vars/secrets/printenv)
+      #   run: |
+      #     # Explicitly write known keys pulling from (in order) repo vars, secrets, then runtime env
+      #     set -euo pipefail
+      #     keys=(
+      #       VITE_START_BAC5_42 VITE_END_BAC5_42
+      #       VITE_START_BAC2_GRETA VITE_END_BAC2_GRETA
+      #       VITE_START_BAC2_CSFIEE VITE_END_BAC2_CSFIEE
+      #       VITE_START_BAC_CSFIEE VITE_END_BAC_CSFIEE
+      #       VITE_START_BAC_IPH VITE_END_BAC_IPH
+      #     )
+      #     for k in "${keys[@]}"; do
+      #       # try workflow vars context, then secrets, then process env
+      #       val=""
+      #       # The following expansions will be empty if the context variable doesn't exist
+      #       case "$k" in
+      #         VITE_START_BAC5_42) val="${{ vars.VITE_START_BAC5_42 }}" ;; 
+      #         VITE_END_BAC5_42) val="${{ vars.VITE_END_BAC5_42 }}" ;; 
+      #         VITE_START_BAC2_GRETA) val="${{ vars.VITE_START_BAC2_GRETA }}" ;; 
+      #         VITE_END_BAC2_GRETA) val="${{ vars.VITE_END_BAC2_GRETA }}" ;; 
+      #         VITE_START_BAC2_CSFIEE) val="${{ vars.VITE_START_BAC2_CSFIEE }}" ;; 
+      #         VITE_END_BAC2_CSFIEE) val="${{ vars.VITE_END_BAC2_CSFIEE }}" ;; 
+      #         VITE_START_BAC_CSFIEE) val="${{ vars.VITE_START_BAC_CSFIEE }}" ;; 
+      #         VITE_END_BAC_CSFIEE) val="${{ vars.VITE_END_BAC_CSFIEE }}" ;; 
+      #         VITE_START_BAC_IPH) val="${{ vars.VITE_START_BAC_IPH }}" ;; 
+      #         VITE_END_BAC_IPH) val="${{ vars.VITE_END_BAC_IPH }}" ;; 
+      #       esac
+      #       if [ -z "$val" ]; then
+      #         case "$k" in
+      #           VITE_START_BAC5_42) val="${{ secrets.VITE_START_BAC5_42 }}" ;; 
+      #           VITE_END_BAC5_42) val="${{ secrets.VITE_END_BAC5_42 }}" ;; 
+      #           VITE_START_BAC2_GRETA) val="${{ secrets.VITE_START_BAC2_GRETA }}" ;; 
+      #           VITE_END_BAC2_GRETA) val="${{ secrets.VITE_END_BAC2_GRETA }}" ;; 
+      #           VITE_START_BAC2_CSFIEE) val="${{ secrets.VITE_START_BAC2_CSFIEE }}" ;; 
+      #           VITE_END_BAC2_CSFIEE) val="${{ secrets.VITE_END_BAC2_CSFIEE }}" ;; 
+      #           VITE_START_BAC_CSFIEE) val="${{ secrets.VITE_START_BAC_CSFIEE }}" ;; 
+      #           VITE_END_BAC_CSFIEE) val="${{ secrets.VITE_END_BAC_CSFIEE }}" ;; 
+      #           VITE_START_BAC_IPH) val="${{ secrets.VITE_START_BAC_IPH }}" ;; 
+      #           VITE_END_BAC_IPH) val="${{ secrets.VITE_END_BAC_IPH }}" ;; 
+      #         esac
+      #       fi
+      #       if [ -z "$val" ]; then
+      #         # final fallback: process env (this will catch values injected as runtime env vars)
+      #         val="$(printenv "$k" || true)"
+      #       fi
+      #       # Remove existing and write final value
+      #       sed -i "/^${k}=/d" .env.production || true
+      #       printf '%s=%s\n' "$k" "$val" >> .env.production
+      #     done
+
+
+
+      - name: AUTO-INJECT ALL VARIABLES (Final solution)
         run: |
-          echo "🚀 Auto-injecting ALL VITE_* variables from ALL sources..."
-          echo "Priority: Environment variables (which include GitHub vars/secrets) → printenv"
+          set -euo pipefail
+          
+          echo "=== ULTIMATE AUTO-INJECTION ==="
+          echo "This will inject ALL variables from GitHub Environment automatically"
           echo ""
           
-          # Cette fonction reproduit EXACTEMENT la logique de votre script original
-          # mais de manière automatique
-          auto_inject_vite_vars() {
-            echo "Step 1: Collecting all VITE_* variables..."
-            
-            # Récupérer TOUTES les variables d'environnement disponibles
-            # Note: GitHub Actions injecte automatiquement:
-            # - Les variables de l'environnement 'github-pages'
-            # - Les variables du repository (si configurées pour être exposées)
-            # - Les secrets (si configurés pour être exposés)
-            
-            # Compter le nombre total de variables VITE_*
-            TOTAL_VITE=$(printenv | grep -c '^VITE_' || true)
-            echo "Found $TOTAL_VITE VITE_* variable(s) in environment"
-            
-            # Liste pour stocker toutes les clés VITE_* uniques
-            declare -A ALL_VITE_KEYS
-            
-            # 1. Ajouter toutes les variables détectées via printenv
-            printenv | grep '^VITE_' | cut -d'=' -f1 | while read -r key; do
-              ALL_VITE_KEYS["$key"]=1
-            done
-            
-            # 2. Liste des clés attendues (pour s'assurer qu'elles sont toujours traitées)
-            # Vous pouvez modifier cette liste si besoin, mais ce n'est plus obligatoire
-            EXPECTED_KEYS=(
-              "VITE_START_BAC5_42" "VITE_END_BAC5_42"
-              "VITE_START_BAC2_GRETA" "VITE_END_BAC2_GRETA"
-              "VITE_START_BAC2_CSFIEE" "VITE_END_BAC2_CSFIEE"
-              "VITE_START_BAC_CSFIEE" "VITE_END_BAC_CSFIEE"
-              "VITE_START_BAC_IPH" "VITE_END_BAC_IPH"
-            )
-            
-            # 3. Ajouter les clés attendues
-            for key in "${EXPECTED_KEYS[@]}"; do
-              ALL_VITE_KEYS["$key"]=1
-            done
-            
-            echo "Step 2: Processing ${#ALL_VITE_KEYS[@]} unique VITE_* key(s)..."
-            echo ""
-            
-            # 4. Pour chaque clé, appliquer la logique: vars → secrets → env
-            for key in "${!ALL_VITE_KEYS[@]}"; do
-              echo "🔧 Processing: $key"
-              
-              # La valeur par défaut (vide)
-              final_value=""
-              
-              # LOGIQUE SIMPLIFIÉE MAIS ÉQUIVALENTE:
-              # Dans GitHub Actions, les variables sont déjà injectées dans l'environnement
-              # avec la priorité correcte si configurées dans l'interface GitHub
-              # Donc on utilise simplement printenv
-              
-              current_value=$(printenv "$key" || echo "")
-              
-              if [ -n "$current_value" ]; then
-                final_value="$current_value"
-                echo "  ✅ Value found in environment"
-              else
-                echo "  ⚠️  No value found (will be empty)"
-              fi
-              
-              # Mise à jour du .env.production
-              # a. Supprimer la ligne existante
-              if [ -f .env.production ]; then
-                grep -v "^$key=" .env.production > .env.production.tmp 2>/dev/null || true
-                if [ -f .env.production.tmp ]; then
-                  mv .env.production.tmp .env.production
-                else
-                  touch .env.production
-                fi
-              fi
-              
-              # b. Ajouter la nouvelle ligne (même si vide)
-              echo "$key=$final_value" >> .env.production
+          # ÉTAPE 1: Récupérer TOUTES les variables disponibles
+          # Le secret: GitHub injecte AUTOMATIQUEMENT toutes les variables de l'environnement
+          # dans les variables d'environnement du runner !
+          
+          # Liste de toutes les variables qui commencent par VITE_
+          VITE_VARS=$(printenv | grep -E '^VITE_' || true)
+          
+          if [ -z "$VITE_VARS" ]; then
+              echo "⚠️  No VITE_* variables found in environment!"
+              echo "Please add them in: Settings → Environments → github-pages"
+              exit 0
+          fi
+          
+          echo "Found $(echo "$VITE_VARS" | wc -l) VITE_* variables"
+          echo ""
+          
+          # ÉTAPE 2: Mettre à jour .env.production
+          if [ ! -f .env.production ]; then
+              touch .env.production
+          fi
+          
+          # Créer un nouveau .env.production
+          {
+              # Garder tout ce qui n'est pas VITE_
+              grep -v '^VITE_' .env.production 2>/dev/null || true
               
               echo ""
-            done
-            
-            echo "✅ Auto-injection completed!"
-            echo "📊 Summary: ${#ALL_VITE_KEYS[@]} variables processed"
-          }
+              echo "# ==========================================="
+              echo "# AUTO-INJECTED FROM GITHUB ENVIRONMENT"
+              echo "# Add/remove variables in:"
+              echo "# Settings → Environments → github-pages"
+              echo "# ==========================================="
+              echo ""
+              
+              # Ajouter toutes les variables VITE_
+              echo "$VITE_VARS"
+          } > .env.production.new
           
-          # Exécuter la fonction
-          auto_inject_vite_vars
+          mv .env.production.new .env.production
+          
+          echo "✅ DONE! Variables automatically injected."
+          echo ""
+          echo "📋 To add new variables in the future:"
+          echo "   1. Go to GitHub → Settings → Environments → github-pages"
+          echo "   2. Add your VITE_* variable"
+          echo "   3. That's it! It will be auto-injected next deployment"
 
-      - name: Debug output (safe)
+
+
+      - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
         run: |
-          echo "=== Final .env.production VITE section ==="
-          if [ -f .env.production ]; then
-            grep -E '^VITE_' .env.production || echo "No VITE_* variables found"
-            echo ""
-            echo "Total VITE_* variables: $(grep -c '^VITE_' .env.production 2>/dev/null || echo 0)"
+          echo "Debug: listing VITE_* keys and value lengths from .env.production"
+          if [ ! -f .env.production ]; then
+            echo ".env.production not found"
+            exit 0
           fi
           sed -n 's/\r$//; /^VITE_/p' .env.production | while IFS= read -r kv; do
             key=$(echo "$kv" | sed -E 's/=.*//')
