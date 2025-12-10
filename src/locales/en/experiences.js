@@ -9,6 +9,7 @@ export default {
                 {
                     dates: "April 2024 - Present",
                     company: "Freelance",
+                    logo: "independant.png",
                     role: "AI/ML Developer",
                     details: [
                         "AI projects: data and image classification, anomaly detection",
@@ -188,8 +189,8 @@ export default {
                 },
                 {
                     dates: "August 2008 - November 2009",
-                    company: "Internet and Network Gaming Center",
-                    // no logo available
+                    company: "Aquarium Informatique",
+                    logo: "Aquarium_Informatique.png",
                     role: "Associate Manager",
                     details: [
                         "IT service sales and after-sales",

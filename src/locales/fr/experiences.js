@@ -9,6 +9,7 @@ export default {
                 {
                     dates: "avril 2024 - Présent",
                     company: "Indépendant",
+                    logo: "independant.png",
                     role: "Développeur IA/ML",
                     details: [
                         "Réalisation de projets IA : classification de données et d'images, détection d'anomalies",
@@ -112,12 +113,14 @@ export default {
                 {
                     dates: "juillet 2019 - août 2019",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
                 },
                 {
                     dates: "février 2019 - avril 2019",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
                 },
@@ -131,6 +134,7 @@ export default {
                 {
                     dates: "novembre 2018 - décembre 2018",
                     company: "LVMH Fragrance Brands",
+                    logo: "LVMH.png",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
                 },
@@ -185,8 +189,8 @@ export default {
                 },
                 {
                     dates: "août 2008 - novembre 2009",
-                    company: "Salle d'internet et jeux en réseaux",
-                    // pas de logo
+                    company: "Aquarium Informatique",
+                    logo: "Aquarium_Informatique.png",
                     role: "Associé gérant",
                     details: [
                         "Service informatique vente et SAV",

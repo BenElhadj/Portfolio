@@ -83,6 +83,10 @@
 import PageLayout from "../assets/PageLayout.vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+// Import experiences from all locales to build the set of known logo filenames
+import enExperiences from "../locales/en/experiences";
+import frExperiences from "../locales/fr/experiences";
+import arExperiences from "../locales/ar/experiences";
 
 const { t, tm } = useI18n();
 
@@ -98,47 +102,78 @@ const slugify = (s) => {
     .replace(/^_+|_+$/g, "");
 };
 
+// Build the set of known logos from the locale experiences files so we don't hard-code filenames.
+const collectLogos = (localeExpModule) => {
+  const out = [];
+  if (!localeExpModule || !Array.isArray(localeExpModule.list)) return out;
+  for (const cat of localeExpModule.list) {
+    if (!cat || !Array.isArray(cat.experiences)) continue;
+    for (const e of cat.experiences) if (e && e.logo) out.push(e.logo);
+  }
+  return out;
+};
+
+const AVAILABLE_LOGOS = Array.from(new Set([
+  ...collectLogos(enExperiences),
+  ...collectLogos(frExperiences),
+  ...collectLogos(arExperiences),
+]));
+
+// Map normalized company slug -> actual filename (from AVAILABLE_LOGOS)
+const LOGO_MAP = {};
+for (const fn of AVAILABLE_LOGOS) {
+  const name = fn.replace(/\.[^.]+$/, "");
+  const s = slugify(name);
+  if (s) LOGO_MAP[s] = fn;
+}
+
 // Construct a probable logo path. Prioritize exp.logo if provided, else try a normalized png under /experiences/
 const logoPath = (exp) => {
   // Use Vite base so paths work both locally and when deployed under a subpath (GitHub Pages)
   const base = import.meta.env.BASE_URL || './';
   if (!exp) return null;
-  if (exp.logo) return `${base}experiences/${exp.logo}`;
+  // explicit logo field wins only if it's declared in the locale files (AVAILABLE_LOGOS)
+  if (exp.logo) {
+    if (AVAILABLE_LOGOS.includes(exp.logo)) return `${base}experiences/${exp.logo}`;
+    // If the current exp.logo is not present in the locale-derived list, ignore it to avoid 404
+    return null;
+  }
+  // fallback: try to map normalized company name to an available image
   const slug = slugify(exp.company || "");
   if (!slug) return null;
-  // Try to resolve using a known index to handle case/format differences (built from public/experiences)
-  if (LOGO_INDEX[slug]) return `${base}experiences/${LOGO_INDEX[slug]}`;
-  // fallback to a generic lowercase png name
-  return `${base}experiences/${slug}.png`;
+  // lookup by normalized slug in LOGO_MAP (derived from locales)
+  if (LOGO_MAP[slug]) return `${base}experiences/${LOGO_MAP[slug]}`;
+  // nothing matched: don't render an <img> (return null) to avoid a 404
+  return null;
 };
 
 // Known logo filenames found in public/experiences. This handles case/underscore/hyphen variants
 // Key = normalized slug (lowercase, underscores), value = actual filename in experiences
-const LOGO_INDEX = {
-  "ap_hp": "AP-HP.png",
-  "chanel": "chanel.png",
-  "dim": "Dim.png",
-  "dior": "Dior.png",
-  "european_trade": "EUROPEAN_TRADE.png",
-  "european_trade_la_force_de_vente": "EUROPEAN_TRADE.png",
-  "institut_du_cerveau_et_de_la_moelle_epiniere_icm": "ICM.png",
-  "icm": "ICM.png",
-  "keakr": "KEAKR.png",
-  "kiatoo": "kiatoo.png",
-  "lvmh_fragrance_brands": "LVMH.png",
-  "microlux_dimatec": "Microlux.png",
-  "mss_fnac": "MSS_Fnac.png",
-  "parkeon": "Parkeon.png",
-  "retronix_tunisia": "Retronix.png",
-  "sagemcom": "Sagem.png",
-  "solutions30_france": "solutions-30.png",
-  "stie": "STIE.png",
-  "tekne_tunisia": "Tekne.png",
-  "transtu_tgm": "Transtu.png",
-  "multiserv_plus": "MULTISERV_PLUS.png",
-  "greta": "GRETA.png",
-  "greta_metehor_paris": "GRETA.png",
-};
+// const LOGO_INDEX = {
+//   "ap_hp": "AP-HP.png",
+//   "chanel": "chanel.png",
+//   "dim": "Dim.png",
+//   "dior": "Dior.png",
+//   "european_trade": "EUROPEAN_TRADE.png",
+//   // "european_trade_la_force_de_vente": "EUROPEAN_TRADE.png",
+//   // "institut_du_cerveau_et_de_la_moelle_epiniere_icm": "ICM.png",
+//   "icm": "ICM.png",
+//   "keakr": "KEAKR.png",
+//   "kiatoo": "kiatoo.png",
+//   "lvmh_fragrance_brands": "LVMH.png",
+//   "microlux_dimatec": "Microlux.png",
+//   "mss_fnac": "MSS_Fnac.png",
+//   "parkeon": "Parkeon.png",
+//   "retronix_tunisia": "Retronix.png",
+//   "sagemcom": "Sagem.png",
+//   "solutions30_france": "solutions-30.png",
+//   "stie": "STIE.png",
+//   "tekne_tunisia": "Tekne.png",
+//   "transtu_tgm": "Transtu.png",
+//   "multiserv_plus": "MULTISERV_PLUS.png",
+//   "greta": "GRETA.png",
+//   "greta_metehor_paris": "GRETA.png",
+// };
 
 // LinkedIn URL: use exp.linkedin if present, else fallback to a LinkedIn search for the company
 const linkedinUrl = (exp) => {

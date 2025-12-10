@@ -326,39 +326,50 @@ onMounted(() => {
 
     // Tenter de charger un clip de marche externe et le retarget sur l'avatar
     const animLoader = new GLTFLoader();
-    animLoader.load(
-      getAssetPath("/models/walk.glb"),
-      (wgltf) => {
-        try {
-          if (!mixer) mixer = new THREE.AnimationMixer(avatar);
-          // choisir un clip "Walk" si dispo, sinon le premier
-          const clip = (wgltf.animations || []).find(c => /walk/i.test(c.name)) || wgltf.animations?.[0];
-          if (clip) {
-            let retargeted = null;
-            try {
-              retargeted = SkeletonUtils.retargetClip(wgltf.scene, avatar, clip);
-            } catch (e) {
-              // si retarget indisponible, tenter de jouer le clip tel quel (si mêmes noms d'os)
-              retargeted = clip;
-            }
-            walkClip = retargeted;
-            walkAction = mixer.clipAction(walkClip);
-            walkAction.setLoop(THREE.LoopRepeat, Infinity);
-            walkAction.enabled = true;
-            walkAction.clampWhenFinished = false;
-            walkAction.play();
-            // démarrer à poids nul; on pilotera weight/timeScale dans animate()
-            walkAction.weight = 0;
-          }
-        } catch (e) {
-          // silencieux: on restera en procédural
-        }
-      },
-      undefined,
-      () => {
-        // pas de walk.glb -> rester en procédural
-      }
-    );
+    // Liste des modèles réellement présents (évite d'appeler loader sur un fichier manquant)
+    // Si vous ajoutez walk.glb sous public/models, ajoutez "walk.glb" à ce tableau.
+    const AVAILABLE_MODELS = [
+      "avatar.glb",
+    ];
+
+    // const walkModelName = "walk.glb";
+    // if (AVAILABLE_MODELS.includes(walkModelName)) {
+    //   animLoader.load(
+    //     getAssetPath(`/models/${walkModelName}`),
+    //     (wgltf) => {
+    //       try {
+    //         if (!mixer) mixer = new THREE.AnimationMixer(avatar);
+    //         // choisir un clip "Walk" si dispo, sinon le premier
+    //         const clip = (wgltf.animations || []).find(c => /walk/i.test(c.name)) || wgltf.animations?.[0];
+    //         if (clip) {
+    //           let retargeted = null;
+    //           try {
+    //             retargeted = SkeletonUtils.retargetClip(wgltf.scene, avatar, clip);
+    //           } catch (e) {
+    //             // si retarget indisponible, tenter de jouer le clip tel quel (si mêmes noms d'os)
+    //             retargeted = clip;
+    //           }
+    //           walkClip = retargeted;
+    //           walkAction = mixer.clipAction(walkClip);
+    //           walkAction.setLoop(THREE.LoopRepeat, Infinity);
+    //           walkAction.enabled = true;
+    //           walkAction.clampWhenFinished = false;
+    //           walkAction.play();
+    //           // démarrer à poids nul; on pilotera weight/timeScale dans animate()
+    //           walkAction.weight = 0;
+    //         }
+    //       } catch (e) {
+    //         // silencieux: on restera en procédural
+    //       }
+    //     },
+    //     undefined,
+    //     () => {
+    //       // pas de walk.glb -> rester en procédural
+    //     }
+    //   );
+    // } else {
+    //   // walk.glb absent : on reste en animation procédurale sans tenter le chargement
+    // }
 
     clock = new THREE.Clock();
     lastTime = performance.now();
