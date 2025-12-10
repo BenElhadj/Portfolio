@@ -22,9 +22,7 @@ jobs:
     environment:
       name: github-pages
     runs-on: ubuntu-latest
-    # Run the build inside the deploy job so environment variables defined on the
-    # 'github-pages' environment are available at build time and will be embedded
-    # in the production bundle (Vite must see them during build).
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,58 +58,6 @@ jobs:
             esac
           done < <(printenv)
 
-      # - name: Ensure specific VITE_* keys are present in .env.production (read from vars/secrets/printenv)
-      #   run: |
-      #     # Explicitly write known keys pulling from (in order) repo vars, secrets, then runtime env
-      #     set -euo pipefail
-      #     keys=(
-      #       VITE_START_BAC5_42 VITE_END_BAC5_42
-      #       VITE_START_BAC2_GRETA VITE_END_BAC2_GRETA
-      #       VITE_START_BAC2_CSFIEE VITE_END_BAC2_CSFIEE
-      #       VITE_START_BAC_CSFIEE VITE_END_BAC_CSFIEE
-      #       VITE_START_BAC_IPH VITE_END_BAC_IPH
-      #     )
-      #     for k in "${keys[@]}"; do
-      #       # try workflow vars context, then secrets, then process env
-      #       val=""
-      #       # The following expansions will be empty if the context variable doesn't exist
-      #       case "$k" in
-      #         VITE_START_BAC5_42) val="${{ vars.VITE_START_BAC5_42 }}" ;; 
-      #         VITE_END_BAC5_42) val="${{ vars.VITE_END_BAC5_42 }}" ;; 
-      #         VITE_START_BAC2_GRETA) val="${{ vars.VITE_START_BAC2_GRETA }}" ;; 
-      #         VITE_END_BAC2_GRETA) val="${{ vars.VITE_END_BAC2_GRETA }}" ;; 
-      #         VITE_START_BAC2_CSFIEE) val="${{ vars.VITE_START_BAC2_CSFIEE }}" ;; 
-      #         VITE_END_BAC2_CSFIEE) val="${{ vars.VITE_END_BAC2_CSFIEE }}" ;; 
-      #         VITE_START_BAC_CSFIEE) val="${{ vars.VITE_START_BAC_CSFIEE }}" ;; 
-      #         VITE_END_BAC_CSFIEE) val="${{ vars.VITE_END_BAC_CSFIEE }}" ;; 
-      #         VITE_START_BAC_IPH) val="${{ vars.VITE_START_BAC_IPH }}" ;; 
-      #         VITE_END_BAC_IPH) val="${{ vars.VITE_END_BAC_IPH }}" ;; 
-      #       esac
-      #       if [ -z "$val" ]; then
-      #         case "$k" in
-      #           VITE_START_BAC5_42) val="${{ secrets.VITE_START_BAC5_42 }}" ;; 
-      #           VITE_END_BAC5_42) val="${{ secrets.VITE_END_BAC5_42 }}" ;; 
-      #           VITE_START_BAC2_GRETA) val="${{ secrets.VITE_START_BAC2_GRETA }}" ;; 
-      #           VITE_END_BAC2_GRETA) val="${{ secrets.VITE_END_BAC2_GRETA }}" ;; 
-      #           VITE_START_BAC2_CSFIEE) val="${{ secrets.VITE_START_BAC2_CSFIEE }}" ;; 
-      #           VITE_END_BAC2_CSFIEE) val="${{ secrets.VITE_END_BAC2_CSFIEE }}" ;; 
-      #           VITE_START_BAC_CSFIEE) val="${{ secrets.VITE_START_BAC_CSFIEE }}" ;; 
-      #           VITE_END_BAC_CSFIEE) val="${{ secrets.VITE_END_BAC_CSFIEE }}" ;; 
-      #           VITE_START_BAC_IPH) val="${{ secrets.VITE_START_BAC_IPH }}" ;; 
-      #           VITE_END_BAC_IPH) val="${{ secrets.VITE_END_BAC_IPH }}" ;; 
-      #         esac
-      #       fi
-      #       if [ -z "$val" ]; then
-      #         # final fallback: process env (this will catch values injected as runtime env vars)
-      #         val="$(printenv "$k" || true)"
-      #       fi
-      #       # Remove existing and write final value
-      #       sed -i "/^${k}=/d" .env.production || true
-      #       printf '%s=%s\n' "$k" "$val" >> .env.production
-      #     done
-
-
-
       - name: Auto-inject ALL VITE_* (vars → secrets → runtime env) into .env.production
         run: |
           set -euo pipefail
@@ -143,9 +89,6 @@ jobs:
 
           # Optionnel : trier pour avoir un fichier propre et prévisible
           sort -o .env.production .env.production
-
-
-
 
       - name: "Debug: list VITE_* keys and lengths in .env.production (safe)"
         run: |
