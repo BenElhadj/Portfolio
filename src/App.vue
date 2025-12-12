@@ -20,7 +20,7 @@
 
     <!-- Page 4 : Compétences techniques -->
     <section class="page">
-      <Skills />
+      <Hard_Skills />
     </section>
 
     <!-- Page 5 : Projets -->
@@ -30,7 +30,7 @@
     
     <!-- Page 6 : Soft skills -->
     <section class="page">
-      {{ $t("softSkills.title") }}
+      <Soft_Skills />
     </section>
 
     <!-- Page 7 : Liens utiles -->
@@ -45,8 +45,9 @@ import Navbar from "./assets/Navbar.vue";
 import Timeline from "./components/Timeline.vue";
 import Diplomas from "./components/Diplomas.vue";
 import Experiences from "./components/Experiences.vue";
-import Skills from "./components/Skills.vue";
+import Hard_Skills from "./components/Hard_Skills.vue";
 import Projects from "./components/Projects.vue";
+import Soft_Skills from "./components/Soft_Skills.vue";
 
 import { usePageNavigation } from "./composables/usePageNavigation.js";
 usePageNavigation(".pages");
