@@ -30,13 +30,14 @@
                 class="company-logo-link"
                 :title="`Voir ${exp.company} sur LinkedIn`"
               >
-                <img
-                  :src="logoSrc(exp.logo)"
-                  class="company-logo"
-                  :alt="exp.company + ' logo'"
-                  @error="(e) => e.target.style.display = 'none'"
-                  aria-hidden="true"
-                />
+                <div class="degree-thumb">
+                  <img
+                    :src="logoSrc(exp.logo)"
+                    :alt="exp.company + ' logo'"
+                    @error="(e) => e.target.style.display = 'none'"
+                    aria-hidden="true"
+                  />
+                </div>
               </a>
 
               <!-- Nom de société cliquable -->
@@ -107,37 +108,3 @@ const categories = computed(() => {
   return Array.isArray(list) ? list : [];
 });
 </script>
-
-<style scoped>
-.company-logo {
-  width: 200px;
-  height: 64px;
-  object-fit: contain;
-  margin: 12px auto;
-  display: block;
-  transition: transform 160ms ease, filter 160ms ease;
-  transform-origin: center center;
-  cursor: pointer;
-}
-.company-logo-link {
-  display: inline-block;
-  line-height: 0;
-}
-.company-logo-link:hover .company-logo {
-  transform: scale(1.25);
-  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));
-}
-.company-link {
-  font-weight: 600;
-  margin-right: 8px;
-}
-.linkedin-link {
-  margin-left: 8px;
-  vertical-align: middle;
-}
-.card .dates {
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 6px;
-}
-</style>

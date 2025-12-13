@@ -59,66 +59,62 @@
       </PageLayout>
     </div>
 
-    <Popup
-        :visible="popupVisible"
-        :title="popupTitle"
-        @close="handleClose"
-      >
-    <template #controls v-if="isDiplomaPopup">
-      <div class="zoom-control">
-        <span class="zoom-icon" aria-hidden="true" title="Zoom">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
-            <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
-        </span>
-        <input
-        type="range"
-        min="1"
-        max="10"
-        step="0.1"
-        v-model.number="zoomScale"
-        aria-label="Niveau de zoom"
-        />
-        <div class="zoom-value">{{ zoomScale.toFixed(1) }}×</div>
-        <br>
-  <div class="diploma-name" v-if="popupDegree" :dir="String(locale.value).startsWith('ar') ? 'rtl' : 'ltr'" style="flex:1; text-align:center;">{{ popupDegree }}</div>
-      </div>
-    </template>
-        <div v-if="popupImage" class="zoom-wrapper" ref="zoomWrapper">
-    <div v-if="popupLoading" class="popup-spinner-overlay">{{ $t('diplomas.loading') || 'Chargement...' }}</div>
-          <div
-            v-if="isDiplomaPopup"
-            class="pan-wrapper"
-            :class="{ dragging: dragging }"
-            :style="{ transform: `translate(${panX}px, ${panY}px)` }"
-            @pointerdown.prevent="onPointerDown"
-            @pointermove.prevent="onPointerMove"
-            @pointerup.prevent="onPointerUp"
-            @pointercancel.prevent="onPointerUp"
-            @mouseleave.prevent="onPointerUp"
-            @wheel.prevent="onWheel"
-            @contextmenu.prevent
-            @copy.prevent
-          >
-            <img
-              :src="popupImage"
-              class="popup-image"
-              :style="{ transform: `scale(${zoomScale})` }"
-              alt="diploma"
-              draggable="false"
-              @dragstart.prevent
-            />
-          </div>
-          <div v-else class="logo-wrapper">
-            <img
-              :src="popupImage"
-              class="popup-image"
-              alt="logo"
-            />
-          </div>
+    <Popup :visible="popupVisible" :title="popupTitle" @close="handleClose">
+      <template #controls v-if="isDiplomaPopup">
+        <div class="zoom-control">
+          <span class="zoom-icon" aria-hidden="true" title="Zoom">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+              <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </span>
+          <input
+          type="range"
+          min="1"
+          max="10"
+          step="0.1"
+          v-model.number="zoomScale"
+          aria-label="Niveau de zoom"
+          />
+          <div class="zoom-value">{{ zoomScale.toFixed(1) }}×</div>
+          <br>
+          <div class="diploma-name" v-if="popupDegree" :dir="String(locale.value).startsWith('ar') ? 'rtl' : 'ltr'" style="flex:1; text-align:center;">{{ popupDegree }}</div>
         </div>
-      </Popup>
+      </template>
+      <div v-if="popupImage" class="zoom-wrapper" ref="zoomWrapper">
+        <div v-if="popupLoading" class="popup-spinner-overlay">{{ $t('diplomas.loading') || 'Chargement...' }}</div>
+        <div
+          v-if="isDiplomaPopup"
+          class="pan-wrapper"
+          :class="{ dragging: dragging }"
+          :style="{ transform: `translate(${panX}px, ${panY}px)` }"
+          @pointerdown.prevent="onPointerDown"
+          @pointermove.prevent="onPointerMove"
+          @pointerup.prevent="onPointerUp"
+          @pointercancel.prevent="onPointerUp"
+          @mouseleave.prevent="onPointerUp"
+          @wheel.prevent="onWheel"
+          @contextmenu.prevent
+          @copy.prevent
+        >
+          <img
+            :src="popupImage"
+            class="popup-image"
+            :style="{ transform: `scale(${zoomScale})` }"
+            alt="diploma"
+            draggable="false"
+            @dragstart.prevent
+          />
+        </div>
+        <div v-else class="logo-wrapper">
+          <img
+            :src="popupImage"
+            class="popup-image"
+            alt="logo"
+          />
+        </div>
+      </div>
+    </Popup>
   </div>
 </template>
 
@@ -583,23 +579,3 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', keyDownHandler);
 });
 </script>
-
-<style scoped>
-.card[role="button"]{cursor:pointer}
-.popup-image{max-width:900px;max-height:80vh;width:100%;height:auto;display:block;margin:0 auto}
-.popup-spinner-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.0);pointer-events:none;font-weight:700;color:var(--text)}
-.zoom-wrapper{position:relative;display:inline-block;max-width:100%;overflow:hidden}
-.pan-wrapper{display:block}
-.pan-wrapper{touch-action:none}
-.pan-wrapper{cursor:grab}
-.pan-wrapper.dragging{cursor:grabbing}
-.zoom-wrapper .popup-image{transition:transform 320ms cubic-bezier(.2,.8,.2,1);transform-origin:center center;display:block;margin:0 auto;max-width:100%;max-height:80vh}
-.zoom-control{display:flex;align-items:center;gap:8px}
-.zoom-control input[type="range"]{width:220px}
-.zoom-value{font-weight:600;padding-left:6px}
-.zoom-icon{display:inline-flex;align-items:center;justify-content:center;color:var(--text);opacity:0.7;margin-right:6px}
-.zoom-icon svg{display:block}
-
-.diploma-name{font-weight:700;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
-
-</style>

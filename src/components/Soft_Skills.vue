@@ -14,18 +14,18 @@
               <div
                 v-for="(item, i) in group.items"
                 :key="item.key"
-                class="card line-card soft-card"
+                class="card line-card reveal"
                 role="button"
                 tabindex="0"
                 v-observe-visibility="(isVisible) => onVisible(isVisible, item.key)"
-                :class="{ visible: visibleSkills.includes(item.key) }"
+                :class="{ 'is-visible': visibleSkills.includes(item.key) }"
                 @click="openPopup(item.key)"
                 @keydown.enter.prevent="openPopup(item.key)"
                 @keydown.space.prevent="openPopup(item.key)"
               >
                 <div class="info">
                   <div class="name">{{ $t(`softSkills.items.${item.key}.name`) }}</div>
-                  <div class="desc">{{ $t(`softSkills.items.${item.key}.short`) }}</div>
+                  <small>{{ $t(`softSkills.items.${item.key}.short`) }}</small>
                 </div>
               </div>
             </div>
@@ -97,28 +97,3 @@ const popupKey = ref(null);
 function openPopup(key) { popupKey.value = key; popupVisible.value = true; }
 function closePopup() { popupVisible.value = false; popupKey.value = null; }
 </script>
-
-<style scoped>
-.soft-card .desc { font-size: 0.95rem; color: var(--text-secondary); margin-top: 6px; }
-
-.soft-card {
-  opacity: 1;
-  transform: translateY(18px) scale(0.99);
-  transition: all 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
-}
-.soft-card.visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.group-title {
-  color: var(--title);
-  font-size: var(--fs-h3);
-  margin-bottom: 12px;
-}
-
-.soft-card .info { display: flex; flex-direction: column; }
-.soft-card .name { font-weight: 600; color: var(--text); }
-.card.line-card { border-left: 4px solid var(--blue); }
-
-</style>
