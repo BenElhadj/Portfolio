@@ -35,7 +35,7 @@
 
     <!-- Page 7 : Liens utiles -->
     <section class="page">
-      {{ $t("links.title") }}
+      <Links />
     </section>
   </div>
 </template>
@@ -48,6 +48,7 @@ import Experiences from "./components/Experiences.vue";
 import Hard_Skills from "./components/Hard_Skills.vue";
 import Projects from "./components/Projects.vue";
 import Soft_Skills from "./components/Soft_Skills.vue";
+import Links from "./components/Links.vue";
 
 import { usePageNavigation } from "./composables/usePageNavigation.js";
 usePageNavigation(".pages");
