@@ -101,7 +101,6 @@ function closePopup() { popupVisible.value = false; popupKey.value = null; }
 <style scoped>
 .soft-card .desc { font-size: 0.95rem; color: var(--text-secondary); margin-top: 6px; }
 
-/* Reuse animation & visual cues from diplomas timeline */
 .soft-card {
   opacity: 1;
   transform: translateY(18px) scale(0.99);
@@ -118,7 +117,6 @@ function closePopup() { popupVisible.value = false; popupKey.value = null; }
   margin-bottom: 12px;
 }
 
-/* Make the card header/left border use the same accent as diplomas */
 .soft-card .info { display: flex; flex-direction: column; }
 .soft-card .name { font-weight: 600; color: var(--text); }
 .card.line-card { border-left: 4px solid var(--blue); }
