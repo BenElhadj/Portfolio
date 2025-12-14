@@ -13,12 +13,14 @@ export default {
         github: {
             name: "GitHub",
             short: "مشاريعي المفتوحة المصدر ومساهماتي.",
-            url: "https://github.com/USERNAME"
+            url: "https://github.com/USERNAME",
+            qr: "/qr/qr_GitHub.png"
         },
         linkedin: {
             name: "LinkedIn",
             short: "ملفي المهني — السيرة الذاتية والشبكة.",
-            url: "https://www.linkedin.com/in/USERNAME"
+            url: "https://www.linkedin.com/in/USERNAME",
+            qr: "/qr/qr_LinkedIn.png"
         },
         email: {
             name: "البريد الإلكتروني",
