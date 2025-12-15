@@ -27,12 +27,12 @@ export default {
             short: "Send me a message directly by email.",
             qr: "/qr/qr_Email.png",
             // escape @ to avoid vue-i18n linked-format parsing issues
-            address: "42bhamdi\\@gmail.com"
+            address: "42bhamdi@gmail.com"
         },
         contact: {
             name: "Contact me",
             short: "Contact form or direct message.",
-            url: "mailto:you@example.com",
+            url: "mailto:42bhamdi@gmail.com",
             qr: "/qr/qr_Contact.png",
             form: {
                 nameLabel: "Your name",

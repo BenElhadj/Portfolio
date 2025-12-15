@@ -7,7 +7,7 @@
     "dev": "vite --open",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vite build && gh-pages -d dist",
+    "deploy": "vite build && node -e \"const fs=require('fs'),path=require('path');(function d(p){fs.readdirSync(p).forEach(f=>{const q=path.join(p,f);if(fs.statSync(q).isDirectory())d(q);else if(q.endsWith('.gz'))fs.unlinkSync(q)})})(process.argv[1])\" dist && gh-pages -d dist",
     "build:analyze": "vite build --mode analyze"
   },
   "dependencies": {
