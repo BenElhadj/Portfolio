@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper links-wrapper">
     <h2 class="title">{{ $t('links.title') }}</h2>
 
     <PageLayout :columns="2" :rows="2">
@@ -57,6 +57,19 @@
       </div>
     </template>
     </PageLayout>
+    
+    <div class="favicon-center">
+      <img
+        src="/favicon.png"
+        alt="favicon"
+        role="button"
+        tabindex="0"
+        class="clickable-favicon"
+        :title="cvLabel"
+        @click="downloadCV"
+        @keydown.enter="downloadCV"
+      />
+    </div>
   </div>
 </template>
 
@@ -68,7 +81,7 @@ import Popup from './Popup.vue';
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 // decode escaped @ in locale email address (we store as "42bhamdi\@gmail.com" to avoid i18n parsing)
 const emailAddress = computed(() => {
@@ -120,5 +133,26 @@ onBeforeUnmount(() => {
 // does not provide a static image path).
 function qrFor(value) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(value)}`;
+}
+
+// CV download URL depending on current locale (fr => FR, otherwise EN including ar)
+const cvUrl = computed(() => (String(locale.value).startsWith('fr') ? '/cv/CV_FR.pdf' : '/cv/CV_EN.pdf'));
+const cvLabel = computed(() => (String(locale.value).startsWith('fr') ? 'Télécharger le CV (FR)' : 'Download CV (EN)'));
+
+function downloadCV() {
+  try {
+    const url = cvUrl.value;
+    // Create temporary link to trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = url.split('/').pop() || '';
+    // Ensure it's added to DOM for Firefox
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (e) {
+    // fallback: open in new tab
+    window.open(cvUrl.value, '_blank');
+  }
 }
 </script>

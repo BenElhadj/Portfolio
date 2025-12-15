@@ -108,6 +108,41 @@ h1, .h1 { font-size: var(--fs-h1); }
 h2, .h2 { font-size: var(--fs-h2); }
 h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
 
+/* Styles for Links page favicon (moved from Links.vue) */
+.links-wrapper {
+  position: relative;
+}
+.links-wrapper .favicon-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.links-wrapper .favicon-center img {
+  width: 300px;
+  height: auto;
+  display: block;
+  transform-origin: center;
+}
+.links-wrapper .clickable-favicon {
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform;
+  outline: none;
+  transition: transform 160ms ease, filter 120ms ease;
+}
+.links-wrapper .clickable-favicon:hover {
+  transform: translateZ(0) scale(1.05);
+  filter: brightness(1.02);
+}
+.links-wrapper .clickable-favicon:active {
+  transform: translateZ(0) scale(0.98);
+}
+
 p, li, span, div, small {
   font-size: var(--fs-body);
   color: var(--text);
