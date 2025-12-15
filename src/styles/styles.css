@@ -391,7 +391,7 @@ a:hover { text-decoration: underline; }
 /* QR visuals sized from a CSS variable so card height can follow */
 .card.corner .corner-qr {
   position: absolute;
-  top: 12px;
+  /* anchor the QR to the bottom-right with a 12px gap */
   right: 12px;
   bottom: 12px;
   width: var(--corner-qr-size);
@@ -399,6 +399,10 @@ a:hover { text-decoration: underline; }
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 6px 18px var(--card-shadow);
+  /* scale from the bottom so the QR enlarges upward (no layout shift at the card bottom) */
+  transform-origin: center bottom;
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 160ms ease, filter 120ms ease;
+  cursor: pointer;
 }
 .card.corner .corner-qr img {
   width: 100%;
@@ -406,6 +410,16 @@ a:hover { text-decoration: underline; }
   object-fit: cover;
   display: block;
 }
+/* Hover/active effects: enlarge in-place without causing layout shift */
+.card.corner .corner-qr:hover,
+.card.corner .corner-qr:focus {
+  transform: scale(1.08);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+.card.corner .corner-qr:active {
+  transform: scale(0.98);
+}
+.card.corner .corner-qr:focus { outline: 2px solid rgba(11,111,184,0.12); }
 /* Ensure card height follows QR size */
 .card.corner {
   min-height: calc(var(--corner-qr-size) );
@@ -427,6 +441,9 @@ a:hover { text-decoration: underline; }
   [dir="rtl"] .card.corner { padding-left: 112px; padding-right: 0; }
   [dir="rtl"] .card.corner { padding-left: calc(var(--corner-qr-size)); padding-right: 0; }
   [dir="rtl"] .card.corner .corner-qr { left: 12px; right: auto; }
+
+  /* ensure bottom gap remains 12px in RTL mobile too */
+  [dir="rtl"] .card.corner .corner-qr { bottom: 12px; }
 }
 /* RTL support: place QR on the left and adjust padding */
 [dir="rtl"] .card.corner {
@@ -437,6 +454,9 @@ a:hover { text-decoration: underline; }
   left: 12px;
   right: auto;
 }
+
+/* ensure bottom gap remains 12px in RTL desktop too */
+[dir="rtl"] .card.corner .corner-qr { bottom: 12px; }
 
 /* Diplomas utilities moved from component scoped styles to global styles */
 .card[role="button"] {
