@@ -35,6 +35,8 @@
   --fs-small: 0.85rem;
   --radius: 10px;
   --navbar-height: 36px;
+  /* QR corner size (can be adjusted globally) */
+  --corner-qr-size: 168px;
 }
 
 /* Mode clair explicite */
@@ -384,23 +386,56 @@ a:hover { text-decoration: underline; }
 .card.corner {
   position: relative;
   /* leave space on the right for the corner QR */
-  padding-right: 96px;
+  padding-right: calc(var(--corner-qr-size) + 24px);
 }
+/* QR visuals sized from a CSS variable so card height can follow */
 .card.corner .corner-qr {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 56px;
-  height: 56px;
-  border-radius: 6px;
+  bottom: 12px;
+  width: var(--corner-qr-size);
+  height: var(--corner-qr-size);
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 10px var(--card-shadow);
+  box-shadow: 0 6px 18px var(--card-shadow);
 }
 .card.corner .corner-qr img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+/* Ensure card height follows QR size */
+.card.corner {
+  min-height: calc(var(--corner-qr-size) );
+}
+
+/* Responsive: reduce QR size on small screens to avoid layout breaking */
+@media (max-width: 640px) {
+  /* mobile: set smaller corner size via variable */
+  :root { --corner-qr-size: 80px; }
+  .card.corner {
+    padding-right: calc(var(--corner-qr-size) );
+    min-height: calc(var(--corner-qr-size) );
+  }
+  .card.corner .corner-qr {
+    width: var(--corner-qr-size);
+    height: var(--corner-qr-size);
+    border-radius: 6px;
+  }
+  [dir="rtl"] .card.corner { padding-left: 112px; padding-right: 0; }
+  [dir="rtl"] .card.corner { padding-left: calc(var(--corner-qr-size)); padding-right: 0; }
+  [dir="rtl"] .card.corner .corner-qr { left: 12px; right: auto; }
+}
+/* RTL support: place QR on the left and adjust padding */
+[dir="rtl"] .card.corner {
+  padding-left: 288px;
+  padding-right: 12px;
+}
+[dir="rtl"] .card.corner .corner-qr {
+  left: 12px;
+  right: auto;
 }
 
 /* Diplomas utilities moved from component scoped styles to global styles */
