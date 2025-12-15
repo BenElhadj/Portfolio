@@ -25,12 +25,23 @@ export default {
         email: {
             name: "البريد الإلكتروني",
             short: "أرسل رسالة مباشرة عبر البريد الإلكتروني.",
-            address: "you@example.com"
+            qr: "/qr/qr_Email.png",
+            // escape @ to avoid vue-i18n linked-format parsing issues
+            address: "42bhamdi\\@gmail.com"
         },
         contact: {
             name: "تواصل معي",
             short: "نموذج الاتصال أو رسالة مباشرة.",
-            url: "mailto:you@example.com"
+            url: "mailto:you@example.com",
+            qr: "/qr/qr_Contact.png",
+            form: {
+                nameLabel: "اسمك",
+                emailLabel: "بريدك الإلكتروني (اختياري)",
+                messageLabel: "رسالتك",
+                submitLabel: "إرسال",
+                success: "تم إرسال الرسالة — شكراً!",
+                error: "خطأ أثناء الإرسال"
+            }
         }
     }
 };

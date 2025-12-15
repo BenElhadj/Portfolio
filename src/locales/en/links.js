@@ -25,12 +25,23 @@ export default {
         email: {
             name: "Email",
             short: "Send me a message directly by email.",
-            address: "you@example.com"
+            qr: "/qr/qr_Email.png",
+            // escape @ to avoid vue-i18n linked-format parsing issues
+            address: "42bhamdi\\@gmail.com"
         },
         contact: {
             name: "Contact me",
             short: "Contact form or direct message.",
-            url: "mailto:you@example.com"
+            url: "mailto:you@example.com",
+            qr: "/qr/qr_Contact.png",
+            form: {
+                nameLabel: "Your name",
+                emailLabel: "Your email (optional)",
+                messageLabel: "Your message",
+                submitLabel: "Send",
+                success: "Message sent — thank you!",
+                error: "Error while sending"
+            }
         }
     }
 };

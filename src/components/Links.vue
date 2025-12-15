@@ -33,7 +33,7 @@
           <h3>{{ $t('links.items.email.name') }}</h3>
           <small>{{ $t('links.items.email.short') }}</small>
           <div class="actions">
-            <a :href="`mailto:${$t('links.items.email.address')}`" class="corner-qr"><img :src="$t('links.items.email.qr') || qrFor(`mailto:${$t('links.items.email.address')}`)" alt="email-qr" /></a>
+            <a :href="`mailto:${emailAddress}`" class="corner-qr"><img :src="$t('links.items.email.qr') || qrFor(`mailto:${emailAddress}`)" alt="email-qr" /></a>
           </div>
         </div>
       </div>
@@ -45,9 +45,15 @@
           <h3>{{ $t('links.items.contact.name') }}</h3>
           <small>{{ $t('links.items.contact.short') }}</small>
           <div class="actions">
-            <a :href="$t('links.items.contact.url')" target="_blank" rel="noopener noreferrer" class="corner-qr"><img :src="$t('links.items.contact.qr') || qrFor($t('links.items.contact.url'))" alt="contact-qr" /></a>
+            <!-- Use i18n-provided QR for contact; clicking opens the popup and updates the hash -->
+            <a :href="'#contact'" class="corner-qr" @click.prevent="openContact" :title="$t('links.items.contact.name')">
+              <img :src="$t('links.items.contact.qr') || qrFor($t('links.items.contact.url'))" :alt="$t('links.items.contact.name')" />
+            </a>
           </div>
         </div>
+        <Popup :visible="showContact" :title="$t('links.items.contact.name')" @close="closeContact">
+          <ContactForm />
+        </Popup>
       </div>
     </template>
     </PageLayout>
@@ -56,6 +62,59 @@
 
 <script setup>
 import PageLayout from "../assets/PageLayout.vue";
+import ContactForm from './ContactForm.vue';
+import Popup from './Popup.vue';
+
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+// decode escaped @ in locale email address (we store as "42bhamdi\@gmail.com" to avoid i18n parsing)
+const emailAddress = computed(() => {
+  const raw = t('links.items.email.address');
+  return String(raw).replace(/\\@/g, '@');
+});
+
+const showContact = ref(false);
+
+function openContact() {
+  showContact.value = true;
+  try {
+    history.replaceState(null, '', '#contact');
+  } catch (e) {
+    // ignore
+  }
+}
+
+function closeContact() {
+  showContact.value = false;
+  try {
+    // remove hash without reloading
+    const url = new URL(window.location.href);
+    url.hash = '';
+    history.replaceState(null, '', url.toString());
+  } catch (e) {
+    // ignore
+  }
+}
+
+function handleHashChange() {
+  if (window.location.hash === '#contact') openContact();
+}
+
+onMounted(() => {
+  // open on initial load if URL contains #contact or ?contact=1
+  const params = new URLSearchParams(window.location.search);
+  if (window.location.hash === '#contact' || params.get('contact') === '1' || params.get('contact') === 'true') {
+    showContact.value = true;
+  }
+  window.addEventListener('hashchange', handleHashChange);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', handleHashChange);
+});
 
 // qrFor: generate a QR image URL for any value (used as fallback when a locale
 // does not provide a static image path).
