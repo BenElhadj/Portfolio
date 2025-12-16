@@ -45,7 +45,6 @@
           <h3>{{ $t('links.items.contact.name') }}</h3>
           <small>{{ $t('links.items.contact.short') }}</small>
           <div class="actions">
-            <!-- Use i18n-provided QR for contact; clicking opens the popup and updates the hash -->
             <a :href="'#contact'" class="corner-qr" @click.prevent="openContact" :title="$t('links.items.contact.name')">
               <img :src="$t('links.items.contact.qr') || qrFor(contactUrl)" :alt="$t('links.items.contact.name')" />
             </a>
@@ -86,7 +85,8 @@ const { t, locale } = useI18n();
 // decode placeholders in locale email address (we store as "42bhamdi[at]gmail.com" to avoid i18n parsing)
 const emailAddress = computed(() => {
   const raw = t('links.items.email.address');
-  return String(raw).replace(/\\@/g, '@').replace(/\[at\]/g, '@');
+  // decode stored placeholder like "42bhamdi[at]gmail.com"
+  return String(raw).replace(/\[at\]/g, '@').replace(/\\@/g, '@');
 });
 
 const showContact = ref(false);
@@ -94,7 +94,7 @@ const showContact = ref(false);
 // decode contact url placeholder (some locales store mailto as "mailto:42bhamdi[at]gmail.com")
 const contactUrl = computed(() => {
   const raw = t('links.items.contact.url');
-  return String(raw).replace(/\\@/g, '@').replace(/\[at\]/g, '@');
+  return String(raw).replace(/\[at\]/g, '@').replace(/\\@/g, '@');
 });
 
 function openContact() {
@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
 // qrFor: generate a QR image URL for any value (used as fallback when a locale
 // does not provide a static image path).
 function qrFor(value) {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(value)}`;
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(value);
 }
 
 // CV download URL depending on current locale (fr => FR, otherwise EN including ar)

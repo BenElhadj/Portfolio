@@ -6,7 +6,7 @@
         <template
           v-for="(cat, catIndex) in diplomas"
           :key="catIndex"
-          v-slot:[`slot${catIndex+1}`]
+          v-slot:[('slot'+(catIndex+1))]
         >
           <div class="category">
             <div class="category-header">
@@ -32,9 +32,9 @@
                     @click.stop.prevent="openLogo(d)"
                     @keydown.enter.prevent="openLogo(d)"
                     @keydown.space.prevent="openLogo(d)"
-                    :title="`Voir logo ${d.institution}`"
+                    :title="'Voir logo ' + d.institution"
                   >
-                    <img v-if="d.image" :src="getAssetPath(`/degrees/${d.image}`)" :alt="d.degree" />
+                    <img v-if="d.image" :src="getAssetPath('/degrees/' + d.image)" :alt="d.degree" />
                   </div>
 
                   <div
@@ -87,7 +87,7 @@
           v-if="isDiplomaPopup"
           class="pan-wrapper"
           :class="{ dragging: dragging }"
-          :style="{ transform: `translate(${panX}px, ${panY}px)` }"
+          :style="{ transform: 'translate(' + panX + 'px, ' + panY + 'px)' }"
           @pointerdown.prevent="onPointerDown"
           @pointermove.prevent="onPointerMove"
           @pointerup.prevent="onPointerUp"
@@ -100,7 +100,7 @@
           <img
             :src="popupImage"
             class="popup-image"
-            :style="{ transform: `scale(${zoomScale})` }"
+            :style="{ transform: 'scale(' + zoomScale + ')' }"
             alt="diploma"
             draggable="false"
             @dragstart.prevent
