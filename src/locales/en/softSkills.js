@@ -35,6 +35,7 @@ export default {
     creativityInnovation: {
       name: "Creativity & Innovation",
       level: "",
+      short: "Suggests new and original ideas.",
       info: "Thinks outside the box and proposes new methods to challenge existing practices."
     },
     strategicThinking: {

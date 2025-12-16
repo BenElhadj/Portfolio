@@ -26,13 +26,13 @@ export default {
             name: "البريد الإلكتروني",
             short: "أرسل رسالة مباشرة عبر البريد الإلكتروني.",
             qr: "/qr/qr_Email.png",
-            // escape @ to avoid vue-i18n linked-format parsing issues
-            address: "42bhamdi@gmail.com"
+            // store as "42bhamdi[at]gmail.com" and decode in the component
+            address: "42bhamdi[at]gmail.com"
         },
         contact: {
             name: "تواصل معي",
             short: "نموذج الاتصال أو رسالة مباشرة.",
-            url: "mailto:42bhamdi@gmail.com",
+            url: "mailto:42bhamdi[at]gmail.com",
             qr: "/qr/qr_Contact.png",
             form: {
                 nameLabel: "اسمك",

@@ -33,7 +33,7 @@
           <h3>{{ $t('links.items.email.name') }}</h3>
           <small>{{ $t('links.items.email.short') }}</small>
           <div class="actions">
-            <a :href="`mailto:${emailAddress}`" class="corner-qr"><img :src="$t('links.items.email.qr') || qrFor(`mailto:${emailAddress}`)" alt="email-qr" /></a>
+            <a :href="'mailto:' + emailAddress" class="corner-qr"><img :src="$t('links.items.email.qr') || qrFor('mailto:' + emailAddress)" alt="email-qr" /></a>
           </div>
         </div>
       </div>
@@ -47,7 +47,7 @@
           <div class="actions">
             <!-- Use i18n-provided QR for contact; clicking opens the popup and updates the hash -->
             <a :href="'#contact'" class="corner-qr" @click.prevent="openContact" :title="$t('links.items.contact.name')">
-              <img :src="$t('links.items.contact.qr') || qrFor($t('links.items.contact.url'))" :alt="$t('links.items.contact.name')" />
+              <img :src="$t('links.items.contact.qr') || qrFor(contactUrl)" :alt="$t('links.items.contact.name')" />
             </a>
           </div>
         </div>
@@ -83,13 +83,19 @@ import { useI18n } from 'vue-i18n';
 
 const { t, locale } = useI18n();
 
-// decode escaped @ in locale email address (we store as "42bhamdi\@gmail.com" to avoid i18n parsing)
+// decode placeholders in locale email address (we store as "42bhamdi[at]gmail.com" to avoid i18n parsing)
 const emailAddress = computed(() => {
   const raw = t('links.items.email.address');
-  return String(raw).replace(/\\@/g, '@');
+  return String(raw).replace(/\\@/g, '@').replace(/\[at\]/g, '@');
 });
 
 const showContact = ref(false);
+
+// decode contact url placeholder (some locales store mailto as "mailto:42bhamdi[at]gmail.com")
+const contactUrl = computed(() => {
+  const raw = t('links.items.contact.url');
+  return String(raw).replace(/\\@/g, '@').replace(/\[at\]/g, '@');
+});
 
 function openContact() {
   showContact.value = true;
@@ -123,6 +129,13 @@ onMounted(() => {
     showContact.value = true;
   }
   window.addEventListener('hashchange', handleHashChange);
+  // debug: print decoded email and contact url to help trace i18n parsing issues
+  // try {
+  //   // eslint-disable-next-line no-console
+  //   console.log('Links.debug emailAddress ->', emailAddress.value, 'contactUrl ->', contactUrl.value);
+  // } catch (e) {
+  //   // ignore
+  // }
 });
 
 onBeforeUnmount(() => {
