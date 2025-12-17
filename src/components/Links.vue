@@ -201,22 +201,3 @@ function downloadCV() {
   }
 }
 </script>
-
-<style scoped>
-.cv-tooltip {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.85);
-  color: #fff;
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-size: 13px;
-  pointer-events: none; /* don't block mouse events */
-  z-index: 10000;
-  white-space: nowrap;
-  transform: translate(0, 0);
-}
-
-.clickable-favicon {
-  cursor: pointer;
-}
-</style>
