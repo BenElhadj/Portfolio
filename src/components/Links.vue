@@ -64,14 +64,12 @@
         role="button"
         tabindex="0"
         class="clickable-favicon"
-        :title="$t('links.cvLabel')"
+        :aria-label="$t('links.cvLabel')"
         @click="downloadCV"
         @keydown.enter="downloadCV"
         @mouseenter="onCvMouseEnter"
         @mouseleave="onCvMouseLeave"
         @mousemove="onCvMouseMove"
-        @focus="onCvFocus"
-        @blur="onCvBlur"
       />
       <teleport to="body">
         <div
@@ -111,15 +109,6 @@ const showContact = ref(false);
 const showCvTooltip = ref(false);
 const tooltipX = ref(0);
 const tooltipY = ref(0);
-let _rafId = null;
-let _pendingX = 0;
-let _pendingY = 0;
-
-function _updateTooltipPos() {
-  _rafId = null;
-  tooltipX.value = _pendingX;
-  tooltipY.value = _pendingY;
-}
 
 function onCvMouseEnter() {
   showCvTooltip.value = true;
@@ -127,40 +116,12 @@ function onCvMouseEnter() {
 
 function onCvMouseLeave() {
   showCvTooltip.value = false;
-  if (_rafId) {
-    cancelAnimationFrame(_rafId);
-    _rafId = null;
-  }
 }
 
 function onCvMouseMove(e) {
-  // follow the cursor tightly: position exactly at the cursor (top-left at pointer)
-  _pendingX = Math.round(e.clientX);
-  _pendingY = Math.round(e.clientY);
-  if (!_rafId) _rafId = requestAnimationFrame(_updateTooltipPos);
-}
-
-function onCvFocus(e) {
-  // position tooltip above the image when focused
-  try {
-    const rect = e.target.getBoundingClientRect();
-    _pendingX = Math.round(rect.left + rect.width / 2);
-    _pendingY = Math.round(rect.top - 10);
-  } catch (err) {
-    // fallback to center of viewport
-    _pendingX = Math.round(window.innerWidth / 2);
-    _pendingY = 40;
-  }
-  if (!_rafId) _rafId = requestAnimationFrame(_updateTooltipPos);
-  showCvTooltip.value = true;
-}
-
-function onCvBlur() {
-  showCvTooltip.value = false;
-  if (_rafId) {
-    cancelAnimationFrame(_rafId);
-    _rafId = null;
-  }
+  // simple direct follow of the cursor with a light offset so label doesn't sit exactly under the pointer
+  tooltipX.value = Math.round(e.clientX + 8);
+  tooltipY.value = Math.round(e.clientY + 8);
 }
 
 // decode contact url placeholder (some locales store mailto as "mailto:42bhamdi[at]gmail.com")
