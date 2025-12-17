@@ -64,10 +64,26 @@
         role="button"
         tabindex="0"
         class="clickable-favicon"
-        :title="cvLabel"
+        :title="$t('links.cvLabel')"
         @click="downloadCV"
         @keydown.enter="downloadCV"
+        @mouseenter="onCvMouseEnter"
+        @mouseleave="onCvMouseLeave"
+        @mousemove="onCvMouseMove"
+        @focus="onCvFocus"
+        @blur="onCvBlur"
       />
+      <teleport to="body">
+        <div
+          v-if="showCvTooltip"
+          class="cv-tooltip"
+          :style="{ left: tooltipX + 'px', top: tooltipY + 'px' }"
+          role="tooltip"
+          aria-hidden="false"
+        >
+          {{ $t('links.cvLabel') }}
+        </div>
+      </teleport>
     </div>
   </div>
 </template>
@@ -90,6 +106,62 @@ const emailAddress = computed(() => {
 });
 
 const showContact = ref(false);
+
+// CV tooltip that follows the mouse when hovering the favicon
+const showCvTooltip = ref(false);
+const tooltipX = ref(0);
+const tooltipY = ref(0);
+let _rafId = null;
+let _pendingX = 0;
+let _pendingY = 0;
+
+function _updateTooltipPos() {
+  _rafId = null;
+  tooltipX.value = _pendingX;
+  tooltipY.value = _pendingY;
+}
+
+function onCvMouseEnter() {
+  showCvTooltip.value = true;
+}
+
+function onCvMouseLeave() {
+  showCvTooltip.value = false;
+  if (_rafId) {
+    cancelAnimationFrame(_rafId);
+    _rafId = null;
+  }
+}
+
+function onCvMouseMove(e) {
+  // follow the cursor tightly: position exactly at the cursor (top-left at pointer)
+  _pendingX = Math.round(e.clientX);
+  _pendingY = Math.round(e.clientY);
+  if (!_rafId) _rafId = requestAnimationFrame(_updateTooltipPos);
+}
+
+function onCvFocus(e) {
+  // position tooltip above the image when focused
+  try {
+    const rect = e.target.getBoundingClientRect();
+    _pendingX = Math.round(rect.left + rect.width / 2);
+    _pendingY = Math.round(rect.top - 10);
+  } catch (err) {
+    // fallback to center of viewport
+    _pendingX = Math.round(window.innerWidth / 2);
+    _pendingY = 40;
+  }
+  if (!_rafId) _rafId = requestAnimationFrame(_updateTooltipPos);
+  showCvTooltip.value = true;
+}
+
+function onCvBlur() {
+  showCvTooltip.value = false;
+  if (_rafId) {
+    cancelAnimationFrame(_rafId);
+    _rafId = null;
+  }
+}
 
 // decode contact url placeholder (some locales store mailto as "mailto:42bhamdi[at]gmail.com")
 const contactUrl = computed(() => {
@@ -150,7 +222,6 @@ function qrFor(value) {
 
 // CV download URL depending on current locale (fr => FR, otherwise EN including ar)
 const cvUrl = computed(() => (String(locale.value).startsWith('fr') ? '/cv/CV_FR.pdf' : '/cv/CV_EN.pdf'));
-const cvLabel = computed(() => (String(locale.value).startsWith('fr') ? 'Télécharger le CV (FR)' : 'Download CV (EN)'));
 
 function downloadCV() {
   try {
@@ -169,3 +240,22 @@ function downloadCV() {
   }
 }
 </script>
+
+<style scoped>
+.cv-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  pointer-events: none; /* don't block mouse events */
+  z-index: 10000;
+  white-space: nowrap;
+  transform: translate(0, 0);
+}
+
+.clickable-favicon {
+  cursor: pointer;
+}
+</style>

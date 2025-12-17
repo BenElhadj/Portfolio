@@ -1,5 +1,7 @@
 export default {
     title: "Useful links",
+    // Label for the CV download button/title
+    cvLabel: "Download CV (EN)",
     open: "Open",
     emailMe: "Send email",
     contactMe: "Contact",

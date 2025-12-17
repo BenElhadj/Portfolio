@@ -1,5 +1,7 @@
 export default {
     title: "روابط مفيدة",
+    // Label for the CV download button/title
+    cvLabel: "تحميل السيرة الذاتية (EN)",
     open: "فتح",
     emailMe: "أرسل بريداً إلكترونياً",
     contactMe: "اتصل بي",
