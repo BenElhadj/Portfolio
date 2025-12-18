@@ -381,20 +381,42 @@ a:hover { text-decoration: underline; }
 }
 
 .degree-thumb {
-  width: 64px;
-  height: 64px;
+  /* Keep the container flexible: prefer fixed height, allow width to expand where needed */
+  height: 48px;              /* fixed height only (changeable) */
+  width: auto;               /* don't force a fixed width so images can use full available width */
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;         /* allow image to be fully visible (object-fit will preserve ratio) */
   cursor: pointer;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 .degree-thumb img {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 2px var(--blue));
+  display: block;
+  width: 100%;               /* image fills available width of its container */
+  height: 48px;             /* fixed height only */
+  object-fit: contain;      /* preserve aspect ratio without cropping */
+  object-position: center;
+  transition: transform 160ms ease, filter 120ms ease; /* smooth hover/click effects */
+  /* subtle drop shadow to keep clarity without strong glow */
+  filter: drop-shadow(0 0 1px rgba(11,111,184,0.6));
 }
+
+/* Hover / active (click) visual feedback for logos - global styles to reuse existing classes */
+.company-logo-link:hover .degree-thumb img,
+.degree-thumb:hover img {
+  transform: translateZ(0) scale(1.04);
+  /* much smaller brightness/contrast adjustments to keep effect subtle */
+  filter: drop-shadow(0 0 1px rgba(11,111,184,0.65)) brightness(1.01) contrast(1.01);
+}
+.company-logo-link:active .degree-thumb img,
+.degree-thumb:active img {
+  transform: translateZ(0) scale(0.98);
+}
+
+/* Make sure links indicate interactivity */
+.company-logo-link { cursor: pointer; display: inline-block; }
+.company-link { cursor: pointer; }
 
 .popup-image {
   max-width: 100%;
@@ -421,9 +443,8 @@ a:hover { text-decoration: underline; }
 
 
 .degree-thumb :hover{
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 0 2px var(--green-glow));
+  /* keep this rule minimal - don't change size, only a very small glow */
+  filter: drop-shadow(0 0 1px rgba(52,211,153,0.35));
 }
 
 /* Avatar canvas full-size helper (moved from Avatar3D.vue scoped styles) */

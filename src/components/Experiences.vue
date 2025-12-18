@@ -22,13 +22,13 @@
             >
               <div class="dates">{{ exp.dates }}</div>
               <!-- logo placé entre la date et le nom de la société -->
-              <a
-                v-if="logoSrc(exp.logo)"
-                :href="linkedinUrl(exp)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="company-logo-link"
-                :title="`Voir ${exp.company} sur LinkedIn`"
+                <a
+                  v-if="logoSrc(exp.logo)"
+                  :href="companyUrl(exp)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="company-logo-link"
+                  :title="linkTitle(exp)"
               >
                 <div class="degree-thumb">
                   <img
@@ -43,9 +43,10 @@
               <!-- Nom de société cliquable -->
               <div class="company">
                 <!-- Company name linking to website when available -->
+                <!-- Company name linking to provided link/website when available -->
                 <a
-                  v-if="exp.website"
-                  :href="exp.website"
+                  v-if="companyUrl(exp) && companyUrl(exp) !== '#'"
+                  :href="companyUrl(exp)"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="company-link"
@@ -55,7 +56,9 @@
                 <span v-else>{{ exp.company }}</span>
 
                 <!-- LinkedIn link: use provided exp.linkedin or fallback to a LinkedIn search for the company -->
+                <!-- LinkedIn link for quick access (keeps behaviour) -->
                 <a
+                  v-if="linkedinUrl(exp)"
                   class="linkedin-link"
                   :href="linkedinUrl(exp)"
                   target="_blank"
@@ -101,6 +104,23 @@ const linkedinUrl = (exp) => {
   if (exp.linkedin) return exp.linkedin;
   // Search query on LinkedIn
   return `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(exp.company || "")}`;
+};
+
+// Unified company link: prefer exp.link, then exp.website, then exp.linkedin, else '#'
+const companyUrl = (exp) => {
+  if (!exp) return "#";
+  if (exp.link) return exp.link;
+  if (exp.website) return exp.website;
+  if (exp.linkedin) return exp.linkedin;
+  return `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(exp.company || "")}`;
+};
+
+const linkTitle = (exp) => {
+  if (!exp) return '';
+  if (exp.link) return `Open ${exp.company || 'link'}`;
+  if (exp.website) return `Open ${exp.company || 'website'}`;
+  if (exp.linkedin) return `Voir ${exp.company || 'sur LinkedIn'}`;
+  return `Rechercher ${exp.company || ''} sur LinkedIn`;
 };
 
 const categories = computed(() => {

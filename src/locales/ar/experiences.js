@@ -10,6 +10,7 @@ export default {
                     dates: "أبريل 2024 - الآن",
                     company: "مستقل",
                     logo: "independant.png",
+                    link: "https://github.com/BenElhadj",
                     role: "مطور ذكاء اصطناعي/تعلم الآلة",
                     details: [
                         "مشاريع ذكاء اصطناعي: تصنيف البيانات والصور، كشف الشذوذ",
@@ -23,6 +24,7 @@ export default {
                     dates: "أكتوبر 2022 - أكتوبر 2023",
                     company: "KEAKR",
                     logo: "KEAKR.png",
+                    link: "https://www.linkedin.com/company/keakr/",
                     role: "مطور ويب/موبايل كامل",
                     details: [
                         "صيانة وتحسين تطبيق وموقع KEAKR",
@@ -35,6 +37,7 @@ export default {
                     dates: "يونيو 2021 - يوليو 2022",
                     company: "MULTISERV PLUS",
                     logo: "MULTISERV_PLUS.png",
+                    link: "https://linkedin.com/search/results/all/?keywords=MULTISERV%20PLUS",
                     role: "تطوير ويب كامل",
                     details: [
                         "تصميم وتطوير تطبيق ويب كامل لشركة تدريب",
@@ -48,6 +51,7 @@ export default {
                     dates: "أكتوبر 2019 - سبتمبر 2020",
                     company: "معهد الدماغ والحبل الشوكي (ICM)",
                     logo: "ICM.png",
+                    link: "https://institutducerveau.org/",
                     role: "مطور تطبيقات موبايل",
                     details: [
                         "تصميم وتطوير تطبيق CONNECT لمرضى السكتة الدماغية",
@@ -59,6 +63,7 @@ export default {
                     dates: "يناير 2019 - يوليو 2019",
                     company: "MULTISERV PLUS",
                     logo: "MULTISERV_PLUS.png",
+                    link: "https://linkedin.com/search/results/all/?keywords=MULTISERV%20PLUS",
                     role: "متدرب مطور",
                     details: [
                         "تطوير وصيانة موقع ويب لبيع الأفلام عبر الإنترنت",
@@ -71,6 +76,7 @@ export default {
                     dates: "أكتوبر 2021 - ديسمبر 2021",
                     company: "GRETA METEHOR Paris",
                     logo: "GRETA.png",
+                    link: "https://www.gpi2d.greta.fr/",
                     role: "تدريب مطور أندرويد",
                     details: [
                         "تدريب مكثف في تطوير تطبيقات أندرويد"
@@ -86,6 +92,7 @@ export default {
                     dates: "نوفمبر 2020 - يونيو 2021",
                     company: "AP-HP (مستشفى شارل-فوا)",
                     logo: "AP-HP.png",
+                    link: "https://charlesfoix.aphp.fr/",
                     role: "فني دعم ميداني",
                     details: ["إدارة الأصول المعلوماتية", "معالجة طلبات التدخل", "صيانة النظام والشبكة"]
                 },
@@ -93,6 +100,7 @@ export default {
                     dates: "أكتوبر 2020 - نوفمبر 2020",
                     company: "LVMH Fragrance Brands",
                     logo: "LVMH.png",
+                    link: "https://www.lvmh.com/fr",
                     role: "مدير/لوجستي أصول معلوماتية (HELPLINE)",
                     details: ["إدارة مخزون المعدات المعلوماتية", "جدولة تدخلات الفنيين VIP"]
                 },
@@ -100,6 +108,7 @@ export default {
                     dates: "سبتمبر 2020 - أكتوبر 2020",
                     company: "DIM",
                     logo: "Dim.png",
+                    link: "https://www.dim.fr/",
                     role: "فني VIP (HELPLINE)",
                     details: ["فني دعم ميداني VIP", "تهيئة الحواسيب", "تسجيل الهواتف الذكية"]
                 },
@@ -107,6 +116,7 @@ export default {
                     dates: "سبتمبر 2019 - أكتوبر 2019",
                     company: "DIM",
                     logo: "Dim.png",
+                    link: "https://www.dim.fr/",
                     role: "فني VIP (HELPLINE)",
                     details: ["فني دعم ميداني VIP", "تهيئة الحواسيب", "تسجيل الهواتف الذكية"]
                 },
@@ -114,6 +124,7 @@ export default {
                     dates: "يوليو 2019 - أغسطس 2019",
                     company: "LVMH Fragrance Brands",
                     logo: "LVMH.png",
+                    link: "https://www.lvmh.com/fr",
                     role: "مدير/لوجستي أصول معلوماتية (HELPLINE)",
                     details: ["إدارة مخزون المعدات المعلوماتية", "جدولة تدخلات الفنيين VIP"]
                 },
@@ -121,6 +132,7 @@ export default {
                     dates: "فبراير 2019 - أبريل 2019",
                     company: "LVMH Fragrance Brands",
                     logo: "LVMH.png",
+                    link: "https://www.lvmh.com/fr",
                     role: "مدير/لوجستي أصول معلوماتية (HELPLINE)",
                     details: ["إدارة مخزون المعدات المعلوماتية", "جدولة تدخلات الفنيين VIP"]
                 },
@@ -128,6 +140,7 @@ export default {
                     dates: "ديسمبر 2018 - يناير 2019",
                     company: "ATOUTEK - مصنع إعادة تأهيل الحواسيب",
                     logo: "ATOUTEK.png",
+                    link: "https://atoutek.fr/",
                     role: "فني صيانة حواسيب (KIATOO)",
                     details: ["صيانة برمجية وعتادية"]
                 },
@@ -135,6 +148,7 @@ export default {
                     dates: "نوفمبر 2018 - ديسمبر 2018",
                     company: "LVMH Fragrance Brands",
                     logo: "LVMH.png",
+                    link: "https://www.lvmh.com/fr",
                     role: "مدير/لوجستي أصول معلوماتية (HELPLINE)",
                     details: ["إدارة مخزون المعدات المعلوماتية", "جدولة تدخلات الفنيين VIP"]
                 },
@@ -142,6 +156,7 @@ export default {
                     dates: "يوليو 2018 - أغسطس 2018",
                     company: "CHANEL",
                     logo: "chanel.png",
+                    link: "https://www.linkedin.com/company/chanel/",
                     role: "فني دعم VIP ميداني (HELPLINE)",
                     details: ["إدارة جداول التدخلات", "فني دعم ميداني VIP", "تهيئة الحواسيب"]
                 },
@@ -149,6 +164,7 @@ export default {
                     dates: "يوليو 2017 - يناير 2018",
                     company: "Parkeon",
                     logo: "Parkeon.png",
+                    link: "https://www.linkedin.com/products/itr-of-georgia-inc--flowbirdparkeon/",
                     role: "فني ميداني",
                     details: [
                         "صيانة معلوماتية، شبكات، إلكترونيات، هواء مضغوط وميكانيك",
@@ -159,6 +175,7 @@ export default {
                     dates: "يوليو 2016 - سبتمبر 2016",
                     company: "Solutions30 France",
                     logo: "solutions-30.png",
+                    link: "https://solutions30.com/?lang=fr",
                     role: "فني صيانة حواسيب (HELP 1FO)",
                     details: ["خدمة عملاء متنقلة", "صيانة برمجية وعتادية"]
                 },
@@ -166,6 +183,7 @@ export default {
                     dates: "يناير 2016 - مايو 2016",
                     company: "MSS Fnac",
                     logo: "MSS_Fnac.png",
+                    link: "https://www.linkedin.com/company/global-info-tn/",
                     role: "فني معلوماتية",
                     details: ["خدمة العملاء", "صيانة برمجية وعتادية"]
                 },
@@ -173,6 +191,7 @@ export default {
                     dates: "فبراير 2015 - مايو 2015",
                     company: "EUROPEAN TRADE LA FORCE DE VENTE",
                     logo: "EUROPEAN_TRADE.png",
+                    link: "https://europeantrade.fr/",
                     role: "مندوب مبيعات ميداني",
                     details: ["تسويق عقود GDF"]
                 },
@@ -180,6 +199,7 @@ export default {
                     dates: "يناير 2010 - أغسطس 2014",
                     company: "Global Info",
                     logo: "Global_Info.png",
+                    link: "https://www.linkedin.com/company/global-info-tn/",
                     role: "مالك ومدير",
                     details: [
                         "بيع وخدمة ما بعد البيع للمعدات المعلوماتية",
@@ -191,6 +211,7 @@ export default {
                     dates: "أغسطس 2008 - نوفمبر 2009",
                     company: "Aquarium Informatique",
                     logo: "Aquarium_Informatique.png",
+                    link: "https://www.linkedin.com/company/l-aquarium-informatique",
                     role: "شريك مدير",
                     details: [
                         "خدمات معلوماتية البيع وخدمة ما بعد البيع",
@@ -202,6 +223,7 @@ export default {
                     dates: "فبراير 2013 - أبريل 2013",
                     company: "STIE",
                     logo: "STIE.png",
+                    link: "http://stietunisie.com/",
                     role: "فني صيانة حواسيب متدرب",
                     details: [
                         "تجميع وإصلاح الحواسيب",
@@ -212,6 +234,7 @@ export default {
                     dates: "أبريل 2012 - يونيو 2012",
                     company: "TRANSTU TGM",
                     logo: "TRANSTU.png",
+                    link: "https://www.transtu.tn/fr/",
                     role: "فني صيانة صناعية متدرب",
                     details: [
                         "صيانة مترو Citadis Alstom و Siemens Hannover",
@@ -222,6 +245,7 @@ export default {
                     dates: "سبتمبر 2011 - نوفمبر 2011",
                     company: "Retronix تونس",
                     logo: "Retronix.png",
+                    link: "https://retronix.com/",
                     role: "فني صيانة إلكترونية متدرب",
                     details: [
                         "إصلاح المودمات، الحواسيب، أجهزة الاستقبال",
@@ -232,6 +256,7 @@ export default {
                     dates: "ديسمبر 2007 - فبراير 2008",
                     company: "Sagemcom",
                     logo: "Sagem.png",
+                    link: "https://www.sagemcom.com/fr",
                     role: "فني تصنيع إلكترونيات متدرب",
                     details: [
                         "متابعة دورة الإنتاج الإلكتروني",
@@ -243,6 +268,7 @@ export default {
                     dates: "يونيو 2007 - يوليو 2007",
                     company: "Microlux-Dimatec",
                     logo: "Microlux.png",
+                    link: "https://www.tunisieindex.com/entreprises/Micro-Ordinateurs-Distribution-1759.html",
                     role: "متدرب تجميع وصيانة حواسيب",
                     details: ["تجميع وصيانة الحواسيب"]
                 },
@@ -250,6 +276,7 @@ export default {
                     dates: "يناير 2007 - فبراير 2007",
                     company: "TEKNE-TUNISIA",
                     logo: "TEKNE-TUNISIE.png",
+                    link: "https://en.tekne.it/",
                     role: "متدرب تجميع كابلات سيارات كهربائية",
                     details: ["تجميع كابلات السيارات الكهربائية"]
                 }
