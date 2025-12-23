@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper diplomas-page">
     <h2 class="title">{{ $t("diplomas.title") }}</h2>
     <div class="timeline" aria-label="Timeline des diplômes">
       <PageLayout :columns="1" :rows="diplomas.length">
