@@ -2,6 +2,7 @@
   <div class="pages">
     <div>
       <Navbar />
+      <NameBanner />
     </div>
     <!-- Page 1 : Timeline + Avatar -->
     <section class="page">
@@ -42,6 +43,7 @@
 
 <script setup>
 import Navbar from "./assets/Navbar.vue";
+import NameBanner from "./assets/NameBanner.vue";
 import Timeline from "./components/Timeline.vue";
 import Diplomas from "./components/Diplomas.vue";
 import Experiences from "./components/Experiences.vue";

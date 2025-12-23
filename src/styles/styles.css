@@ -35,6 +35,16 @@
   --fs-small: 0.85rem;
   --radius: 10px;
   --navbar-height: 36px;
+  /* padding global des pages */
+  --wrapper-padding-top: 28px;
+  --page-padding-x: 24px;
+  /* hauteur du bandeau de nom (égale à la taille des titres h2) */
+  --name-banner-height: var(--fs-h2);
+  --name-banner-offset: 0px; /* ajustement fin vertical commun bandeau/titre */
+  /* couleur du nom: noir en thème clair par défaut */
+  --name-banner-color: #000000;
+  /* padding global vertical des pages (haut et bas identiques) */
+  --page-padding-y: 16px;
   /* QR corner size (can be adjusted globally) */
   --corner-qr-size: 168px;
 }
@@ -88,6 +98,9 @@
   --scrollbar-track: #1e1e1e;
   --scrollbar-thumb: #3b82f6;
   --green-glow: #34D399;
+
+  /* En sombre: le bandeau du nom doit être blanc */
+  --name-banner-color: #ffffff;
 }
 
 /* ===== STRUCTURE ===== */
@@ -376,7 +389,8 @@ a:hover { text-decoration: underline; }
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 40px 24px;
+  /* Le padding vertical est géré par .page pour être uniforme haut/bas */
+  padding: 0 var(--page-padding-x);
   box-sizing: border-box;
 }
 
@@ -952,14 +966,19 @@ a:hover { text-decoration: underline; }
 }
 
 .page {
-  min-height: calc(100vh - var(--navbar-height));
-  height: 100%;
+  /* La page occupe exactement la hauteur du viewport; la navbar est fixe au-dessus */
+  height: 100vh;
+  box-sizing: border-box;
   scroll-snap-align: start;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 3rem;
-  padding-top: var(--navbar-height);
+  flex-direction: column;
+  align-items: stretch;
+  /* Padding horizontal global */
+  padding-left: var(--page-padding-x);
+  padding-right: var(--page-padding-x);
+  /* Padding vertical: haut inclut la hauteur de navbar pour éviter le recouvrement */
+  padding-top: calc(var(--navbar-height) + var(--page-padding-y) + var(--name-banner-offset));
+  padding-bottom: var(--page-padding-y);
 }
 .page::-webkit-scrollbar {
   display: none;
