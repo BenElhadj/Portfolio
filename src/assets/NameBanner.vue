@@ -20,7 +20,13 @@ const svgPath = computed(() => {
   const l = (locale?.value || 'fr').toLowerCase()
   // normalise vers fr/en/ar uniquement
   const code = ['fr','en','ar'].includes(l) ? l : 'fr'
-  return `/logos/texts/${code}-hamdi.svg`
+
+  // Important: respecter le base path de Vite pour GitHub Pages
+  // import.meta.env.BASE_URL vaut '/', './' ou '/<repo>/' selon la config
+  const base = (import.meta.env?.BASE_URL ?? '/')
+  // Évite le double slash si base se termine par '/'
+  const normalizedBase = base.endsWith('/') ? base : base + '/'
+  return `${normalizedBase}logos/texts/${code}-hamdi.svg`
 })
 
 // Style de masque pour recolorer le SVG en pur noir/blanc selon le thème
