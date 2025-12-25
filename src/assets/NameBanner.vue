@@ -31,6 +31,7 @@ const container = ref(null)
 // État d'animation
 const currentIndex = ref(0)
 let stopLoop = false
+let themeChangedHandler = null
 
 const langCode = computed(() => {
   const l = (locale?.value || 'fr').toLowerCase()
@@ -45,13 +46,17 @@ function getModeCode() {
 
 const buildUrl = (key) => `${normalizedBase}logos/texts/${langCode.value}-${getModeCode()}-${key}.svg`
 
-async function animateSvgText(url) {
+let currentRenderToken = 0
+
+async function animateSvgText(url, expectedToken) {
+  const token = expectedToken ?? ++currentRenderToken
   try {
     const res = await fetch(url)
     const txt = await res.text()
     if (!svgHolder.value) return
 
     // Injecte l'SVG dans le holder
+    if (token !== currentRenderToken) return
     svgHolder.value.innerHTML = txt
     const svg = svgHolder.value.querySelector('svg')
     if (!svg) return
@@ -79,7 +84,7 @@ async function animateSvgText(url) {
     const paths = Array.from(svg.querySelectorAll('path'))
     const durationPerPath = 600 // ms
     for (const p of paths) {
-      if (stopLoop) return
+      if (stopLoop || token !== currentRenderToken) return
       let len = 0
       try {
         len = p.getTotalLength()
@@ -95,13 +100,15 @@ async function animateSvgText(url) {
       p.style.transition = `stroke-dashoffset ${durationPerPath}ms ease`
       p.style.strokeDashoffset = '0'
       await new Promise(r => setTimeout(r, durationPerPath + 60))
+      if (token !== currentRenderToken) return
     }
 
     // Pause d'affichage de 5 secondes
     await new Promise(r => setTimeout(r, 5000))
+    if (token !== currentRenderToken) return
 
     // Efface en fondu
-    if (svgHolder.value) {
+    if (svgHolder.value && token === currentRenderToken) {
       svgHolder.value.classList.add('fade-out')
       await new Promise(r => setTimeout(r, 600))
       svgHolder.value.classList.remove('fade-out')
@@ -123,11 +130,25 @@ async function runLoop() {
 }
 
 onMounted(() => {
+  themeChangedHandler = async () => {
+    // Invalide les rendus en cours et recharge immédiatement le texte courant
+    currentRenderToken++
+    if (svgHolder.value) svgHolder.value.innerHTML = ''
+    const key = sequence[currentIndex.value]
+    await animateSvgText(buildUrl(key), currentRenderToken)
+  }
+  window.addEventListener('theme-changed', themeChangedHandler)
+  // Démarre la boucle
   runLoop()
 })
 
 onUnmounted(() => {
   stopLoop = true
+  // Nettoie l'écouteur
+  if (themeChangedHandler) {
+    window.removeEventListener('theme-changed', themeChangedHandler)
+    themeChangedHandler = null
+  }
 })
 
 // Si la langue change, on repart du début de la séquence

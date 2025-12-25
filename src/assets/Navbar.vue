@@ -121,11 +121,17 @@ function applySavedTheme() {
   const saved = localStorage.getItem("theme") || "light";
   theme.value = saved;
   document.documentElement.classList.toggle("dark", saved === "dark");
+  try {
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme.value } }))
+  } catch {}
 }
 function toggleTheme() {
   theme.value = theme.value === "light" ? "dark" : "light";
   localStorage.setItem("theme", theme.value);
   document.documentElement.classList.toggle("dark", theme.value === "dark");
+  try {
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme.value } }))
+  } catch {}
 }
 
 /* Init */
