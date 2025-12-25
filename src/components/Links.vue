@@ -182,7 +182,8 @@ function qrFor(value) {
 }
 
 // CV download URL depending on current locale (fr => FR, otherwise EN including ar)
-const cvUrl = computed(() => (String(locale.value).startsWith('fr') ? '/cv/CV_FR.pdf' : '/cv/CV_EN.pdf'));
+// Use a RELATIVE path so it works under GitHub Pages subpaths (avoid leading slash)
+const cvUrl = computed(() => (String(locale.value).startsWith('fr') ? 'cv/CV_FR.pdf' : 'cv/CV_EN.pdf'));
 
 function downloadCV() {
   const url = cvUrl.value;
