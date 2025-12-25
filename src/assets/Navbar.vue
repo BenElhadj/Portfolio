@@ -114,6 +114,9 @@ function changeLang(lang) {
     html.classList.remove("rtl");
     html.setAttribute("dir", "ltr");
   }
+  try {
+    window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang } }))
+  } catch {}
 }
 
 /* Thème */

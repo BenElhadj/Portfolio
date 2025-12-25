@@ -32,6 +32,7 @@ const container = ref(null)
 const currentIndex = ref(0)
 let stopLoop = false
 let themeChangedHandler = null
+let languageChangedHandler = null
 
 const langCode = computed(() => {
   const l = (locale?.value || 'fr').toLowerCase()
@@ -138,6 +139,14 @@ onMounted(() => {
     await animateSvgText(buildUrl(key), currentRenderToken)
   }
   window.addEventListener('theme-changed', themeChangedHandler)
+  languageChangedHandler = async (e) => {
+    // Rester sur la même key, mais recharger dans la nouvelle langue
+    currentRenderToken++
+    if (svgHolder.value) svgHolder.value.innerHTML = ''
+    const key = sequence[currentIndex.value]
+    await animateSvgText(buildUrl(key), currentRenderToken)
+  }
+  window.addEventListener('language-changed', languageChangedHandler)
   // Démarre la boucle
   runLoop()
 })
@@ -149,12 +158,15 @@ onUnmounted(() => {
     window.removeEventListener('theme-changed', themeChangedHandler)
     themeChangedHandler = null
   }
+  if (languageChangedHandler) {
+    window.removeEventListener('language-changed', languageChangedHandler)
+    languageChangedHandler = null
+  }
 })
 
 // Si la langue change, on repart du début de la séquence
-watch(() => locale.value, () => {
-  currentIndex.value = 0
-})
+// Le rechargement instantané est géré par l'évènement 'language-changed'
+watch(() => locale.value, () => {})
 </script>
 
 <style scoped>
