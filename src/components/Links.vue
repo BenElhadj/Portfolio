@@ -59,7 +59,7 @@
     
     <div class="favicon-center">
       <img
-        src="favicon.png"
+        :src="faviconSrc"
         alt="favicon"
         role="button"
         tabindex="0"
@@ -201,6 +201,10 @@ const cvUrl = computed(() => {
   const file = String(locale.value).startsWith('fr') ? 'cv/CV_FR.pdf' : 'cv/CV_EN.pdf';
   return getBasePath() + file;
 });
+
+// Favicon path built under the detected base to avoid build-time import of a relative file
+// and to ensure correct path on GitHub Pages subpaths.
+const faviconSrc = computed(() => getBasePath() + 'favicon.png');
 
 function downloadCV() {
   const url = cvUrl.value;
