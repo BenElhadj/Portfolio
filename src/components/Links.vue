@@ -59,7 +59,7 @@
     
     <div class="favicon-center">
       <img
-        src="/favicon.png"
+        src="favicon.png"
         alt="favicon"
         role="button"
         tabindex="0"
@@ -181,9 +181,26 @@ function qrFor(value) {
   return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(value);
 }
 
+// Detect GitHub Pages project base from the URL's first path segment.
+// Examples:
+// - https://username.github.io/Portfolio/... -> base '/Portfolio/'
+// - https://custom.domain/ -> base '/'
+function getBasePath() {
+  try {
+    const path = window.location.pathname || '/';
+    const parts = path.split('/').filter(Boolean);
+    return parts.length > 0 ? '/' + parts[0] + '/' : '/';
+  } catch (e) {
+    return '/';
+  }
+}
+
 // CV download URL depending on current locale (fr => FR, otherwise EN including ar)
-// Use a RELATIVE path so it works under GitHub Pages subpaths (avoid leading slash)
-const cvUrl = computed(() => (String(locale.value).startsWith('fr') ? 'cv/CV_FR.pdf' : 'cv/CV_EN.pdf'));
+// Build an absolute path under the detected base to avoid 404 on GitHub Pages subpaths.
+const cvUrl = computed(() => {
+  const file = String(locale.value).startsWith('fr') ? 'cv/CV_FR.pdf' : 'cv/CV_EN.pdf';
+  return getBasePath() + file;
+});
 
 function downloadCV() {
   const url = cvUrl.value;
