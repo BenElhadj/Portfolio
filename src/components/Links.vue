@@ -185,19 +185,42 @@ function qrFor(value) {
 const cvUrl = computed(() => (String(locale.value).startsWith('fr') ? '/cv/CV_FR.pdf' : '/cv/CV_EN.pdf'));
 
 function downloadCV() {
+  const url = cvUrl.value;
+  // Heuristic: mobile/tablet devices often ignore the download attribute,
+  // especially iOS Safari. On touch devices, prefer opening the PDF in a new tab
+  // so the OS viewer can handle saving/sharing.
+  const isTouchDevice = (typeof window !== 'undefined') && (
+    (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '')
+  );
+
+  if (isTouchDevice) {
+    try {
+      const w = window.open(url, '_blank');
+      // Ensure no opener reference for security
+      if (w && 'opener' in w) w.opener = null;
+      return;
+    } catch (e) {
+      // As a last resort, navigate current tab
+      window.location.href = url;
+      return;
+    }
+  }
+
+  // Desktop: try a programmatic download
   try {
-    const url = cvUrl.value;
-    // Create temporary link to trigger download
     const a = document.createElement('a');
     a.href = url;
-    a.download = url.split('/').pop() || '';
+    a.setAttribute('download', url.split('/').pop() || '');
+    a.setAttribute('rel', 'noopener');
     // Ensure it's added to DOM for Firefox
     document.body.appendChild(a);
     a.click();
     a.remove();
   } catch (e) {
-    // fallback: open in new tab
-    window.open(cvUrl.value, '_blank');
+    // Fallback: open in new tab
+    const w = window.open(url, '_blank');
+    if (w && 'opener' in w) w.opener = null;
   }
 }
 </script>
