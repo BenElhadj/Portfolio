@@ -2,20 +2,25 @@
 
 /* Tablettes */
 @media (max-width: 1024px) {
-  .page-layout.two-cols {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+  /* Conserver la grille 2x2 sur la page Liens pour maintenir les QR aux coins */
+  .links-wrapper .page-layout.grid-2x2 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
   }
-  
-  .page-layout.grid-2x2 {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
-  }
+  /* Réduire la taille des QR dans la page Liens */
+  .links-wrapper { --corner-qr-size: 120px; }
   
   .projects-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
+  /* QR encore plus compacts pour petits écrans tout en restant visibles en entier */
+  .links-wrapper { --corner-qr-size: 100px; }
   
+
+/* Très petits écrans: QR minimum 80px pour garantir visibilité complète */
+@media (max-width: 480px) {
+  .links-wrapper { --corner-qr-size: 80px; }
+}
   .wrapper {
     padding: 30px 18px;
   }
@@ -41,6 +46,17 @@
 
 /* Mobiles */
 @media (max-width: 768px) {
+  /* Sur mobile, conserver une grille 2x2 spécifique à la page Liens */
+  .links-wrapper .page-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .links-wrapper .page-layout.grid-2x2 {
+    grid-template-rows: 1fr 1fr;
+  }
+  /* Optionnel: réduire légèrement le padding du wrapper pour gagner de l’espace */
+  .links-wrapper .wrapper {
+    padding: 20px 10px;
+  }
   :root {
     --fs-h1: 2rem;
     --fs-h2: 1.8rem;

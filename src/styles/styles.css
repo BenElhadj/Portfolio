@@ -1176,3 +1176,40 @@ a:hover { text-decoration: underline; }
     height: calc((var(--name-banner-height, var(--fs-h2))) * 0.8);
   }
 }
+
+/* ===== Links page: afficher uniquement les QR en dessous de 1024px ===== */
+/* Masquer les titres et descriptions des cartes UNIQUEMENT pour les écrans < 1024px */
+@media (max-width: 1024px) {
+  .links-wrapper .line-card h3,
+  .links-wrapper .line-card small {
+    display: none;
+  }
+}
+
+/* Avatar (favicon) centré: toujours au centre, tailles réduites par breakpoint */
+@media (max-width: 1024px) {
+  .links-wrapper .favicon-center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .links-wrapper .favicon-center img { width: 160px; }
+}
+
+@media (max-width: 768px) {
+  .links-wrapper .favicon-center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .links-wrapper .favicon-center img { width: 120px; }
+}
+
+@media (max-width: 480px) {
+  .links-wrapper .favicon-center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .links-wrapper .favicon-center img { width: 100px; }
+}
