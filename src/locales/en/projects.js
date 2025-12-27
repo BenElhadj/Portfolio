@@ -17,11 +17,11 @@ export default {
       link: "https://benelhadj.github.io/Conception-AI/"
     },
     {
-      name: "Personal Portfolio",
+      name: "QR Code Creator",
       year: "2025",
-      description: "Professional portfolio showcasing my projects, skills, and career path, deployed with Render.",
-      stack: "Vue.js, Node.js, Docker, Render",
-      link: "https://benelhadj.github.io/Portfolio/"
+      description: "A fully static, customizable QR code generator (logo, colors, sizes, margin), exports PNG/JPEG/SVG, automatically deployed via GitHub Pages.",
+      stack: "HTML, CSS, JavaScript, GitHub Pages",
+      link: "https://benelhadj.github.io/QR-code_creator/"
     },
     {
       name: "Learn2Slither",

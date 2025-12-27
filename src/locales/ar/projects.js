@@ -13,22 +13,21 @@ export default {
       name: "Conception AI",
       year: "2025",
       description: "تطبيق ذكاء اصطناعي يسمح بتصميم الواجهات والعوامل التفاعلية عبر نماذج الذكاء الاصطناعي التوليدية.",
-      stack: "Vue.js, Python, FastAPI, Docker",
+      stack: "Vue.js، Python، FastAPI، Docker",
       link: "https://benelhadj.github.io/Conception-AI/"
     },
     {
-      name: "الملف الشخصي",
+      name: "منشئ رموز QR",
       year: "2025",
-      description: "ملف شخصي احترافي يعرض مشاريعي ومهاراتي ومساري المهني، تم نشره باستخدام Render.",
-      stack: "Vue.js, Node.js, Docker, Render",
-      link: "https://benelhadj.github.io/Portfolio/"
+      description: "مولّد رموز QR ثابت وقابل للتخصيص (شعار، ألوان، أحجام، هامش)، يدعم التصدير PNG/JPEG/SVG، ومنشور تلقائيًا عبر GitHub Pages.",
+      stack: "HTML، CSS، JavaScript، GitHub Pages",
+      link: "https://benelhadj.github.io/QR-code_creator/"
     },
     {
       name: "Learn2Slither",
       year: "2025",
-      description:
-        "لعبة تعليمية تفاعلية مستوحاة من لعبة Snake الشهيرة، صممت لتعليم أساسيات البرمجة بطريقة ممتعة.",
-      stack: "Svelte, Vite, GitHub Pages",
+      description: "لعبة تعليمية تفاعلية مستوحاة من لعبة Snake الشهيرة، صممت لتعليم أساسيات البرمجة بطريقة ممتعة.",
+      stack: "Svelte، Vite، GitHub Pages",
       link: "https://benelhadj.github.io/Learn2Slither/",
     },
     {
