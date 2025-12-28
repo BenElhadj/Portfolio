@@ -40,6 +40,12 @@ export default {
                 nameLabel: "Votre nom",
                 emailLabel: "Votre e-mail (optionnel)",
                 messageLabel: "Votre message",
+                subjectLabel: "Objet (optionnel)",
+                missingSubject: "Sans objet",
+                missingName: "Sans nom",
+                missingEmail: "Sans email",
+                optionalHint: "optionnel",
+                requiredHint: "obligatoire",
                 submitLabel: "Envoyer",
                 success: "Message envoyé — merci !",
                 error: "Erreur lors de l'envoi"

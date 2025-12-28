@@ -6,17 +6,22 @@
     <form @submit.prevent="onSubmit">
       <label>
         {{ nameLabel }}
-        <input v-model="form.name" type="text" required />
+        <input v-model="form.name" type="text" :placeholder="namePlaceholder" />
       </label>
 
       <label>
-        {{ messageLabel }}
-        <textarea v-model="form.message" rows="5" required></textarea>
+        {{ emailLabelPure }}
+        <input v-model="form.email" type="email" :placeholder="emailPlaceholder" />
       </label>
 
       <label>
-        {{ emailLabel }}
-        <input v-model="form.email" type="email" :placeholder="emailLabel" />
+        {{ subjectLabelPure }}
+        <input v-model="form.subject" type="text" :placeholder="subjectPlaceholder" />
+      </label>
+
+      <label>
+        {{ messageLabel }} *
+        <textarea v-model="form.message" rows="5" required :placeholder="messagePlaceholder"></textarea>
       </label>
 
       <div class="actions">
@@ -49,6 +54,7 @@ const { t, locale } = useI18n();
 const title = computed(() => t('links.items.contact.name'));
 const subtitle = computed(() => t('links.items.contact.short'));
 const nameLabel = computed(() => t('links.items.contact.form.nameLabel'));
+const subjectLabel = computed(() => t('links.items.contact.form.subjectLabel'));
 const messageLabel = computed(() => t('links.items.contact.form.messageLabel'));
 const emailLabel = computed(() => t('links.items.contact.form.emailLabel'));
 const submitLabel = computed(() => t('links.items.contact.form.submitLabel'));
@@ -56,7 +62,26 @@ const successMessage = computed(() => t('links.items.contact.form.success'));
 const errorMessage = computed(() => t('links.items.contact.form.error'));
 const isRtl = computed(() => String(locale.value).startsWith('ar'));
 
-const form = ref({ name: '', message: '', email: '' });
+// Placeholders localisés pour champs manquants
+const missingSubject = computed(() => t('links.items.contact.form.missingSubject'));
+const missingName = computed(() => t('links.items.contact.form.missingName'));
+const missingEmail = computed(() => t('links.items.contact.form.missingEmail'));
+
+// Hints localisés pour placeholders
+const optionalHint = computed(() => t('links.items.contact.form.optionalHint'));
+const requiredHint = computed(() => t('links.items.contact.form.requiredHint'));
+
+// Labels "purs" sans suffixe (optionnel) pour affichage
+const emailLabelPure = computed(() => String(emailLabel.value).replace(/\s*\(.*\)\s*$/, ''));
+const subjectLabelPure = computed(() => String(subjectLabel.value).replace(/\s*\(.*\)\s*$/, ''));
+
+// Placeholders simples (localisés)
+const namePlaceholder = computed(() => optionalHint.value);
+const emailPlaceholder = computed(() => optionalHint.value);
+const subjectPlaceholder = computed(() => optionalHint.value);
+const messagePlaceholder = computed(() => requiredHint.value);
+
+const form = ref({ name: '', subject: '', message: '', email: '' });
 const sending = ref(false);
 const status = ref('');
 const statusOk = ref(false);
@@ -79,10 +104,24 @@ async function onSubmit() {
       throw new Error('EmailJS variables manquantes. Remplissez VITE_EMAILJS_* dans votre .env (voir .env.example)');
     }
 
+    // Construire un message formaté avec une forme identique, en gardant
+    // le texte tel qu'il est saisi par l'utilisateur.
+    const subj = form.value.subject ? form.value.subject : (missingSubject.value || '');
+    const nm = form.value.name ? form.value.name : (missingName.value || '');
+    const em = form.value.email ? form.value.email : (missingEmail.value || '');
+
+    const formattedMessage =
+      `subject: ${subj}\n` +
+      `name: ${nm}\n` +
+      `email: ${em}\n\n` +
+      `--- message ---\n` +
+      (form.value.message ?? '');
+
     const templateParams = {
-      from_name: form.value.name || 'Anonyme',
-      message: form.value.message || '(aucun message)',
-      reply_to: form.value.email || 'noreply@example.com',
+      from_name: form.value.name || '',
+      message: formattedMessage,
+      reply_to: form.value.email || '',
+      subject: form.value.subject || '',
       to_email: '42bhamdi@gmail.com'
     };
 
@@ -109,6 +148,7 @@ async function onSubmit() {
 
     // clear form on success
     form.value.name = '';
+  form.value.subject = '';
     form.value.message = '';
     form.value.email = '';
 

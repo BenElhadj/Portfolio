@@ -40,6 +40,12 @@ export default {
                 nameLabel: "اسمك",
                 emailLabel: "بريدك الإلكتروني (اختياري)",
                 messageLabel: "رسالتك",
+                subjectLabel: "الموضوع (اختياري)",
+                missingSubject: "بدون موضوع",
+                missingName: "بدون اسم",
+                missingEmail: "بدون بريد إلكتروني",
+                optionalHint: "اختياري",
+                requiredHint: "إلزامي",
                 submitLabel: "إرسال",
                 success: "تم إرسال الرسالة — شكراً!",
                 error: "خطأ أثناء الإرسال"
