@@ -63,7 +63,6 @@ const errorMessage = computed(() => t('links.items.contact.form.error'));
 const isRtl = computed(() => String(locale.value).startsWith('ar'));
 
 // Placeholders localisés pour champs manquants
-const missingSubject = computed(() => t('links.items.contact.form.missingSubject'));
 const missingName = computed(() => t('links.items.contact.form.missingName'));
 const missingEmail = computed(() => t('links.items.contact.form.missingEmail'));
 
@@ -104,22 +103,20 @@ async function onSubmit() {
       throw new Error('EmailJS variables manquantes. Remplissez VITE_EMAILJS_* dans votre .env (voir .env.example)');
     }
 
-    // Construire un message formaté avec une forme identique, en gardant
-    // le texte tel qu'il est saisi par l'utilisateur.
-    const subj = form.value.subject ? form.value.subject : (missingSubject.value || '');
+    // Adapter aux variables attendues par le template EmailJS:
+    // {{name}}, {{time}}, {{email}}, {{message}}
     const nm = form.value.name ? form.value.name : (missingName.value || '');
     const em = form.value.email ? form.value.email : (missingEmail.value || '');
-
-    const formattedMessage =
-      `subject: ${subj}\n` +
-      `name: ${nm}\n` +
-      `email: ${em}\n\n` +
-      `--- message ---\n` +
-      (form.value.message ?? '');
+    const timeStr = new Date().toLocaleString(String(locale.value) || undefined, { hour12: false });
 
     const templateParams = {
+      // Champs utilisés dans le template EmailJS
+      name: nm,
+      time: timeStr,
+      email: em,
+      message: form.value.message ?? '',
+      // Champs additionnels/compatibilité
       from_name: form.value.name || '',
-      message: formattedMessage,
       reply_to: form.value.email || '',
       subject: form.value.subject || '',
       to_email: '42bhamdi@gmail.com'
@@ -148,7 +145,7 @@ async function onSubmit() {
 
     // clear form on success
     form.value.name = '';
-  form.value.subject = '';
+    form.value.subject = '';
     form.value.message = '';
     form.value.email = '';
 
