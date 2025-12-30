@@ -69,7 +69,7 @@ const fallback = {
 
 /* état */
 const currentIndex = ref(0);
-const theme = ref("light");
+const theme = ref("dark");
 
 /* Dom refs / observer */
 let pagesContainer = null;
@@ -121,7 +121,7 @@ function changeLang(lang) {
 
 /* Thème */
 function applySavedTheme() {
-  const saved = localStorage.getItem("theme") || "light";
+  const saved = localStorage.getItem("theme") || "dark";
   theme.value = saved;
   document.documentElement.classList.toggle("dark", saved === "dark");
   try {
