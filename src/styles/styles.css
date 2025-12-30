@@ -55,7 +55,7 @@
 .tg-send {
   --tg-size: 80px; /* larger size */
   --tg-scale: 1; /* scale used for hover */
-  --tg-flip: none; /* set to scaleX(-1) in RTL */
+  --tg-flip: scaleX(1); /* set to scaleX(-1) in RTL */
   --tg-icon-offset: 8px; /* icon micro-offset */
   width: var(--tg-size);
   height: var(--tg-size);
@@ -581,32 +581,7 @@ a:hover { text-decoration: underline; }
 .contact-form p.ok { color:var(--green-glow); }
 .contact-form p.error { color:crimson; }
 
-/* Triangular messenger-style send button: show only SVG triangle, larger and centered */
-.tg-send {
-  --tg-size: 80px; /* larger size */
-  width: var(--tg-size);
-  height: var(--tg-size);
-  padding: 0;
-  border: none !important; /* ensure no border/contour */
-  background: transparent; /* transparent so only SVG triangle is visible */
-  color: var(--blue); /* icon color */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: none; /* remove any shadow/contour */
-  transition: transform 160ms cubic-bezier(.2,.9,.2,1), filter 120ms ease, opacity 120ms ease;
-  transform-origin: center center;
-}
-.tg-send:focus { outline: none; }
-.tg-send:hover { transform: scale(1.12); filter: brightness(0.98); }
-.tg-send:active { transform: scale(1.06); }
-.tg-send:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: grayscale(0.2); }
-.tg-send .tg-icon { display: block; color: var(--blue); width: 34px; height: 34px; }
-
-/* Note: RTL/LTR handled globally by site; do not flip here to avoid conflicts. */
-
-
+ 
 /* Make contact form expand to popup edges and reduce inner padding so it appears wider */
 .popup-content .contact-form.card {
   /* margin: 0 0; */
