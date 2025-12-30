@@ -3,28 +3,43 @@
     <h3>{{ title }}</h3>
     <small>{{ subtitle }}</small>
 
-    <form @submit.prevent="onSubmit">
+    <form @submit.prevent="onSubmit" ref="formEl" enctype="multipart/form-data">
       <label>
         {{ nameLabel }}
-        <input v-model="form.name" type="text" :placeholder="namePlaceholder" />
+        <input v-model="form.name" name="name" type="text" :placeholder="namePlaceholder" />
       </label>
 
       <label>
         {{ emailLabelPure }}
-        <input v-model="form.email" type="email" :placeholder="emailPlaceholder" />
+        <input v-model="form.email" name="email" type="email" :placeholder="emailPlaceholder" />
       </label>
 
       <label>
         {{ subjectLabelPure }}
-        <input v-model="form.subject" type="text" :placeholder="subjectPlaceholder" />
+        <input v-model="form.subject" name="subject" type="text" :placeholder="subjectPlaceholder" />
       </label>
 
       <label>
         {{ messageLabel }} *
-        <textarea v-model="form.message" rows="5" required :placeholder="messagePlaceholder"></textarea>
+        <textarea v-model="form.message" name="message" rows="5" required :placeholder="messagePlaceholder"></textarea>
       </label>
 
+      <!-- Input fichier caché déclenché par le bouton trombone -->
+      <input ref="fileInputRef" type="file" name="attachments" multiple style="display:none" />
+
       <div class="actions">
+        <!-- Bouton trombone pour joindre des fichiers -->
+        <button
+          type="button"
+          class="clip-btn"
+          :aria-label="attachLabel"
+          :title="attachLabel"
+          @click="onAttachClick"
+        >
+          <svg class="clip-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M7 13l5.5-5.5a3.536 3.536 0 014.999 5l-7.5 7.5a5 5 0 11-7.071-7.071L11 5a2.5 2.5 0 113.536 3.536L8 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
         <!-- Triangular messenger-style send button -->
         <button
           type="submit"
@@ -57,6 +72,7 @@ const nameLabel = computed(() => t('links.items.contact.form.nameLabel'));
 const subjectLabel = computed(() => t('links.items.contact.form.subjectLabel'));
 const messageLabel = computed(() => t('links.items.contact.form.messageLabel'));
 const emailLabel = computed(() => t('links.items.contact.form.emailLabel'));
+const attachLabel = computed(() => t('links.items.contact.form.attachLabel'));
 const submitLabel = computed(() => t('links.items.contact.form.submitLabel'));
 const successMessage = computed(() => t('links.items.contact.form.success'));
 const errorMessage = computed(() => t('links.items.contact.form.error'));
@@ -81,6 +97,8 @@ const subjectPlaceholder = computed(() => optionalHint.value);
 const messagePlaceholder = computed(() => requiredHint.value);
 
 const form = ref({ name: '', subject: '', message: '', email: '' });
+const formEl = ref(null);
+const fileInputRef = ref(null);
 const sending = ref(false);
 const status = ref('');
 const statusOk = ref(false);
@@ -103,36 +121,26 @@ async function onSubmit() {
       throw new Error('EmailJS variables manquantes. Remplissez VITE_EMAILJS_* dans votre .env (voir .env.example)');
     }
 
-    // Adapter aux variables attendues par le template EmailJS:
-    // {{name}}, {{time}}, {{email}}, {{message}}
+    // Construire FormData à partir du formulaire pour permettre les pièces jointes
     const nm = form.value.name ? form.value.name : (missingName.value || '');
     const em = form.value.email ? form.value.email : (missingEmail.value || '');
     const timeStr = new Date().toLocaleString(String(locale.value) || undefined, { hour12: false });
 
-    const templateParams = {
-      // Champs utilisés dans le template EmailJS
-      name: nm,
-      time: timeStr,
-      email: em,
-      message: form.value.message ?? '',
-      // Champs additionnels/compatibilité
-      from_name: form.value.name || '',
-      reply_to: form.value.email || '',
-      subject: form.value.subject || '',
-      to_email: '42bhamdi@gmail.com'
-    };
+    const fd = new FormData(formEl.value);
+    // Surcharger avec placeholders/localisations si vides
+    fd.set('name', nm);
+    fd.set('email', em);
+    fd.set('message', form.value.message ?? '');
+    fd.set('time', timeStr);
 
-    const payload = {
-      service_id: EMAILJS_SERVICE,
-      template_id: EMAILJS_TEMPLATE,
-      user_id: EMAILJS_USER,
-      template_params: templateParams
-    };
+    // Paramètres EmailJS requis
+    fd.append('service_id', EMAILJS_SERVICE);
+    fd.append('template_id', EMAILJS_TEMPLATE);
+    fd.append('user_id', EMAILJS_USER);
 
-    const resp = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    const resp = await fetch('https://api.emailjs.com/api/v1.0/email/send-form', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: fd
     });
 
     if (!resp.ok) {
@@ -158,4 +166,47 @@ async function onSubmit() {
     sending.value = false;
   }
 }
+
+function onAttachClick() {
+  try {
+    if (fileInputRef.value) fileInputRef.value.click();
+  } catch (e) {
+    // ignore
+  }
+}
 </script>
+
+<style scoped>
+.actions {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.clip-btn {
+  background: transparent;
+  border: none !important;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  transition: transform .16s cubic-bezier(.2,.9,.2,1), filter .12s ease, opacity .12s ease;
+  transform-origin: center center;
+}
+
+.clip-btn:focus { outline: none; }
+.clip-btn:hover { transform: scale(1.12); filter: brightness(0.98); }
+.clip-btn:active { transform: scale(1.06); }
+.clip-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: grayscale(0.2); }
+
+.clip-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  color: var(--blue);
+}
+</style>

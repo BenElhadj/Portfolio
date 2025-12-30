@@ -46,6 +46,7 @@ export default {
                 missingEmail: "Sans email",
                 optionalHint: "optionnel",
                 requiredHint: "obligatoire",
+                attachLabel: "Joindre des fichiers (optionnel)",
                 submitLabel: "Envoyer",
                 success: "Message envoyé — merci !",
                 error: "Erreur lors de l'envoi"

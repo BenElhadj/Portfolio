@@ -46,6 +46,7 @@ export default {
                 missingEmail: "بدون بريد إلكتروني",
                 optionalHint: "اختياري",
                 requiredHint: "إلزامي",
+                attachLabel: "إرفاق ملفات (اختياري)",
                 submitLabel: "إرسال",
                 success: "تم إرسال الرسالة — شكراً!",
                 error: "خطأ أثناء الإرسال"
