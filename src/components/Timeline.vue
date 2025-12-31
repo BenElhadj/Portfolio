@@ -194,7 +194,29 @@ onMounted(() => {
   // mettre à jour quand la langue change (Navbar émet 'language-changed')
   window.addEventListener("language-changed", (e) => {
     const lang = (e?.detail?.lang) || (document.documentElement.getAttribute("lang") || "fr");
-    isRTL.value = (lang === "ar") || (document.documentElement.getAttribute("dir") === "rtl");
+    const newIsRTL = (lang === "ar") || (document.documentElement.getAttribute("dir") === "rtl");
+    
+    // Si la direction change, conserver le même événement chronologique
+    if (newIsRTL !== isRTL.value) {
+      // Calculer l'index chronologique actuel
+      const currentVisIndex = indexFromWorldPos(state.worldPos);
+      const currentChronIndex = isRTL.value ? (timelineEvents.length - 1 - currentVisIndex) : currentVisIndex;
+      
+      // Basculer la direction
+      isRTL.value = newIsRTL;
+      
+      // Calculer le nouvel index visuel pour le même événement chronologique
+      const newVisIndex = newIsRTL ? (timelineEvents.length - 1 - currentChronIndex) : currentChronIndex;
+      
+      // Mettre à jour worldPos pour pointer vers le même événement
+      state.worldPos = 80 + newVisIndex * eventSpacing;
+      
+      // Mettre à jour les index de suivi
+      prevVisIndex.value = newVisIndex;
+      prevChronIndex.value = currentChronIndex;
+    } else {
+      isRTL.value = newIsRTL;
+    }
   });
   handleResize();
   lastTime = performance.now();
