@@ -1,14 +1,14 @@
 <template>
   <div class="timeline-viewport" ref="viewport">
-    <!-- Avatar 3D -->
-    <Avatar3D :speed="Math.abs(state.speed) / maxSpeed" />
+    <!-- Avatar: marche pilotée par la timeline (vitesse/direction depuis la souris) -->
+    <Avatar3D :useMouseForWalk="false" :walkSpeed="avatarWalkSpeed" :walkDirection="state.facing" />
 
-    <!-- piste -->
+    <!-- Piste: largeur dynamique selon nombre d'événements -->
     <div class="timeline-track" ref="track" :style="{ width: trackWidth + 'px' }">
       <div
-        v-for="(m, i) in milestones"
+        v-for="(m, i) in eventMarkers"
         :key="i"
-        class="milestone"
+        :class="['milestone', 'cat-' + m.category]"
         :style="{ left: m.x + 'px' }"
       >
         <div class="dot"></div>
@@ -16,57 +16,129 @@
       </div>
     </div>
 
-    <!-- Soleil/Lune -->
+    <!-- Overlay d'infos actives: du Début à la Fin -->
+    <div class="timeline-overlay" aria-hidden="true">
+      <div v-for="entry in activeInfoList" :key="entry.key" class="overlay-item">
+        <div class="overlay-type">{{ t(`timeline.types.${entry.type}`) ?? entry.type }}</div>
+        <div class="overlay-info">{{ entry.info }}</div>
+        <div v-if="entry.Niveau" class="overlay-level">{{ entry.Niveau }}</div>
+      </div>
+    </div>
+
     <div class="sky-icon"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from "vue";
+import { ref, reactive, onMounted, onUnmounted, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import gsap from "gsap";
 import Avatar3D from "./Avatar3D.vue";
+import { timelineEvents } from "../timelineEvents.js";
 
 const viewport = ref(null);
 const track = ref(null);
-const avatarComp = ref(null);
+// Direction de langue (RTL/LTR)
+const isRTL = ref(false);
 
-let trackWidth = window.innerWidth * 3;
+let trackWidth = 0;
 const maxSpeed = 1200;
-const startAvatarX = 24;
-let centerThreshold = window.innerWidth * 0.5;
-let worldMax = trackWidth - window.innerWidth + centerThreshold;
+let worldMax = 0; // coordonnée max (dernier événement)
 
 const state = reactive({
   worldPos: 0,
-  desiredSpeed: 0,
-  speed: 0,
-  facing: 1,
-  avatarState: "student"
+  facing: 1
 });
 
-const milestones = [
-  { x: 80, label: "Naissance" },
-  { x: 600, label: "École" },
-  { x: 1300, label: "BTS / 42" },
-  { x: 2100, label: "1er job" },
-  { x: 2600, label: "Pro" }
-];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-const avatarState = ref(state.avatarState);
-const facing = ref(state.facing);
+// Espacement et marqueurs (légèrement rapproché)
+const eventSpacing = 380; // px
+function getCategory(typeStr = "") {
+  const t = String(typeStr).toLowerCase();
+  if (t.includes("formation")) return "formation";
+  if (t.includes("stage")) return "stage";
+  // mots clés liés au travail
+  if (
+    t.includes("développeur") || t.includes("technicien") || t.includes("gestionnaire") ||
+    t.includes("commercial") || t.includes("associé") || t.includes("propriétaire") ||
+    t.includes("web3") || t.includes("ia") || t.includes("machine learning") || t.includes("travail")
+  ) return "travail";
+  if (t.includes("nouveau départ") || t.includes("immigration")) return "autre";
+  return "autre";
+}
 
-function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+const { t } = (() => { try { return useI18n(); } catch { return { t: (k) => k }; } })();
+
+const eventMarkers = computed(() => {
+  const list = isRTL.value ? [...timelineEvents].reverse() : timelineEvents;
+  return list.map((ev, i) => ({
+    x: 80 + i * eventSpacing,
+    label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim(),
+    category: getCategory(ev.type)
+  }));
+});
+
+// Overlay d'infos actives
+const activeInfoMap = ref(new Map());
+const activeInfoList = computed(() => Array.from(activeInfoMap.value.values()));
+const makeKey = (ev) => `${ev.type}|${ev.info}`;
+
+function applyForward(ev) {
+  const key = makeKey(ev);
+  if (ev.action === "Début") {
+    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+  } else if (ev.action === "Fin") {
+    activeInfoMap.value.delete(key);
+  } else if (ev.action === "En cours") {
+    if (!activeInfoMap.value.has(key)) {
+      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+    }
+  }
+}
+
+function applyBackward(ev) {
+  const key = makeKey(ev);
+  if (ev.action === "Début") {
+    // en remontant avant le début: l'info n'est plus active
+    activeInfoMap.value.delete(key);
+  } else if (ev.action === "Fin") {
+    // en remontant avant la fin: l'info redevient active
+    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+  } else if (ev.action === "En cours") {
+    if (!activeInfoMap.value.has(key)) {
+      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+    }
+  }
+}
+
+// Index selon worldPos
+const indexFromWorldPos = (wp) => clamp(Math.floor((wp - 80 + eventSpacing * 0.5) / eventSpacing), 0, timelineEvents.length - 1);
+const prevVisIndex = ref(0);
+const prevChronIndex = ref(0);
+
+// Avatar walk speed (0..1) + cible pour lissage
+const avatarWalkSpeed = ref(0);
+const targetWalkSpeed = ref(0);
+// Phase de marche (pour synchroniser distance et pas)
+const CYCLE_BASE = 2.6;   // correspond au preset 'normal' d'Avatar3D
+const CYCLE_GAIN = 6.0;   // idem
+let walkPhase = 0;        // cumul en radians
 
 function handleMouseMove(e) {
   const centerX = window.innerWidth / 2;
-  const distanceFromCenter = (e.clientX - centerX) / centerX;
-  state.desiredSpeed = clamp(distanceFromCenter * maxSpeed, -maxSpeed, maxSpeed);
+  const distanceFromCenter = (e.clientX - centerX) / centerX; // [-1..1]
+  const dir = Math.sign(distanceFromCenter) || 0;
+  if (dir !== 0) state.facing = dir > 0 ? 1 : -1;
+  targetWalkSpeed.value = clamp(Math.abs(distanceFromCenter), 0, 1);
 }
 
 function handleResize() {
-  trackWidth = window.innerWidth * 3;
-  centerThreshold = window.innerWidth * 0.5;
-  worldMax = trackWidth - window.innerWidth + centerThreshold;
+  const totalWidth = 80 + Math.max(0, timelineEvents.length - 1) * eventSpacing; // x du dernier événement
+  // largeur de piste suffisante: contenu + un écran pour le centrage aux bornes
+  trackWidth = Math.max(totalWidth + window.innerWidth, window.innerWidth * 2);
+  // worldMax devient la coordonnée du dernier événement
+  worldMax = totalWidth;
 }
 
 let rafId;
@@ -76,70 +148,67 @@ function update(now) {
   const dt = (now - lastTime) / 1000;
   lastTime = now;
 
-  state.speed += (state.desiredSpeed - state.speed) * 0.18;
-  if (Math.abs(state.desiredSpeed) < 2 && Math.abs(state.speed) < 0.5) state.speed = 0;
+  // Lisser la vitesse de marche (0..1)
+  avatarWalkSpeed.value += (targetWalkSpeed.value - avatarWalkSpeed.value) * 0.25;
 
-  state.worldPos += state.speed * dt;
-  state.worldPos = clamp(state.worldPos, 0, worldMax);
+  // Bloquer la marche si on pousse vers l'extérieur aux bornes
+  const outwardBlocked = (state.worldPos <= 0 && state.facing < 0) || (state.worldPos >= worldMax && state.facing > 0);
 
-  if (state.speed > 6) state.facing = 1;
-  else if (state.speed < -6) state.facing = -1;
+  // Avancer la phase de marche (synchro avec Avatar3D)
+  const phaseRate = (CYCLE_BASE + CYCLE_GAIN * avatarWalkSpeed.value) * avatarWalkSpeed.value; // rad/s
+  const dPhase = outwardBlocked ? 0 : phaseRate * dt;
+  walkPhase += dPhase;
 
-  facing.value = state.facing;
+  // Distance par cycle: dépend fortement de la vitesse et de l'espacement voulu
+  // Objectif: à vitesse max, ~0.6 * eventSpacing par cycle (≈1.2s par événement)
+  const stridePx = eventSpacing * (0.25 + 0.35 * avatarWalkSpeed.value);
+  const dWorld = state.facing * (dPhase / (2 * Math.PI)) * stridePx;
+  state.worldPos = clamp(state.worldPos + dWorld, 0, worldMax);
 
+  // translation de la piste pour centrer worldPos au milieu de l'écran
   const centerX = window.innerWidth / 2;
-  let avatarScreenX;
-  let trackTranslateX;
-
-  if (state.worldPos < centerThreshold) {
-    avatarScreenX = startAvatarX + state.worldPos;
-    trackTranslateX = 0;
-  } else {
-    avatarScreenX = centerX;
-    trackTranslateX = -(state.worldPos - centerThreshold);
-  }
-
-  avatarScreenX = Math.max(avatarScreenX, startAvatarX);
-
-  if (avatarComp.value && avatarComp.value.root) {
-    gsap.to(avatarComp.value.root, {
-      x: avatarScreenX - avatarComp.value.root.clientWidth / 2,
-      duration: 0.14,
-      ease: "power1.out",
-      overwrite: true
-    });
-  }
+  const trackTranslateX = centerX - state.worldPos;
   if (track.value) {
-    gsap.to(track.value, {
-      x: trackTranslateX,
-      duration: 0.22,
-      ease: "power1.out",
-      overwrite: true
-    });
+    gsap.to(track.value, { x: trackTranslateX, duration: 0.22, ease: "power1.out", overwrite: true });
   }
 
-  const progress = state.worldPos / worldMax;
-  let newState = "student";
-  if (progress < 0.22) newState = "baby";
-  else if (progress < 0.62) newState = "student";
-  else newState = "pro";
+  // avatarWalkSpeed déjà lissé plus haut; rien à recalculer ici
 
-  if (newState !== avatarState.value) avatarState.value = newState;
+  // détection de franchissement d'index (visible → chronologique selon RTL/LTR)
+  const curVis = indexFromWorldPos(state.worldPos);
+  const curChron = isRTL.value ? (timelineEvents.length - 1 - curVis) : curVis;
+  if (curChron > prevChronIndex.value) {
+    for (let i = prevChronIndex.value + 1; i <= curChron; i++) applyForward(timelineEvents[i]);
+    prevChronIndex.value = curChron;
+  } else if (curChron < prevChronIndex.value) {
+    for (let i = prevChronIndex.value; i > curChron; i--) applyBackward(timelineEvents[i]);
+    prevChronIndex.value = curChron;
+  }
+  prevVisIndex.value = curVis;
 
-  state.avatarState = avatarState.value;
   rafId = requestAnimationFrame(update);
 }
 
 onMounted(() => {
-  window.addEventListener("mousemove", handleMouseMove);
   window.addEventListener("resize", handleResize);
+  window.addEventListener("mousemove", handleMouseMove);
+  // initialiser RTL depuis <html dir="...">
+  try { isRTL.value = (document.documentElement.getAttribute("dir") === "rtl"); } catch {}
+  // mettre à jour quand la langue change (Navbar émet 'language-changed')
+  window.addEventListener("language-changed", (e) => {
+    const lang = (e?.detail?.lang) || (document.documentElement.getAttribute("lang") || "fr");
+    isRTL.value = (lang === "ar") || (document.documentElement.getAttribute("dir") === "rtl");
+  });
+  handleResize();
   lastTime = performance.now();
+  prevVisIndex.value = indexFromWorldPos(state.worldPos);
+  prevChronIndex.value = isRTL.value ? (timelineEvents.length - 1 - prevVisIndex.value) : prevVisIndex.value;
   rafId = requestAnimationFrame(update);
 });
 
 onUnmounted(() => {
-  window.removeEventListener("mousemove", handleMouseMove);
   window.removeEventListener("resize", handleResize);
+  window.removeEventListener("mousemove", handleMouseMove);
   cancelAnimationFrame(rafId);
 });
 </script>
