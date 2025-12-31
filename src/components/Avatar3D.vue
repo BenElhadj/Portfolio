@@ -169,12 +169,27 @@ const GAIT_PRESETS = {
   }
 };
 
-// Prop pour sélectionner le preset
+// Props: preset + contrôle externe de la marche
 const props = defineProps({
   gaitPreset: {
     type: String,
     default: "normal",
     validator: (v) => ["casual", "normal", "dynamic"].includes(v)
+  },
+  // Si défini (0..1), on pilote la marche par l'extérieur et on ignore la souris pour la MARCHE
+  walkSpeed: {
+    type: Number,
+    default: null
+  },
+  // Direction de marche quand walkSpeed est piloté (1: droite, -1: gauche)
+  walkDirection: {
+    type: Number,
+    default: 1
+  },
+  // True: la souris contrôle la MARCHE (hérité) — False: marche contrôlée par props
+  useMouseForWalk: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -639,23 +654,28 @@ function animate() {
     return;
   }
 
-  // === Détection de la marche basée sur la position horizontale de la souris ===
-  const mouseHorizontal = mouseNDC.x;
-  const deadZone = 0.1; // Zone morte réduite
-  
-  // Déterminer si on marche et dans quelle direction
-  if (Math.abs(mouseHorizontal) > deadZone) {
-    isWalking = true;
-    walkDirection = Math.sign(mouseHorizontal);
-    
-    // Vitesse proportionnelle à la distance du centre
-    const rawSpeed = (Math.abs(mouseHorizontal) - deadZone) / (1 - deadZone);
-    walkSpeed = clamp(rawSpeed, 0, 1);
+  // === Contrôle MARCHE: soit par props (externe), soit par souris (hérité) ===
+  if (!props.useMouseForWalk && typeof props.walkSpeed === 'number') {
+    // Contrôle externe
+    const target = clamp(props.walkSpeed, 0, 1);
+    // lissage léger pour éviter les à-coups
+    walkSpeed = lerp(walkSpeed, target, 0.3);
+    walkDirection = props.walkDirection >= 0 ? 1 : -1;
+    isWalking = walkSpeed > 0.03;
   } else {
-    isWalking = false;
-    // Réduire progressivement la vitesse
-    walkSpeed = lerp(walkSpeed, 0, 0.2);
-    if (walkSpeed < 0.01) walkSpeed = 0;
+    // Contrôle par la position horizontale de la souris (hérité)
+    const mouseHorizontal = mouseNDC.x;
+    const deadZone = 0.1; // Zone morte réduite
+    if (Math.abs(mouseHorizontal) > deadZone) {
+      isWalking = true;
+      walkDirection = Math.sign(mouseHorizontal);
+      const rawSpeed = (Math.abs(mouseHorizontal) - deadZone) / (1 - deadZone);
+      walkSpeed = clamp(rawSpeed, 0, 1);
+    } else {
+      isWalking = false;
+      walkSpeed = lerp(walkSpeed, 0, 0.2);
+      if (walkSpeed < 0.01) walkSpeed = 0;
+    }
   }
 
   // === Orientation du corps vers le pointeur (plus naturel) ===

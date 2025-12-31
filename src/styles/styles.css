@@ -333,6 +333,40 @@ a:hover { text-decoration: underline; }
   border-bottom: none;
 }
 
+/* Overlay d'informations actives de la timeline */
+.timeline-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2.2vh;
+  padding: 10vh 6vw 4vh 6vw;
+  opacity: 0.14; /* discret, en fond */
+}
+.timeline-overlay .overlay-item {
+  line-height: 1.1;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.timeline-overlay .overlay-type {
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  opacity: 0.9;
+}
+.timeline-overlay .overlay-info {
+  font-size: clamp(28px, 5.8vw, 72px);
+  font-weight: 800;
+  color: var(--text);
+}
+.timeline-overlay .overlay-level {
+  font-size: clamp(14px, 1.6vw, 20px);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
 /* Piste */
 .timeline-track {
   position: absolute;
@@ -340,8 +374,9 @@ a:hover { text-decoration: underline; }
   left: 0;
   top: 0;
   display: block;
-  background-image: linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 60px 100%;
+  /* Suppression des lignes verticales */
+  background-image: none;
+  background-size: initial;
 }
 
 /* Milestones */
@@ -349,23 +384,49 @@ a:hover { text-decoration: underline; }
   position: absolute;
   bottom: 28px;
   transform: translateX(-50%);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   pointer-events: none;
 }
 .milestone .dot {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--card-bg);
   border: 2px solid var(--text);
-  margin: 0 auto;
 }
 .milestone .label {
-  margin-top: 6px;
   font-size: var(--fs-small);
   color: var(--text);
   text-shadow: 0 1px 2px rgba(0,0,0,0.35);
 }
+
+/* Couleurs par catégorie */
+:root {
+  --cat-formation: #0ea5e9; /* cyan */
+  --cat-stage: #f59e0b;     /* amber */
+  --cat-travail: #22c55e;   /* green */
+  --cat-autre: #a78bfa;     /* violet */
+}
+.dark {
+  --cat-formation: #38bdf8;
+  --cat-stage: #fbbf24;
+  --cat-travail: #4ade80;
+  --cat-autre: #c4b5fd;
+}
+
+.milestone.cat-formation .dot { border-color: var(--cat-formation); }
+.milestone.cat-formation .label { color: var(--cat-formation); }
+
+.milestone.cat-stage .dot { border-color: var(--cat-stage); }
+.milestone.cat-stage .label { color: var(--cat-stage); }
+
+.milestone.cat-travail .dot { border-color: var(--cat-travail); }
+.milestone.cat-travail .label { color: var(--cat-travail); }
+
+.milestone.cat-autre .dot { border-color: var(--cat-autre); }
+.milestone.cat-autre .label { color: var(--cat-autre); }
 
 /* Soleil en mode clair */
 .sky-icon {
