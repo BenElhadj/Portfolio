@@ -47,6 +47,8 @@ export default {
                 optionalHint: "optional",
                 requiredHint: "required",
                 attachLabel: "Attach files (optional)",
+                attachLimitWarning: "Email limit (~50KB) exceeded: files won't be attached. File names will be included in the message.",
+                removeAttachment: "Remove attachment",
                 submitLabel: "Send",
                 success: "Message sent — thank you!",
                 error: "Error while sending"

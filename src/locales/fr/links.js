@@ -47,6 +47,8 @@ export default {
                 optionalHint: "optionnel",
                 requiredHint: "obligatoire",
                 attachLabel: "Joindre des fichiers (optionnel)",
+                attachLimitWarning: "Limite Email (≈ 50KB) dépassée : les fichiers ne seront pas joints. Les noms seront inclus dans le message.",
+                removeAttachment: "Supprimer la pièce jointe",
                 submitLabel: "Envoyer",
                 success: "Message envoyé — merci !",
                 error: "Erreur lors de l'envoi"

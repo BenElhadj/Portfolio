@@ -47,6 +47,8 @@ export default {
                 optionalHint: "اختياري",
                 requiredHint: "إلزامي",
                 attachLabel: "إرفاق ملفات (اختياري)",
+                attachLimitWarning: "تم تجاوز حد Email (≈ 50KB): لن تُرفق الملفات. ستُدرج أسماء الملفات داخل الرسالة.",
+                removeAttachment: "إزالة المرفق",
                 submitLabel: "إرسال",
                 success: "تم إرسال الرسالة — شكراً!",
                 error: "خطأ أثناء الإرسال"

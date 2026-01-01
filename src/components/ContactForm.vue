@@ -24,8 +24,32 @@
         <textarea v-model="form.message" name="message" rows="5" required :placeholder="messagePlaceholder"></textarea>
       </label>
 
+      <!-- Liste des pièces jointes sélectionnées (entre message et boutons) -->
+      <div v-if="attachments.length" class="attachments-list" aria-live="polite">
+        <div
+          v-for="(file, idx) in attachments"
+          :key="file.name + '-' + file.size + '-' + idx"
+          class="attachment-item"
+        >
+          <span class="attachment-name">{{ file.name }}</span>
+          <span class="attachment-size">({{ formatBytes(file.size) }})</span>
+          <button
+            type="button"
+            class="attachment-remove"
+            :aria-label="t('links.items.contact.form.removeAttachment') || 'Supprimer la pièce jointe'"
+            title="Supprimer"
+            @click="removeAttachment(idx)"
+          >
+            ×
+          </button>
+        </div>
+        <p v-if="attachmentsTooLarge" class="attachment-warning">
+          {{ t('links.items.contact.form.attachLimitWarning') || 'Limite EmailJS (≈ 50KB) dépassée : les fichiers ne seront pas joints. Les noms seront inclus dans le message.' }}
+        </p>
+      </div>
+
       <!-- Input fichier caché déclenché par le bouton trombone -->
-      <input ref="fileInputRef" type="file" name="attachments" multiple style="display:none" />
+  <input ref="fileInputRef" type="file" name="attachments" multiple style="display:none" @change="onFilesSelected" />
 
       <div class="actions">
         <!-- Bouton trombone pour joindre des fichiers -->
@@ -99,6 +123,29 @@ const messagePlaceholder = computed(() => requiredHint.value);
 const form = ref({ name: '', subject: '', message: '', email: '' });
 const formEl = ref(null);
 const fileInputRef = ref(null);
+const attachments = ref([]);
+const ATTACH_LIMIT = 50 * 1024; // ~50KB limite EmailJS pour variables
+const attachmentsSize = computed(() => attachments.value.reduce((s, f) => s + (f?.size || 0), 0));
+// Base64 ajoute ~33%; on prend une marge de sécurité
+const attachmentsTooLarge = computed(() => attachmentsSize.value * 1.35 > ATTACH_LIMIT);
+
+function formatBytes(bytes) {
+  try {
+    const lang = String(locale.value || 'fr');
+    const units = lang.startsWith('fr')
+      ? ['octets', 'Ko', 'Mo', 'Go']
+      : lang.startsWith('ar')
+        ? ['بايت', 'كيلو بايت', 'ميغا بايت', 'غيغا بايت']
+        : ['bytes', 'KB', 'MB', 'GB'];
+    let i = 0;
+    let val = Number(bytes) || 0;
+    while (val >= 1024 && i < units.length - 1) { val /= 1024; i++; }
+    const num = i === 0 ? Math.round(val) : Number(val.toFixed(1));
+    return `${num} ${units[i]}`;
+  } catch {
+    return `${bytes} bytes`;
+  }
+}
 const sending = ref(false);
 const status = ref('');
 const statusOk = ref(false);
@@ -126,6 +173,12 @@ async function onSubmit() {
     const em = form.value.email ? form.value.email : (missingEmail.value || '');
     const timeStr = new Date().toLocaleString(String(locale.value) || undefined, { hour12: false });
 
+    // Avant de construire le FormData depuis le formulaire, on vide l'input fichier
+    // pour éviter d'envoyer des fichiers supprimés par l'utilisateur.
+    if (fileInputRef.value) {
+      try { fileInputRef.value.value = ''; } catch {}
+    }
+
     const fd = new FormData(formEl.value);
     // Surcharger avec placeholders/localisations si vides
     fd.set('name', nm);
@@ -137,6 +190,21 @@ async function onSubmit() {
     fd.append('service_id', EMAILJS_SERVICE);
     fd.append('template_id', EMAILJS_TEMPLATE);
     fd.append('user_id', EMAILJS_USER);
+
+    // Ajouter les pièces jointes sélectionnées si la taille reste acceptable
+    if (!attachmentsTooLarge.value) {
+      for (const f of attachments.value) {
+        fd.append('attachments', f, f.name);
+      }
+    }
+    // Toujours inclure les noms des fichiers pour visibilité dans le template/email
+    const attachNames = attachments.value.map(f => f.name).join(', ');
+    fd.append('attachments_names', attachNames);
+    // Également, on peut enrichir le message pour que le destinataire voie les noms
+    if (attachNames) {
+      const msg = fd.get('message') || '';
+      fd.set('message', String(msg) + '\n\n' + 'Pièces jointes: ' + attachNames + (attachmentsTooLarge.value ? ' (non jointes — limite ~50KB)' : ''));
+    }
 
     const resp = await fetch('https://api.emailjs.com/api/v1.0/email/send-form', {
       method: 'POST',
@@ -156,6 +224,7 @@ async function onSubmit() {
     form.value.subject = '';
     form.value.message = '';
     form.value.email = '';
+    attachments.value = [];
 
   } catch (err) {
     console.error(err);
@@ -174,39 +243,19 @@ function onAttachClick() {
     // ignore
   }
 }
+
+function onFilesSelected(e) {
+  try {
+    const files = Array.from(e?.target?.files || []);
+    // Concaténer à la liste existante (permet plusieurs sélections successives)
+    attachments.value = attachments.value.concat(files);
+    // Optionnel: réinitialiser la valeur de l'input pour pouvoir re-sélectionner les mêmes fichiers
+    try { e.target.value = ''; } catch {}
+  } catch {}
+}
+
+function removeAttachment(index) {
+  attachments.value.splice(index, 1);
+}
 </script>
 
-<style scoped>
-.actions {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.clip-btn {
-  background: transparent;
-  border: none !important;
-  padding: 6px;
-  cursor: pointer;
-  color: var(--blue);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: none;
-  transition: transform .16s cubic-bezier(.2,.9,.2,1), filter .12s ease, opacity .12s ease;
-  transform-origin: center center;
-}
-
-.clip-btn:focus { outline: none; }
-.clip-btn:hover { transform: scale(1.12); filter: brightness(0.98); }
-.clip-btn:active { transform: scale(1.06); }
-.clip-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: grayscale(0.2); }
-
-.clip-icon {
-  width: 24px;
-  height: 24px;
-  display: block;
-  color: var(--blue);
-}
-</style>

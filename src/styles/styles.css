@@ -657,6 +657,64 @@ a:hover { text-decoration: underline; }
   .popup-content .contact-form.card { margin:0; width:100%; padding:10px; }
 }
 
+/* ===== Bouton trombone (joindre) ===== */
+.clip-btn {
+  background: transparent;
+  border: none !important;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  transition: transform .16s cubic-bezier(.2,.9,.2,1), filter .12s ease, opacity .12s ease;
+  transform-origin: center center;
+}
+.clip-btn:focus { outline: none; }
+.clip-btn:hover { transform: scale(1.12); filter: brightness(0.98); }
+.clip-btn:active { transform: scale(1.06); }
+.clip-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: grayscale(0.2); }
+.clip-icon { width: 24px; height: 24px; display: block; color: var(--blue); }
+
+/* ===== Liste des pièces jointes sélectionnées ===== */
+.contact-form .attachments-list {
+  margin: 1rem 0 0.6rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.contact-form .attachment-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* contenu en ligne; la croix part à droite via margin-left:auto */
+  gap: 10px;
+  padding: 0; /* pas d'encadrement autour des noms */
+  border: none;
+  background: transparent;
+}
+.contact-form .attachment-name { color: var(--text); font-size: var(--fs-body); word-break: break-all; }
+.contact-form .attachment-size { color: var(--text-secondary); font-size: var(--fs-small); }
+.contact-form .attachment-remove {
+  background: transparent;
+  border: none;
+  color: crimson;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px; /* clic accessible sans encadrement visible */
+  margin-left: auto; /* pousser la croix à la fin de la ligne */
+}
+.contact-form .attachment-remove:hover { filter: brightness(1.05); }
+.contact-form .attachment-remove:active { transform: scale(0.96); }
+
+/* Avertissement de limite pour EmailJS */
+.contact-form .attachment-warning {
+  margin-top: 4px;
+  color: crimson;
+  font-size: var(--fs-small);
+}
+
 .popup-spinner-overlay{
   position:absolute;
   inset:0;
