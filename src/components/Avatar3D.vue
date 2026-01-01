@@ -98,8 +98,8 @@ const GAIT_PRESETS = {
   forearmSwingGain: 0.5,
     forearmElbowGain: 0.85,
   kneeLiftAmp: 0.22,
-    cycleFreqBase: 2.2,   // rad/s de base
-    cycleFreqGain: 5.0    // gain selon la vitesse
+    cycleFreqBase: 3.0,   // rad/s de base (augmenté)
+    cycleFreqGain: 7.0    // gain selon la vitesse (augmenté)
   },
   normal: {
     hipYawAmp: 0.04,
@@ -131,8 +131,8 @@ const GAIT_PRESETS = {
   forearmSwingGain: 0.5,
     forearmElbowGain: 0.80,
   kneeLiftAmp: 0.26,
-    cycleFreqBase: 2.6,
-    cycleFreqGain: 6.0
+    cycleFreqBase: 3.5,
+    cycleFreqGain: 8.0
   },
   dynamic: {
     hipYawAmp: 0.05,
@@ -164,8 +164,8 @@ const GAIT_PRESETS = {
   forearmSwingGain: 0.5,
     forearmElbowGain: 0.75,
   kneeLiftAmp: 0.30,
-    cycleFreqBase: 3.0,
-    cycleFreqGain: 7.5
+    cycleFreqBase: 4.0,
+    cycleFreqGain: 10.0
   }
 };
 
@@ -190,6 +190,11 @@ const props = defineProps({
   useMouseForWalk: {
     type: Boolean,
     default: true
+  },
+  // Force avatar to face the screen and stop walking (used at timeline boundaries)
+  faceCamera: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -655,7 +660,12 @@ function animate() {
   }
 
   // === Contrôle MARCHE: soit par props (externe), soit par souris (hérité) ===
-  if (!props.useMouseForWalk && typeof props.walkSpeed === 'number') {
+  // Si faceCamera est actif, on force l'arrêt
+  if (props.faceCamera) {
+    isWalking = false;
+    walkSpeed = lerp(walkSpeed, 0, 0.4);
+    if (walkSpeed < 0.01) walkSpeed = 0;
+  } else if (!props.useMouseForWalk && typeof props.walkSpeed === 'number') {
     // Contrôle externe
     const target = clamp(props.walkSpeed, 0, 1);
     // lissage léger pour éviter les à-coups
@@ -698,6 +708,8 @@ function animate() {
   // This is achieved by factor = clamp(4*mouseNorm - 2, -1, 1)
   const mouseNorm = (clamp(mouseNDC.x, -1, 1) + 1) * 0.5;
   let factor = clamp(4 * mouseNorm - 2, -1, 1);
+  // Si on doit faire face à la caméra (aux bornes), pas de rotation latérale
+  if (props.faceCamera) factor = 0;
 
   // Keep a small responsiveness adaptation similar to before
   const currentYaw = avatar.rotation.y;
@@ -741,8 +753,13 @@ function animate() {
     let dir = new THREE.Vector3().subVectors(lookPoint, headPos).normalize();
 
     // Angles yaw/pitch (inverser le pitch pour que bas écran = tête vers le bas)
-    const yaw = Math.atan2(dir.x, dir.z);
-    const pitch = -Math.asin(clamp(dir.y, -1, 1));
+    let yaw = Math.atan2(dir.x, dir.z);
+    let pitch = -Math.asin(clamp(dir.y, -1, 1));
+    // Aux bornes: tête centrée (face écran)
+    if (props.faceCamera) {
+      yaw = lerp(yaw, 0, 0.6);
+      pitch = lerp(pitch, 0, 0.6);
+    }
 
     // ---- Appliquer aux yeux ----
     const maxEyeYaw = 0.32;
@@ -758,7 +775,7 @@ function animate() {
 
   // ---- Appliquer à la tête + cou (lissage + anticipation) ----
   // Réduire l'amplitude quand on marche pour un effet plus naturel
-  const headReduction = isWalking ? 0.5 : 1.0;
+  const headReduction = (isWalking && !props.faceCamera) ? 0.5 : 1.0;
   const maxHeadYaw = Math.min(MAX_HEAD_YAW, 0.9 * headReduction);
   const maxHeadPitch = Math.min(MAX_HEAD_PITCH, 0.9 * headReduction);
 

@@ -18,6 +18,7 @@
 
     <!-- Overlay d'infos actives: du Début à la Fin -->
     <div class="timeline-overlay" aria-hidden="true">
+
       <div v-for="entry in activeInfoList" :key="entry.key" class="overlay-item">
         <div class="overlay-type">{{ t(`timeline.types.${entry.type}`) ?? entry.type }}</div>
         <div class="overlay-info">{{ entry.info }}</div>
@@ -125,12 +126,32 @@ const CYCLE_BASE = 2.6;   // correspond au preset 'normal' d'Avatar3D
 const CYCLE_GAIN = 6.0;   // idem
 let walkPhase = 0;        // cumul en radians
 
+// Helper: peut-on se déplacer dans une direction donnée ?
+const canMoveDir = (dir) => {
+  if (dir === 0) return false;
+  // côté vide = pousser hors de la timeline
+  if (state.worldPos <= 0 && dir < 0) return false;      // au début, gauche interdit
+  if (state.worldPos >= worldMax && dir > 0) return false; // à la fin, droite interdite
+  return true;
+};
+
 function handleMouseMove(e) {
   const centerX = window.innerWidth / 2;
   const distanceFromCenter = (e.clientX - centerX) / centerX; // [-1..1]
   const dir = Math.sign(distanceFromCenter) || 0;
-  if (dir !== 0) state.facing = dir > 0 ? 1 : -1;
-  targetWalkSpeed.value = clamp(Math.abs(distanceFromCenter), 0, 1);
+  const speed = clamp(Math.abs(distanceFromCenter), 0, 1);
+  // Bloquer toute marche vers le côté vide aux bornes
+  if (dir === 0) {
+    targetWalkSpeed.value = 0;
+    return;
+  }
+  if (canMoveDir(dir)) {
+    state.facing = dir > 0 ? 1 : -1;
+    targetWalkSpeed.value = speed;
+  } else {
+    // côté vide: ne pas changer la direction, arrêter la marche
+    targetWalkSpeed.value = 0;
+  }
 }
 
 function handleResize() {
@@ -153,6 +174,11 @@ function update(now) {
 
   // Bloquer la marche si on pousse vers l'extérieur aux bornes
   const outwardBlocked = (state.worldPos <= 0 && state.facing < 0) || (state.worldPos >= worldMax && state.facing > 0);
+  if (outwardBlocked) {
+    // arrêt immédiat de l'animation de marche côté vide
+    targetWalkSpeed.value = 0;
+    avatarWalkSpeed.value += (0 - avatarWalkSpeed.value) * 0.6; // amortissement agressif
+  }
 
   // Avancer la phase de marche (synchro avec Avatar3D)
   const phaseRate = (CYCLE_BASE + CYCLE_GAIN * avatarWalkSpeed.value) * avatarWalkSpeed.value; // rad/s
@@ -161,7 +187,8 @@ function update(now) {
 
   // Distance par cycle: dépend fortement de la vitesse et de l'espacement voulu
   // Objectif: à vitesse max, ~0.6 * eventSpacing par cycle (≈1.2s par événement)
-  const stridePx = eventSpacing * (0.25 + 0.35 * avatarWalkSpeed.value);
+  // Augmenter la distance parcourue par cycle pour accélérer le déplacement sur la timeline
+  const stridePx = eventSpacing * (0.35 + 0.65 * avatarWalkSpeed.value);
   const dWorld = state.facing * (dPhase / (2 * Math.PI)) * stridePx;
   state.worldPos = clamp(state.worldPos + dWorld, 0, worldMax);
 
