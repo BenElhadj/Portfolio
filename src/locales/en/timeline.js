@@ -17,14 +17,68 @@ export default {
     }
     ,
     types: {
+        // generic categories
         Formation: "Education",
         Stage: "Internship",
         Travail: "Work",
-        Autre: "Other"
+        Autre: "Other",
+        // sanitized keys for all type values present in timelineEvents
+        formation: "Education",
+        stage: "Internship",
+        associe_gerant: "Managing partner",
+        proprietaire_gerant: "Owner-manager",
+        nouveau_depart: "New start",
+        commercial_terrain: "Field sales",
+        technicien_informatique: "IT technician",
+        technicien_maintenance_it: "IT maintenance technician",
+        technicien_itinerant: "Field technician",
+        technicien_vip: "VIP technician",
+        gestionnaire_parc_it: "IT asset manager",
+        developpeur_web_stage: "Web Developer (Internship)",
+        developpeur_mobile: "Mobile Developer",
+        developpeur_ia_machine_learning: "AI/Machine Learning Developer",
+        developpeur_full_stack: "Full-Stack Developer",
+        developpeur_full_stack_web3: "Full-Stack Web3 Developer",
+        technicien_de_proximite: "Proximity support technician"
     },
     actions: {
         "Début": "Start",
         "En cours": "In progress",
         "Fin": "End"
+    },
+    infos: {
+        institut_professionnel_horizon_iph: "Horizon Professional Institute (IPH)",
+        csfiee_cipe_2: "CSFIEE CIPE 2",
+        tekne_s_p_a_tunisie: "TEKNE S.p.A. (Tunisia)",
+        microlux_dimatec_tunisie: "Microlux-Dimatec (Tunisia)",
+        sagemcom_tunisie: "Sagemcom (Tunisia)",
+        aquarium_informatique_tunisie: "Aquarium Informatique (Tunisia)",
+        global_info_tunisie: "Global Info (Tunisia)",
+        retronix_tunisie: "Retronix Tunisia",
+        transtu_tgm_metro: "TRANSTU TGM (Metro)",
+        stie: "STIE",
+        immigration_en_france: "Immigration to France",
+        european_trade_gdf: "European Trade - GDF",
+        mss_fnac: "MSS Fnac",
+        solutions30_france: "Solutions30 France",
+        greta_paris: "GRETA Paris",
+        ecole_42_paris: "42 School Paris",
+        parkeon: "Parkeon",
+        chanel: "CHANEL",
+        lvmh_fragrance_brands: "LVMH Fragrance Brands",
+        atoutek_kiatoo: "Atoutek / KIATOO",
+        multiserv_plus: "Multiserv Plus",
+        institut_du_cerveau_icm: "Brain Institute (ICM)",
+        ap_hp_hopital_charles_foix: "AP-HP - Charles-Foix Hospital",
+        multiserv_plus_freelance: "Multiserv Plus (Freelance)",
+        keakr_alternance: "KEAKR (Apprenticeship)",
+        freelance: "Freelance"
+    },
+    levels: {
+        bac_pro_maintenance_informatique: "Vocational Baccalaureate in Computer Maintenance",
+        bac_pro_fabrication_electronique: "Vocational Baccalaureate in Electronic Manufacturing",
+        bts_production_electronique_bac_2: "Advanced Technician's Certificate in Electronic Production (2-year degree)",
+        bts_en_systemes_numeriques_option_informatique_et_reseaux: "Advanced Technician's Certificate in Digital Systems, Option: Computer Science and Networks",
+        expert_en_architecture_informatique_data: "Expert in IT Architecture / Data"
     }
 };

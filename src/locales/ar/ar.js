@@ -5,6 +5,7 @@ import skills from "./skills";
 import softSkills from "./softSkills";
 import projects from "./projects";
 import links from "./links";
+import timeline from "./timeline";
 
 export default {
   navbar,
@@ -14,4 +15,5 @@ export default {
   softSkills,
   projects,
   links,
+  timeline,
 };

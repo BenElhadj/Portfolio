@@ -17,14 +17,68 @@ export default {
     }
     ,
     types: {
+        // catégories génériques
         Formation: "Formation",
         Stage: "Stage",
         Travail: "Travail",
-        Autre: "Autre"
+        Autre: "Autre",
+        // clés sanitizées pour tous les types présents
+        formation: "Formation",
+        stage: "Stage",
+        associe_gerant: "Associé gérant",
+        proprietaire_gerant: "Propriétaire gérant",
+        nouveau_depart: "Nouveau départ",
+        commercial_terrain: "Commercial terrain",
+        technicien_informatique: "Technicien informatique",
+        technicien_maintenance_it: "Technicien maintenance IT",
+        technicien_itinerant: "Technicien itinérant",
+        technicien_vip: "Technicien VIP",
+        gestionnaire_parc_it: "Gestionnaire parc IT",
+        developpeur_web_stage: "Développeur Web (Stage)",
+        developpeur_mobile: "Développeur Mobile",
+        developpeur_ia_machine_learning: "Développeur IA / Machine Learning",
+        developpeur_full_stack: "Développeur Full-Stack",
+        developpeur_full_stack_web3: "Développeur Full-Stack Web3",
+        technicien_de_proximite: "Technicien de proximité"
     },
     actions: {
         "Début": "Début",
         "En cours": "En cours",
         "Fin": "Fin"
+    },
+    infos: {
+        institut_professionnel_horizon_iph: "Institut Professionnel Horizon (IPH)",
+        csfiee_cipe_2: "CSFIEE CIPE 2",
+        tekne_s_p_a_tunisie: "TEKNE S.p.A. (Tunisie)",
+        microlux_dimatec_tunisie: "Microlux-Dimatec (Tunisie)",
+        sagemcom_tunisie: "Sagemcom (Tunisie)",
+        aquarium_informatique_tunisie: "Aquarium Informatique (Tunisie)",
+        global_info_tunisie: "Global Info (Tunisie)",
+        retronix_tunisie: "Retronix Tunisie",
+        transtu_tgm_metro: "TRANSTU TGM (Métro)",
+        stie: "STIE",
+        immigration_en_france: "Immigration en France",
+        european_trade_gdf: "European Trade - GDF",
+        mss_fnac: "MSS Fnac",
+        solutions30_france: "Solutions30 France",
+        greta_paris: "GRETA Paris",
+        ecole_42_paris: "École 42 Paris",
+        parkeon: "Parkeon",
+        chanel: "CHANEL",
+        lvmh_fragrance_brands: "LVMH Fragrance Brands",
+        atoutek_kiatoo: "Atoutek / KIATOO",
+        multiserv_plus: "Multiserv Plus",
+        institut_du_cerveau_icm: "Institut du Cerveau (ICM)",
+        ap_hp_hopital_charles_foix: "AP-HP - Hôpital Charles-Foix",
+        multiserv_plus_freelance: "Multiserv Plus (Freelance)",
+        keakr_alternance: "KEAKR (Alternance)",
+        freelance: "Freelance"
+    },
+    levels: {
+        bac_pro_maintenance_informatique: "Bac Pro Maintenance Informatique",
+        bac_pro_fabrication_electronique: "Bac Pro Fabrication Électronique",
+        bts_production_electronique_bac_2: "BTS Production Électronique (Bac +2)",
+        bts_en_systemes_numeriques_option_informatique_et_reseaux: "BTS en SYSTÈMES NUMÉRIQUES Option: INFORMATIQUE et RÉSEAUX",
+        expert_en_architecture_informatique_data: "Expert en Architecture Informatique / Data"
     }
 };

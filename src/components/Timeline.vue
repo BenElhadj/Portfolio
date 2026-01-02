@@ -20,9 +20,9 @@
     <div class="timeline-overlay" aria-hidden="true">
 
       <div v-for="entry in activeInfoList" :key="entry.key" class="overlay-item">
-        <div class="overlay-type">{{ t(`timeline.types.${entry.type}`) ?? entry.type }}</div>
-        <div class="overlay-info">{{ entry.info }}</div>
-        <div v-if="entry.Niveau" class="overlay-level">{{ entry.Niveau }}</div>
+  <div class="overlay-type">{{ t(`timeline.types.${sanitizeKey(entry.type)}`) ?? entry.type }}</div>
+  <div class="overlay-info">{{ t(`timeline.infos.${sanitizeKey(entry.info)}`) ?? entry.info }}</div>
+  <div v-if="entry.Niveau" class="overlay-level">{{ t(`timeline.levels.${sanitizeKey(entry.Niveau)}`) ?? entry.Niveau }}</div>
       </div>
     </div>
 
@@ -70,6 +70,18 @@ function getCategory(typeStr = "") {
 }
 
 const { t } = (() => { try { return useI18n(); } catch { return { t: (k) => k }; } })();
+
+// Sanitize a label into a stable i18n key: remove accents, non-alphanumerics to '_', collapse and trim
+function sanitizeKey(str = "") {
+  const s = String(str)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .replace(/_+/g, "_");
+  return s || "_";
+}
 
 const eventMarkers = computed(() => {
   const list = isRTL.value ? [...timelineEvents].reverse() : timelineEvents;
