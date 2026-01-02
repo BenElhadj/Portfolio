@@ -45,11 +45,11 @@
                     @keydown.enter.prevent="openPopup(d)"
                     @keydown.space.prevent="openPopup(d)"
                   >
+                    <div class="degree">{{ d.degree }}</div>
                     <div class="meta">
                       <span class="year">{{ d.period }}</span>
                       <span class="institution">{{ d.institution }}</span>
                     </div>
-                    <div class="degree">{{ d.degree }}</div>
                   </div>
                 </div>
               </div>
