@@ -65,6 +65,7 @@ export default {
         ecole_42_paris: "École 42 Paris",
         parkeon: "Parkeon",
         chanel: "CHANEL",
+    dim: "DIM",
         lvmh_fragrance_brands: "LVMH Fragrance Brands",
         atoutek_kiatoo: "Atoutek / KIATOO",
         multiserv_plus: "Multiserv Plus",
