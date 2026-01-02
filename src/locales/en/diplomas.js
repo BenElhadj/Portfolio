@@ -3,7 +3,7 @@ export default {
   loading: "Loading...",
   list: [
     {
-      title: "Level of education : Baccalaureate + 5",
+      title: "Level Baccalaureate + 5",
       diplomes: [
         {
           period: "2016 - 2023",
@@ -15,7 +15,7 @@ export default {
       ]
     },
     {
-      title: "Level of education : Baccalaureate + 2",
+      title: "Level Baccalaureate + 2",
       diplomes: [
         {
           period: "2017 - 2019",
@@ -34,7 +34,7 @@ export default {
       ]
     },
     {
-      title: "Level of education : Equivalent baccalaureate",
+      title: "Level baccalaureate",
       diplomes: [
         {
           period: "2006 - 2008",

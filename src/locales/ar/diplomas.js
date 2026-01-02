@@ -3,7 +3,7 @@ export default {
   loading: "جارٍ التحميل...",
   list: [
     {
-      title: "مستوى التعليم : مهندس خبير",
+      title: "مستوى مهندس خبير",
       diplomes: [
         {
           period: "2016 - 2023",
@@ -15,7 +15,7 @@ export default {
       ]
     },
     {
-      title: "مستوى التعليم : تقني سامي",
+      title: "مستوى تقني سامي",
       diplomes: [
         {
           period: "2017 - 2019",
@@ -34,7 +34,7 @@ export default {
       ]
     },
     {
-      title: "مستوى التعليم : تقني مهني",
+      title: "مستوى تقني مهني",
       diplomes: [
         {
           period: "2006 - 2008",

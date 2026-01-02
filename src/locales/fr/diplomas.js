@@ -3,7 +3,7 @@ export default {
   loading: "Chargement...",
     list: [
       {
-        title: "Niveau d'études : Bac +5",
+        title: "Niveau Bac + 5",
         diplomes: [
           {
             period: "2016 - 2023",
@@ -15,7 +15,7 @@ export default {
         ]
       },
       {
-        title: "Niveau d'études : Bac +2",
+        title: "Niveau Bac + 2",
         diplomes: [
           {
             period: "2017 - 2019",
@@ -34,7 +34,7 @@ export default {
         ]
       },
       {
-        title: "Niveau d'études : Bac équivalent",
+        title: "Niveau Bac",
         diplomes: [
           {
             period: "2006 - 2008",
