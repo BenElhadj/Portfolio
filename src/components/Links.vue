@@ -6,10 +6,12 @@
     <template #slot1>
       <div class="slot-content tl">
         <div class="card line-card corner">
-          <h3>{{ $t('links.items.github.name') }}</h3>
-          <small>{{ $t('links.items.github.short') }}</small>
-          <div class="actions">
+          <div class="corner-qr-block">
             <a :href="$t('links.items.github.url')" target="_blank" rel="noopener noreferrer" class="corner-qr"><img :src="$t('links.items.github.qr') || qrFor($t('links.items.github.url'))" alt="github-qr" /></a>
+            <div class="qr-caption">
+              <div class="qr-name">{{ $t('links.items.github.name') }}</div>
+              <div class="qr-short">{{ $t('links.items.github.short') }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -18,10 +20,12 @@
     <template #slot2>
       <div class="slot-content tr">
         <div class="card line-card corner">
-          <h3>{{ $t('links.items.linkedin.name') }}</h3>
-          <small>{{ $t('links.items.linkedin.short') }}</small>
-          <div class="actions">
+          <div class="corner-qr-block">
             <a :href="$t('links.items.linkedin.url')" target="_blank" rel="noopener noreferrer" class="corner-qr"><img :src="$t('links.items.linkedin.qr') || qrFor($t('links.items.linkedin.url'))" alt="linkedin-qr" /></a>
+            <div class="qr-caption">
+              <div class="qr-name">{{ $t('links.items.linkedin.name') }}</div>
+              <div class="qr-short">{{ $t('links.items.linkedin.short') }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -30,10 +34,12 @@
     <template #slot3>
       <div class="slot-content bl">
         <div class="card line-card corner">
-          <h3>{{ $t('links.items.email.name') }}</h3>
-          <small>{{ $t('links.items.email.short') }}</small>
-          <div class="actions">
+          <div class="corner-qr-block">
             <a :href="'mailto:' + emailAddress" class="corner-qr"><img :src="$t('links.items.email.qr') || qrFor('mailto:' + emailAddress)" alt="email-qr" /></a>
+            <div class="qr-caption">
+              <div class="qr-name">{{ $t('links.items.email.name') }}</div>
+              <div class="qr-short">{{ $t('links.items.email.short') }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -42,12 +48,14 @@
     <template #slot4>
       <div class="slot-content br">
         <div class="card line-card corner">
-          <h3>{{ $t('links.items.contact.name') }}</h3>
-          <small>{{ $t('links.items.contact.short') }}</small>
-          <div class="actions">
+          <div class="corner-qr-block">
             <a :href="'#contact'" class="corner-qr" @click.prevent="openContact" :title="$t('links.items.contact.name')">
               <img :src="$t('links.items.contact.qr') || qrFor(contactUrl)" :alt="$t('links.items.contact.name')" />
             </a>
+            <div class="qr-caption">
+              <div class="qr-name">{{ $t('links.items.contact.name') }}</div>
+              <div class="qr-short">{{ $t('links.items.contact.short') }}</div>
+            </div>
           </div>
         </div>
         <Popup :visible="showContact" :title="$t('links.items.contact.name')" @close="closeContact">

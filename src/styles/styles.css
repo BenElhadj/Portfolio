@@ -499,6 +499,20 @@ a:hover { text-decoration: underline; }
   max-width: 100%;
 }
 
+/* ===== QR captions (nom + explication sous le QR) ===== */
+.corner .qr-caption {
+  margin-top: 8px;
+  text-align: center;
+}
+.corner .qr-caption .qr-name {
+  font-weight: 700;
+  color: var(--text);
+}
+.corner .qr-caption .qr-short {
+  font-size: var(--fs-small);
+  color: var(--text-secondary);
+}
+
 /* Tooltip for CV label (moved from Links.vue) */
 .cv-tooltip {
   position: fixed;
@@ -545,8 +559,8 @@ a:hover { text-decoration: underline; }
 /* Utility: small QR displayed in card corner */
 .card.corner {
   position: relative;
-  /* leave space on the right for the corner QR */
-  padding-right: calc(var(--corner-qr-size) + 24px);
+  /* réserver l'espace pour le bloc QR en fin de ligne (LTR/RTL) */
+  padding-inline-end: calc(var(--corner-qr-size) + 24px);
 }
 /* QR visuals sized from a CSS variable so card height can follow */
 .card.corner .corner-qr {
@@ -582,7 +596,8 @@ a:hover { text-decoration: underline; }
 .card.corner .corner-qr:focus { outline: 2px solid rgba(11,111,184,0.12); }
 /* Ensure card height follows QR size */
 .card.corner {
-  min-height: calc(var(--corner-qr-size) );
+  /* Augmente la hauteur min pour inclure QR + padding + légende sans débordement */
+  min-height: calc(var(--corner-qr-size) + 96px);
 }
 
 /* Responsive: reduce QR size on small screens to avoid layout breaking */
@@ -590,33 +605,29 @@ a:hover { text-decoration: underline; }
   /* mobile: set smaller corner size via variable */
   :root { --corner-qr-size: 80px; }
   .card.corner {
-    padding-right: calc(var(--corner-qr-size) );
-    min-height: calc(var(--corner-qr-size) );
+    padding-inline-end: calc(var(--corner-qr-size) + 24px);
+    min-height: calc(var(--corner-qr-size) + 96px);
   }
   .card.corner .corner-qr {
     width: var(--corner-qr-size);
     height: var(--corner-qr-size);
     border-radius: 6px;
   }
-  [dir="rtl"] .card.corner { padding-left: 112px; padding-right: 0; }
-  [dir="rtl"] .card.corner { padding-left: calc(var(--corner-qr-size)); padding-right: 0; }
-  [dir="rtl"] .card.corner .corner-qr { left: 12px; right: auto; }
+}
+/* Marges uniformes pour QR-block en LTR/RTL via propriétés logiques */
 
-  /* ensure bottom gap remains 12px in RTL mobile too */
-  [dir="rtl"] .card.corner .corner-qr { bottom: 12px; }
+/* Bloc absolu qui regroupe QR + légende en colonne, positionné en coin */
+.card.corner .corner-qr-block {
+  position: absolute;
+  width: calc(var(--corner-qr-size) );
+  text-align: center;
+  box-sizing: border-box;
 }
-/* RTL support: place QR on the left and adjust padding */
-[dir="rtl"] .card.corner {
-  padding-left: 288px;
-  padding-right: 12px;
+.card.corner .corner-qr-block .corner-qr {
+  position: static;
+  width: 100%;
+  height: var(--corner-qr-size);
 }
-[dir="rtl"] .card.corner .corner-qr {
-  left: 12px;
-  right: auto;
-}
-
-/* ensure bottom gap remains 12px in RTL desktop too */
-[dir="rtl"] .card.corner .corner-qr { bottom: 12px; }
 
 /* Diplomas utilities moved from component scoped styles to global styles */
 .card[role="button"] {
