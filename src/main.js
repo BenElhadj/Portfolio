@@ -46,6 +46,9 @@ app.mount("#app");
     lastY = 0;
   let pages = [];
   let sections = [];
+  let hasScrolled = false;
+  const htmlEl = document.documentElement;
+  const scrollFlags = new WeakMap();
 
   function refreshNodes() {
     pages = Array.from(document.querySelectorAll(".pages .page"));
@@ -71,6 +74,39 @@ app.mount("#app");
     });
   }
 
+  // Marquer le document après le premier scroll pour activer le glow
+  function onAnyScroll() {
+    if (hasScrolled) return;
+    try {
+      const scroller = document.querySelector('.pages');
+      const scrolledAmt = scroller ? scroller.scrollTop : window.pageYOffset || document.documentElement.scrollTop || 0;
+      if (scrolledAmt > 10) {
+        hasScrolled = true;
+        htmlEl.classList.add('has-scrolled');
+      }
+    } catch (e) {}
+  }
+
+  // Supprimer le glow pendant le scroll interne d'un compartiment
+  function attachInnerScrollListeners() {
+    sections.forEach((sectionEl) => {
+      const inner = sectionEl.querySelector('.sub-inner');
+      const target = inner || sectionEl;
+      if (scrollFlags.get(target)) return; // éviter doublons
+      const onScroll = () => {
+        const parent = target.closest('.sub-section') || sectionEl;
+        parent.classList.add('is-scrolling');
+        // retirer après une courte pause
+        clearTimeout(onScroll._t);
+        onScroll._t = setTimeout(() => {
+          parent.classList.remove('is-scrolling');
+        }, 220);
+      };
+      target.addEventListener('scroll', onScroll, { passive: true });
+      scrollFlags.set(target, true);
+    });
+  }
+
   function onMouseMove(e) {
     lastX = e.clientX / window.innerWidth;
     lastY = e.clientY / window.innerHeight;
@@ -93,5 +129,11 @@ app.mount("#app");
     window.addEventListener("resize", refreshNodes);
     document.addEventListener("mousemove", onMouseMove, { passive: true });
     document.addEventListener("mouseleave", onMouseLeave, { passive: true });
+    // écouter le scroll global (container .pages si présent, sinon window)
+    const scroller = document.querySelector('.pages');
+    if (scroller) scroller.addEventListener('scroll', onAnyScroll, { passive: true });
+    else window.addEventListener('scroll', onAnyScroll, { passive: true });
+    // écouteurs de scroll interne pour compartiments
+    attachInnerScrollListeners();
   }, 0);
 })();

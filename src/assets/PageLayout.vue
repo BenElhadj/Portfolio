@@ -1,7 +1,9 @@
 <template>
   <div class="page-layout" :class="layout">
     <div v-for="(slotName, index) in slotsList" :key="index" class="sub-section">
-      <slot :name="slotName"></slot>
+      <div class="sub-inner">
+        <slot :name="slotName"></slot>
+      </div>
     </div>
   </div>
 </template>

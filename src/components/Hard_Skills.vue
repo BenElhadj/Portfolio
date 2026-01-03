@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper skills-page">
     <h2 class="title">{{ $t("skills.title") }}</h2>
 
     <PageLayout :columns="2" :rows="2" >
@@ -10,7 +10,7 @@
       >
         <div class="category">
           <h3 class="group-title">{{ $t(group.title) }}</h3>
-          <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));">
+          <div class="grid skills-grid" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
             <div
               v-for="(skill, i) in group.skills"
               :key="i"
