@@ -110,8 +110,56 @@ html, body, #app {
   margin: 0;
   height: 100%;
   width: 100%;
-  background-color: var(--page-bg);
   color: var(--text);
+}
+
+/* Couleur de fond du thème appliquée au document (html) seulement */
+html { background-color: var(--page-bg); }
+/* Le corps et l'app sont transparents pour laisser apparaître la grille */
+body, #app { background: transparent; }
+/* Assure que le contenu passe au-dessus de la grille (qui est en z-index: 0) */
+#app { position: relative; z-index: 1; }
+
+/* =========================
+   FOND QUADRILLÉ AVEC MASQUE DIAGONAL
+   S’adapte automatiquement au thème via var(--page-bg) et var(--text)
+========================= */
+html::before {
+  /* taille des carreaux */
+  --size: 42px;
+  /* couleur des lignes (atténuée) */
+  --line: color-mix(in hsl, var(--text), transparent 90%);
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* flou léger pour adoucir les carreaux */
+  filter: blur(2px);
+
+  /* grille (2 gradients croisés) */
+  background:
+    linear-gradient(90deg, var(--line, rgba(0,0,0,0.05)) 1px, transparent 1px var(--size)) 0 0 / var(--size) var(--size),
+    linear-gradient(var(--line, rgba(0,0,0,0.05)) 1px, transparent 1px var(--size)) 0 0 / var(--size) var(--size);
+  /* pas de couleur de fond ici: on superpose uniquement les carreaux transparents */
+
+  /* masque diagonal: disparition progressive des carreaux */
+  -webkit-mask-image: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 45%,
+    rgba(0, 0, 0, 0.6) 55%,
+    rgba(0, 0, 0, 0.2) 65%,
+    rgba(0, 0, 0, 0) 75%
+  );
+  mask-image: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 45%,
+    rgba(0, 0, 0, 0.6) 55%,
+    rgba(0, 0, 0, 0.2) 65%,
+    rgba(0, 0, 0, 0) 75%
+  );
 }
 
 /* ===== TITRES ===== */
@@ -136,6 +184,7 @@ h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  z-index: 2999; /* au-dessus du contenu des pages, juste sous la navbar (3000) */
 }
 .links-wrapper .favicon-center img {
   width: 300px;
@@ -148,6 +197,8 @@ h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
   cursor: pointer;
   will-change: transform;
   outline: none;
+   position: relative;
+   z-index: 3000; /* le clic passe au-dessus de tout le contenu de la page */
   transition: transform 160ms ease, filter 120ms ease;
 }
 .links-wrapper .clickable-favicon:hover {
@@ -218,8 +269,27 @@ a:hover { text-decoration: underline; }
   height: 100%;
   display: grid;
   overflow: hidden;
+  position: relative; /* nécessaire pour l'overlay interne */
   background-color: var(--page-bg);
   color: var(--text);
+}
+
+/* Overlay de fond quadrillé à l'intérieur des pages,
+   visible uniquement dans les espaces/gaps entre les sections de grille */
+.page-layout::before {
+  /* taille des carreaux (reprend le global) */
+  --size: 42px;
+  /* lignes très atténuées comme l'overlay global */
+  --line: color-mix(in hsl, var(--text), transparent 94%);
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* derrière le contenu de la page */
+  pointer-events: none;
+  filter: blur(1px);
+  background:
+    linear-gradient(90deg, var(--line, rgba(0,0,0,0.05)) 1px, transparent 1px var(--size)) 0 0 / var(--size) var(--size),
+    linear-gradient(var(--line, rgba(0,0,0,0.05)) 1px, transparent 1px var(--size)) 0 0 / var(--size) var(--size);
 }
 
 .sub-section {
@@ -228,6 +298,8 @@ a:hover { text-decoration: underline; }
   overflow-y: auto;
   border-radius: var(--radius);
   margin: 10px;
+  position: relative; /* s'assure que les cartes passent au-dessus de l'overlay */
+  z-index: 1;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   background: var(--card-bg);
