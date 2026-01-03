@@ -204,23 +204,8 @@ h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
 .links-wrapper .clickable-favicon:hover {
   transform: translateZ(0) scale(1.05);
   /* appliquer le glow externe comme sur les compartiments */
+  /* utiliser uniquement drop-shadow basé sur l'alpha de l'image (pas de box-shadow sur le cadre PNG) */
   filter: brightness(1.02) drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
-  box-shadow: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
-}
-.links-wrapper .clickable-favicon::after {
-  content: "";
-  position: absolute;
-  inset: -4%; /* léger dépassement pour un halo plus large */
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 160ms ease;
-  border-radius: 50%;
-  z-index: 3000; /* rendu au-dessus des autres éléments de page */
-  box-shadow: 0 0 22px 8px color-mix(in hsl, var(--blue), transparent 82%);
-}
-.links-wrapper .clickable-favicon:hover::after,
-.links-wrapper .clickable-favicon:focus-visible::after {
-  opacity: 1;
 }
 .links-wrapper .clickable-favicon:active {
   transform: translateZ(0) scale(0.98);
@@ -228,8 +213,8 @@ h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
 
 /* glow aussi en navigation clavier */
 .links-wrapper .clickable-favicon:focus-visible {
+  /* conserver uniquement drop-shadow pour respecter la transparence de l'image */
   filter: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
-  box-shadow: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
 }
 
 p, li, span, div, small {
