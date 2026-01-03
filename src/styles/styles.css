@@ -203,10 +203,33 @@ h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
 }
 .links-wrapper .clickable-favicon:hover {
   transform: translateZ(0) scale(1.05);
-  filter: brightness(1.02);
+  /* appliquer le glow externe comme sur les compartiments */
+  filter: brightness(1.02) drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
+  box-shadow: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
+}
+.links-wrapper .clickable-favicon::after {
+  content: "";
+  position: absolute;
+  inset: -4%; /* léger dépassement pour un halo plus large */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+  border-radius: 50%;
+  z-index: 3000; /* rendu au-dessus des autres éléments de page */
+  box-shadow: 0 0 22px 8px color-mix(in hsl, var(--blue), transparent 82%);
+}
+.links-wrapper .clickable-favicon:hover::after,
+.links-wrapper .clickable-favicon:focus-visible::after {
+  opacity: 1;
 }
 .links-wrapper .clickable-favicon:active {
   transform: translateZ(0) scale(0.98);
+}
+
+/* glow aussi en navigation clavier */
+.links-wrapper .clickable-favicon:focus-visible {
+  filter: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
+  box-shadow: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
 }
 
 p, li, span, div, small {
@@ -300,11 +323,41 @@ a:hover { text-decoration: underline; }
   margin: 10px;
   position: relative; /* s'assure que les cartes passent au-dessus de l'overlay */
   z-index: 1;
+  will-change: transform; /* lissage du petit mouvement parallax */
+  transition: filter 160ms ease, box-shadow 160ms ease;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   background: var(--card-bg);
   color: var(--text);
   border: 1px solid var(--border);
+}
+
+/* Glow externe sur le compartiment entier (au survol ou au focus) */
+.sub-section:hover,
+.sub-section:focus-within {
+  /* drop-shadow pour un halo externe qui n'affecte pas l'intérieur */
+  filter: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
+  box-shadow: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
+  /* placer le compartiment au-dessus des autres contenus (sous la navbar) */
+  z-index: 2998;
+}
+
+/* Couche de glow au-dessus de tout contenu de la page (hors navbar) */
+.sub-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+  border-radius: inherit;
+  /* z-index élevé pour passer au-dessus des autres éléments de la page */
+  z-index: 2999;
+  box-shadow: 0 0 18px 6px color-mix(in hsl, var(--blue), transparent 82%);
+}
+.sub-section:hover::after,
+.sub-section:focus-within::after {
+  opacity: 1;
 }
 
 .two-cols { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
@@ -332,7 +385,8 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  /* Au-dessus de tous les overlays/glows et de la navbar pour afficher les diplômes en entier */
+  z-index: 5000;
 }
 
 .popup-content {
@@ -356,11 +410,11 @@ a:hover { text-decoration: underline; }
 
 .close-btn {
   position: absolute;
-  top: 16px;
+  top: 8px; /* un peu plus haut */
   right: 16px;
   background: var(--card-bg);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: none; /* sans bordure */
   width: 36px;
   height: 36px;
   display: inline-flex;
@@ -619,6 +673,14 @@ a:hover { text-decoration: underline; }
   width: 100%;
   height: auto;             /* contraindre par largeur, garder ratio */
   object-fit: contain;
+}
+
+/* Diplomas au-dessus de tout le contenu de page (ne pas être masqués par le glow des compartiments) */
+.diplomas-page .timeline-item,
+.diplomas-page .degree-thumb,
+.diplomas-page .line-card {
+  position: relative;
+  z-index: 3000; /* au-dessus du ::after (2999) des sub-sections, sous/égal à la navbar */
 }
 
 /* Avatar canvas full-size helper (moved from Avatar3D.vue scoped styles) */
@@ -1164,6 +1226,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  will-change: transform; /* lissage du petit mouvement parallax */
   /* Padding horizontal global */
   padding-left: var(--page-padding-x);
   padding-right: var(--page-padding-x);
