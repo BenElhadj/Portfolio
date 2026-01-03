@@ -65,12 +65,24 @@
     --navbar-height: 32px;
   }
   
+  /* For pages like Soft Skills using a 2x2 grid, when stacking to one column,
+     ensure all rows have equal height by using 1fr auto rows and clearing explicit rows. */
   .page-layout {
     grid-template-columns: 1fr;
+    grid-auto-rows: 1fr;
+    align-items: stretch;
+    /* Preserve visual spacing between compartments when stacked */
+    row-gap: 16px; /* equals previous 8px top + 8px bottom margins */
   }
+  .page-layout.grid-2x2 {
+    /* remove fixed 2-row definition so auto rows can create 4 equal tracks */
+    grid-template-rows: unset;
+  }
+  .sub-section { height: 100%; }
+  .sub-section .sub-inner { height: 100%; }
   
   .sub-section {
-    margin: 8px;
+    margin: 0;      /* spacing now controlled by page-layout row-gap */
     padding: 8px;
   }
   
