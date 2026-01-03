@@ -12,9 +12,12 @@
         :style="{ left: m.x + 'px' }"
       >
         <div class="dot"></div>
-        <div class="label">{{ m.label }}</div>
+        <!-- Labels replaced by YearStream; label hidden -->
       </div>
     </div>
+
+    <!-- Flux d'années avec scanner + étoiles -->
+  <YearStream @seek="onSeekFromYearStream" @setFacing="onSetFacingFromYearStream" />
 
     <!-- Overlay d'infos actives: du Début à la Fin -->
     <div class="timeline-overlay" aria-hidden="true">
@@ -36,6 +39,7 @@ import { useI18n } from "vue-i18n";
 import gsap from "gsap";
 import Avatar3D from "./Avatar3D.vue";
 import { timelineEvents } from "../timelineEvents.js";
+import YearStream from "./YearStream.vue";
 
 const viewport = ref(null);
 const track = ref(null);
@@ -54,7 +58,7 @@ const state = reactive({
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // Espacement et marqueurs (légèrement rapproché)
-const eventSpacing = 380; // px
+const eventSpacing = 380 // px
 function getCategory(typeStr = "") {
   const t = String(typeStr).toLowerCase();
   if (t.includes("formation")) return "formation";
@@ -90,6 +94,13 @@ const eventMarkers = computed(() => {
     label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim(),
     category: getCategory(ev.type)
   }));
+});
+
+// Map first occurrence index for each year
+const yearToIndexMap = computed(() => {
+  const map = new Map();
+  timelineEvents.forEach((ev, i) => { if (!map.has(ev.year)) map.set(ev.year, i); });
+  return map;
 });
 
 // Overlay d'infos actives
@@ -162,6 +173,25 @@ function handleMouseMove(e) {
     targetWalkSpeed.value = speed;
   } else {
     // côté vide: ne pas changer la direction, arrêter la marche
+    targetWalkSpeed.value = 0;
+  }
+}
+
+// YearStream → Timeline navigation
+function onSeekFromYearStream(year) {
+  const idx = yearToIndexMap.value.get(year);
+  if (typeof idx === 'number') {
+    const pos = 80 + idx * eventSpacing;
+    state.worldPos = clamp(pos, 0, worldMax);
+  }
+}
+function onSetFacingFromYearStream(dir) {
+  if (dir !== 1 && dir !== -1) return;
+  if (canMoveDir(dir)) {
+    state.facing = dir > 0 ? 1 : -1;
+    // Boost speed for rapid navigation during drag
+    targetWalkSpeed.value = 1;
+  } else {
     targetWalkSpeed.value = 0;
   }
 }
