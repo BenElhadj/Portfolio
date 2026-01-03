@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper soft-skills-page">
     <h2 class="title">{{ $t("softSkills.title") }}</h2>
 
     <PageLayout :columns="2" :rows="2">
@@ -10,22 +10,26 @@
       >
         <div class="category">
           <h3 class="group-title">{{ $t(group.title) }}</h3>
-            <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
+            <div class="grid">
               <div
                 v-for="(item, i) in group.items"
                 :key="item.key"
-                class="card line-card reveal"
-                role="button"
-                tabindex="0"
+                class="skill-item reveal"
                 v-observe-visibility="(isVisible) => onVisible(isVisible, item.key)"
                 :class="{ 'is-visible': visibleSkills.includes(item.key) }"
-                @click="openPopup(item.key)"
-                @keydown.enter.prevent="openPopup(item.key)"
-                @keydown.space.prevent="openPopup(item.key)"
               >
-                <div class="info">
-                  <div class="name">{{ $t(`softSkills.items.${item.key}.name`) }}</div>
-                  <small>{{ $t(`softSkills.items.${item.key}.short`) }}</small>
+                <div
+                  class="card line-card"
+                  role="button"
+                  tabindex="0"
+                  @click="openPopup(item.key)"
+                  @keydown.enter.prevent="openPopup(item.key)"
+                  @keydown.space.prevent="openPopup(item.key)"
+                >
+                  <div class="info">
+                    <div class="name">{{ $t(`softSkills.items.${item.key}.name`) }}</div>
+                    <small>{{ $t(`softSkills.items.${item.key}.short`) }}</small>
+                  </div>
                 </div>
               </div>
             </div>

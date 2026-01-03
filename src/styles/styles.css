@@ -239,7 +239,18 @@ small { font-size: var(--fs-small); color: var(--text-secondary); }
   border-left: 4px solid var(--blue);
   display: flex;
   flex-direction: column;
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 120ms ease;
 }
+
+/* Effets hover/click par défaut pour les cartes intérieures (modérés) */
+.line-card:hover,
+.line-card:focus-visible {
+  transform: translateZ(0) scale(1.02);
+  box-shadow: 0 8px 22px var(--card-shadow);
+}
+.line-card:active { transform: translateZ(0) scale(0.98); }
+
+
 
 /* ===== BOUTONS ===== */
 button {
@@ -715,6 +726,7 @@ html.has-scrolled .sub-section:focus-within::after {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 160ms ease, filter 120ms ease;
 }
 /* Hover/active effects: enlarge in-place without causing layout shift */
 .card.corner .corner-qr:hover,
