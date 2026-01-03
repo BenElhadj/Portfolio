@@ -128,7 +128,7 @@ html::before {
   /* taille des carreaux */
   --size: 42px;
   /* couleur des lignes (atténuée) */
-  --line: color-mix(in hsl, var(--text), transparent 90%);
+  --line: color-mix(in hsl, var(--text), transparent 87%);
   content: "";
   position: fixed;
   inset: 0;
@@ -691,6 +691,11 @@ html.has-scrolled .sub-section:focus-within::after {
   position: relative;
   z-index: 3000; /* au-dessus du ::after (2999) des sub-sections, sous/égal à la navbar */
 }
+
+/* Diplomas: supprimer la grande ligne bleue de la timeline et la bordure gauche bleue des cartes */
+.diplomas-page .timeline { padding-left: 0; }
+.diplomas-page .timeline::before { display: none; }
+.diplomas-page .line-card { border-left: none; }
 
 /* Avatar canvas full-size helper (moved from Avatar3D.vue scoped styles) */
 .avatar-canvas {
