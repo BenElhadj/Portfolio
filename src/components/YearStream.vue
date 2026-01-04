@@ -8,11 +8,22 @@
     <!-- Card stream -->
     <div class="ys-card-stream" ref="cardStream">
       <div class="ys-card-line" ref="cardLine">
-        <div v-for="(it, i) in items" :key="i" class="ys-card-wrapper">
+        <div
+          v-for="(it, i) in items"
+          :key="i"
+          class="ys-card-wrapper"
+          :style="{ left: (80 + i * EVENT_SPACING - CARD_W / 2) + 'px' }"
+        >
           <div class="ys-card ys-card-normal">
             <div class="ys-card-gradient"></div>
             <!-- Label matches Timeline's m.label -->
-            <div class="ys-card-year"><span class="ys-year-text">{{ it.label }}</span></div>
+            <div class="ys-card-year">
+              <span
+                class="ys-year-text"
+                :class="{ 'rtl-text': (locale?.value === 'ar') }"
+                :lang="locale?.value === 'ar' ? 'ar' : null"
+              >{{ it.label }}</span>
+            </div>
           </div>
           <div class="ys-card ys-card-ascii">
             <div class="ys-ascii-content" ref="asciiContents[i]"></div>
@@ -26,24 +37,21 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import gsap from 'gsap';
 import * as THREE from 'three';
 import { timelineEvents } from '../timelineEvents.js';
 
-// i18n (safe fallback if not available)
-const { t } = (() => { try { return useI18n(); } catch { return { t: (k) => k }; } })();
+// i18n (inclure locale pour reactivité sur changement de langue)
+const i18n = (() => { try { return useI18n(); } catch { return { t: (k) => k, locale: { value: 'fr' } }; } })();
+const { t, locale } = i18n;
 
-// RTL detection (align with Timeline)
-const isRTL = ref(false);
-try { isRTL.value = (document.documentElement.getAttribute('dir') === 'rtl'); } catch {}
-window.addEventListener('language-changed', (e) => {
-  const lang = (e?.detail?.lang) || (document.documentElement.getAttribute('lang') || 'fr');
-  isRTL.value = (lang === 'ar') || (document.documentElement.getAttribute('dir') === 'rtl');
-});
+// Garder le même sens LTR pour l'arabe: pas d'inversion
 
 // Items derived from timelineEvents (match Timeline's labels order)
 const items = computed(() => {
-  const list = isRTL.value ? [...timelineEvents].reverse() : timelineEvents;
-  return list.map((ev) => ({
+  // Dépend explicitement de la langue pour re-composer les labels sans changer l'ordre
+  const _lang = locale?.value;
+  return timelineEvents.map((ev) => ({
     label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim(),
   }));
 });
@@ -75,8 +83,7 @@ let containerWidth = 0;
 let cardLineWidth = 0;
 const CARD_W = 160;   // largeur carte
 const CARD_H = 100;   // hauteur carte
-const EVENT_SPACING = 380; // align spacing with Timeline labels
-let CARD_GAP = Math.max(0, EVENT_SPACING - CARD_W);  // espacement pour correspondre à la distance des labels (runtime-adjustable)
+let EVENT_SPACING = 380; // align spacing with Timeline labels (runtime-adjustable)
 const PARTICLE_H = 80; // hauteur canvas étoiles
 const SCANNER_H = 60;  // hauteur canvas scanner / barre lumineuse (réduit de moitié)
 // Particle size (px) for blue points
@@ -97,7 +104,9 @@ function calculateDimensions() {
   if (!container.value || !cardLine.value) return;
   containerWidth = container.value.offsetWidth;
   const count = items.value.length;
-  cardLineWidth = (CARD_W + CARD_GAP) * count;
+  // Largeur totale de la ligne: du premier marqueur (x=80) au dernier + largeur d'une carte
+  cardLineWidth = (80 + Math.max(0, count - 1) * EVENT_SPACING) + CARD_W;
+  try { cardLine.value.style.width = cardLineWidth + 'px'; } catch {}
 }
 
 function setTransform(x) {
@@ -171,11 +180,10 @@ function handleTimelineMotion(e) {
   const evSpacing = detail.eventSpacing ?? null;
   // Update spacing gap to match Timeline if provided
   if (evSpacing !== null && cardLine.value) {
-    const gap = Math.max(0, evSpacing - CARD_W);
-    CARD_GAP = gap;
-    try { cardLine.value.style.setProperty('--ys-gap', gap + 'px'); } catch {}
-    // Recalculate dimensions to reflect new spacing
+    EVENT_SPACING = evSpacing;
+    // Recalculate dimensions and relayout wrappers to reflect new spacing
     calculateDimensions();
+    layoutWrappers();
   }
   // Disable internal animation when external control is active
   externalControl = true; isAnimating = false;
@@ -183,7 +191,13 @@ function handleTimelineMotion(e) {
   if (worldPos !== null) {
     const centerX = window.innerWidth / 2;
     const translateX = centerX - worldPos;
-    position = translateX; setTransform(position);
+    position = translateX;
+    // Harmoniser avec Timeline: même easing/durée pour éviter tout décalage visuel
+    if (cardLine.value) {
+      gsap.to(cardLine.value, { x: translateX, duration: 0.22, ease: 'power1.out', overwrite: true });
+    } else {
+      setTransform(position);
+    }
     updateCardClipping();
   }
   // Keep direction for any manual interactions
@@ -245,6 +259,16 @@ function measureAndLayoutAscii() {
     // Store px dims to compute char grid later
     asciiNode.dataset.pxw = String(pxW);
     asciiNode.dataset.pxh = String(pxH);
+  });
+}
+
+// Positionner explicitement chaque carte pour aligner son centre sur les marqueurs de Timeline
+function layoutWrappers() {
+  if (!cardLine.value) return;
+  const wrappers = cardLine.value.querySelectorAll('.ys-card-wrapper');
+  wrappers.forEach((w, i) => {
+    const leftPx = 80 + i * EVENT_SPACING - CARD_W / 2;
+    w.style.left = leftPx + 'px';
   });
 }
 
@@ -488,6 +512,8 @@ function setupScanner() {
 
 function onResize() {
   calculateDimensions();
+  // Reposition cards according to current spacing
+  layoutWrappers();
   // Re-measure year text and adjust ASCII blocks
   measureAndLayoutAscii();
   // update scanner dims
@@ -510,11 +536,11 @@ onMounted(() => {
   }, 0);
 
   calculateDimensions();
+  // Position initial des cartes
+  layoutWrappers();
   console.log('[YearStream] mounted with items:', items.value.length);
   // Interaction events
   const line = cardLine.value;
-  // Set gap to match Timeline's label spacing (eventSpacing)
-  try { line.style.setProperty('--ys-gap', CARD_GAP + 'px'); } catch {}
   line.addEventListener('mousedown', (e)=>startDrag(e));
   document.addEventListener('mousemove', (e)=>onDrag(e));
   document.addEventListener('mouseup', ()=>endDrag());
@@ -541,6 +567,7 @@ watch(items, () => {
   // Allow DOM to update before measuring
   setTimeout(() => {
     measureAndLayoutAscii();
+    layoutWrappers();
     const nodes = container.value?.querySelectorAll('.ys-ascii-content') ?? [];
     nodes.forEach((node) => {
       const { width, height } = computeCodeDimsForNode(node);
@@ -564,10 +591,9 @@ onBeforeUnmount(() => {
   display: flex; align-items: center; justify-content: center;
 }
 .ys-card-stream { position: absolute; width: 100%; height: 120px; display: flex; align-items: center; overflow: visible; }
-.ys-card-line { display: flex; align-items: center; gap: var(--ys-gap, 24px); white-space: nowrap; cursor: grab; user-select: none; will-change: transform; }
+.ys-card-line { position: relative; height: 100px; white-space: nowrap; cursor: grab; user-select: none; will-change: transform; direction: ltr; }
 .ys-card-line.dragging { cursor: grabbing; }
-
-.ys-card-wrapper { position: relative; width: 160px; height: 100px; flex-shrink: 0; }
+.ys-card-wrapper { position: absolute; width: 160px; height: 100px; }
 .ys-card { position: absolute; top: 0; left: 0; width: 160px; height: 100px; border-radius: 10px; overflow: hidden; }
 
 /* Normal card appearance: gradient + big year text */
@@ -576,6 +602,7 @@ onBeforeUnmount(() => {
 .ys-card-year { position: absolute; inset: 0; display: flex; align-items: center;  font-size: 32px; font-weight: 900; color: var(--text); text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
 /* Ensure measurable inline box */
 .ys-year-text { display: inline-block; }
+.ys-year-text.rtl-text { direction: rtl; unicode-bidi: plaintext; text-align: right; }
 
 /* ASCII overlay */
 .ys-card-ascii { background: transparent; z-index: 1; position: absolute; top: 0; left: 0; width: 160px; height: 100px; border-radius: 10px; overflow: hidden; }

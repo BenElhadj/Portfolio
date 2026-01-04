@@ -53,6 +53,7 @@ export const timelineEvents = [
   // =========================
 
   { year: 2014, Month: "Septembre", action: "Début", type: "Nouveau départ", info: "Immigration en France" },
+  { year: 2014, Month: "Septembre", action: "Fin", type: "Nouveau départ", info: "Immigration en France" },
 
   // =========================
   // MAINTENANCE & IT – FRANCE

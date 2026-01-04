@@ -43,8 +43,7 @@ import YearStream from "./YearStream.vue";
 
 const viewport = ref(null);
 const track = ref(null);
-// Direction de langue (RTL/LTR)
-const isRTL = ref(false);
+// Garder le même sens pour toutes les langues (pas d'inversion RTL)
 
 let trackWidth = 0;
 const maxSpeed = 1200;
@@ -88,8 +87,8 @@ function sanitizeKey(str = "") {
 }
 
 const eventMarkers = computed(() => {
-  const list = isRTL.value ? [...timelineEvents].reverse() : timelineEvents;
-  return list.map((ev, i) => ({
+  // Toujours LTR: ne pas inverser l'ordre pour l'arabe
+  return timelineEvents.map((ev, i) => ({
     x: 80 + i * eventSpacing,
     label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim(),
     category: getCategory(ev.type)
@@ -251,7 +250,8 @@ function update(now) {
 
   // détection de franchissement d'index (visible → chronologique selon RTL/LTR)
   const curVis = indexFromWorldPos(state.worldPos);
-  const curChron = isRTL.value ? (timelineEvents.length - 1 - curVis) : curVis;
+  // Conserver l'ordre LTR pour toutes les langues
+  const curChron = curVis;
   if (curChron > prevChronIndex.value) {
     for (let i = prevChronIndex.value + 1; i <= curChron; i++) applyForward(timelineEvents[i]);
     prevChronIndex.value = curChron;
@@ -267,17 +267,11 @@ function update(now) {
 onMounted(() => {
   window.addEventListener("resize", handleResize);
   window.addEventListener("mousemove", handleMouseMove);
-  // initialiser RTL depuis <html dir="...">
-  try { isRTL.value = (document.documentElement.getAttribute("dir") === "rtl"); } catch {}
-  // mettre à jour quand la langue change (Navbar émet 'language-changed')
-  window.addEventListener("language-changed", (e) => {
-    const lang = (e?.detail?.lang) || (document.documentElement.getAttribute("lang") || "fr");
-    isRTL.value = (lang === "ar") || (document.documentElement.getAttribute("dir") === "rtl");
-  });
   handleResize();
   lastTime = performance.now();
   prevVisIndex.value = indexFromWorldPos(state.worldPos);
-  prevChronIndex.value = isRTL.value ? (timelineEvents.length - 1 - prevVisIndex.value) : prevVisIndex.value;
+  // Conserver l'ordre LTR pour toutes les langues
+  prevChronIndex.value = prevVisIndex.value;
   rafId = requestAnimationFrame(update);
   // Listen to YearStream control events
   window.addEventListener('yearstream-motion', handleYearStreamMotion);
