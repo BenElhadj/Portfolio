@@ -118,6 +118,6 @@ export const timelineEvents = [
   // IA / MACHINE LEARNING
   // =========================
   { year: 2024, Month: "Avril", action: "Début", type: "Développeur IA / Machine Learning", info: "Freelance" },
-  { year: 2025, Month: "Présent", action: "En cours", type: "Développeur IA / Machine Learning", info: "Freelance" },
+  { year: 2026, Month: "Présent", action: "En cours", type: "Développeur IA / Machine Learning", info: "Freelance" },
 
 ];

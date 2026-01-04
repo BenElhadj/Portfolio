@@ -12,12 +12,12 @@
         :style="{ left: m.x + 'px' }"
       >
         <div class="dot"></div>
-        <!-- Labels replaced by YearStream; label hidden -->
+        <!-- Label removed: YearStream now provides aligned labels -->
       </div>
     </div>
 
     <!-- Flux d'années avec scanner + étoiles -->
-  <YearStream @seek="onSeekFromYearStream" @setFacing="onSetFacingFromYearStream" />
+    <YearStream />
 
     <!-- Overlay d'infos actives: du Début à la Fin -->
     <div class="timeline-overlay" aria-hidden="true">
@@ -96,13 +96,6 @@ const eventMarkers = computed(() => {
   }));
 });
 
-// Map first occurrence index for each year
-const yearToIndexMap = computed(() => {
-  const map = new Map();
-  timelineEvents.forEach((ev, i) => { if (!map.has(ev.year)) map.set(ev.year, i); });
-  return map;
-});
-
 // Overlay d'infos actives
 const activeInfoMap = ref(new Map());
 const activeInfoList = computed(() => Array.from(activeInfoMap.value.values()));
@@ -177,25 +170,6 @@ function handleMouseMove(e) {
   }
 }
 
-// YearStream → Timeline navigation
-function onSeekFromYearStream(year) {
-  const idx = yearToIndexMap.value.get(year);
-  if (typeof idx === 'number') {
-    const pos = 80 + idx * eventSpacing;
-    state.worldPos = clamp(pos, 0, worldMax);
-  }
-}
-function onSetFacingFromYearStream(dir) {
-  if (dir !== 1 && dir !== -1) return;
-  if (canMoveDir(dir)) {
-    state.facing = dir > 0 ? 1 : -1;
-    // Boost speed for rapid navigation during drag
-    targetWalkSpeed.value = 1;
-  } else {
-    targetWalkSpeed.value = 0;
-  }
-}
-
 function handleResize() {
   const totalWidth = 80 + Math.max(0, timelineEvents.length - 1) * eventSpacing; // x du dernier événement
   // largeur de piste suffisante: contenu + un écran pour le centrage aux bornes
@@ -206,6 +180,26 @@ function handleResize() {
 
 let rafId;
 let lastTime = performance.now();
+
+// Handle motion emitted from YearStream (drag/wheel control)
+function handleYearStreamMotion(e) {
+  const detail = e?.detail || {};
+  const deltaWorld = detail.deltaWorld ?? 0;
+  const facing = detail.facing ?? state.facing;
+  const speedBoost = detail.speedBoost ?? 0;
+  // Apply world position change directly, clamped to bounds
+  state.worldPos = clamp(state.worldPos + deltaWorld, 0, worldMax);
+  state.facing = facing;
+  // Animate track immediately to reflect new position
+  const centerX = window.innerWidth / 2;
+  const trackTranslateX = centerX - state.worldPos;
+  if (track.value) {
+    gsap.to(track.value, { x: trackTranslateX, duration: 0.12, ease: "power1.out", overwrite: true });
+  }
+  // Briefly boost avatar leg animation without inducing extra drift
+  avatarWalkSpeed.value = Math.min(1, speedBoost);
+  targetWalkSpeed.value = 0; // avoid double movement accumulation
+}
 
 function update(now) {
   const dt = (now - lastTime) / 1000;
@@ -241,6 +235,18 @@ function update(now) {
     gsap.to(track.value, { x: trackTranslateX, duration: 0.22, ease: "power1.out", overwrite: true });
   }
 
+  // Broadcast motion state so YearStream can mirror the avatar's direction and speed
+  try {
+    window.dispatchEvent(new CustomEvent('timeline-motion', {
+      detail: {
+        worldPos: state.worldPos,
+        facing: state.facing,
+        speed: avatarWalkSpeed.value,
+        eventSpacing
+      }
+    }));
+  } catch {}
+
   // avatarWalkSpeed déjà lissé plus haut; rien à recalculer ici
 
   // détection de franchissement d'index (visible → chronologique selon RTL/LTR)
@@ -273,11 +279,14 @@ onMounted(() => {
   prevVisIndex.value = indexFromWorldPos(state.worldPos);
   prevChronIndex.value = isRTL.value ? (timelineEvents.length - 1 - prevVisIndex.value) : prevVisIndex.value;
   rafId = requestAnimationFrame(update);
+  // Listen to YearStream control events
+  window.addEventListener('yearstream-motion', handleYearStreamMotion);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
   window.removeEventListener("mousemove", handleMouseMove);
+  window.removeEventListener('yearstream-motion', handleYearStreamMotion);
   cancelAnimationFrame(rafId);
 });
 </script>

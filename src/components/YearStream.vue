@@ -8,11 +8,11 @@
     <!-- Card stream -->
     <div class="ys-card-stream" ref="cardStream">
       <div class="ys-card-line" ref="cardLine">
-        <div v-for="(y, i) in years" :key="i" class="ys-card-wrapper" :data-index="i" :data-year="y">
+        <div v-for="(it, i) in items" :key="i" class="ys-card-wrapper">
           <div class="ys-card ys-card-normal">
             <div class="ys-card-gradient"></div>
-            <!-- Wrap year text in span for measurement -->
-            <div class="ys-card-year"><span class="ys-year-text">{{ labelsByYear.get(y) || y }}</span></div>
+            <!-- Label matches Timeline's m.label -->
+            <div class="ys-card-year"><span class="ys-year-text">{{ it.label }}</span></div>
           </div>
           <div class="ys-card ys-card-ascii">
             <div class="ys-ascii-content" ref="asciiContents[i]"></div>
@@ -24,28 +24,28 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, computed } from 'vue';
+import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as THREE from 'three';
 import { timelineEvents } from '../timelineEvents.js';
 
-// Years derived from timelineEvents (unique, sorted)
-const years = computed(() => {
-  const set = new Set(timelineEvents.map(ev => ev.year));
-  return Array.from(set).sort((a,b) => a - b);
-});
-
 // i18n (safe fallback if not available)
 const { t } = (() => { try { return useI18n(); } catch { return { t: (k) => k }; } })();
 
-// Map a representative label to each year (first occurrence)
-const labelsByYear = computed(() => {
-  const map = new Map();
-  for (const ev of timelineEvents) {
-    const lbl = `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim();
-    if (!map.has(ev.year)) map.set(ev.year, lbl);
-  }
-  return map;
+// RTL detection (align with Timeline)
+const isRTL = ref(false);
+try { isRTL.value = (document.documentElement.getAttribute('dir') === 'rtl'); } catch {}
+window.addEventListener('language-changed', (e) => {
+  const lang = (e?.detail?.lang) || (document.documentElement.getAttribute('lang') || 'fr');
+  isRTL.value = (lang === 'ar') || (document.documentElement.getAttribute('dir') === 'rtl');
+});
+
+// Items derived from timelineEvents (match Timeline's labels order)
+const items = computed(() => {
+  const list = isRTL.value ? [...timelineEvents].reverse() : timelineEvents;
+  return list.map((ev) => ({
+    label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim(),
+  }));
 });
 
 // Refs
@@ -55,8 +55,6 @@ const scannerCanvas = ref(null);
 const cardStream = ref(null);
 const cardLine = ref(null);
 const asciiContents = ref([]);
-// Emits for timeline navigation integration
-const emit = defineEmits(['seek', 'setFacing']);
 
 // Motion state
 let position = 0; // translateX
@@ -69,8 +67,8 @@ let mouseVelocity = 0;
 const friction = 0.95;
 const minVelocity = 30;
 let lastTime = 0;
-// Track currently centered card to avoid spamming emits
-let prevCenterIndex = -1;
+// External motion control (from Timeline)
+let externalControl = true;
 
 // Dimensions (réduites)
 let containerWidth = 0;
@@ -78,13 +76,17 @@ let cardLineWidth = 0;
 const CARD_W = 160;   // largeur carte
 const CARD_H = 100;   // hauteur carte
 const EVENT_SPACING = 380; // align spacing with Timeline labels
-const CARD_GAP = Math.max(0, EVENT_SPACING - CARD_W);  // espacement pour correspondre à la distance des labels
+let CARD_GAP = Math.max(0, EVENT_SPACING - CARD_W);  // espacement pour correspondre à la distance des labels (runtime-adjustable)
 const PARTICLE_H = 80; // hauteur canvas étoiles
 const SCANNER_H = 60;  // hauteur canvas scanner / barre lumineuse (réduit de moitié)
+// Particle size (px) for blue points
+const PARTICLE_SIZE = 8;
 // ASCII sizing constants (very small glyphs)
 const ASCII_FONT_SIZE = 6;
 const ASCII_LINE_HEIGHT = 8; // smaller line height for compact 3-line block
 const ASCII_CHAR_WIDTH_RATIO = 0.55; // monospace approx
+// Drag speed multiplier to advance timeline faster
+const DRAG_SPEED_MULT = 1.8;
 
 // Particles (Three.js)
 let three = { scene: null, camera: null, renderer: null, points: null, velocities: null, alphas: null, count: 400 };
@@ -94,7 +96,7 @@ let scan = { w: 0, h: 300, ctx: null, lightBarX: 0, lightBarWidth: 1, fadeZone: 
 function calculateDimensions() {
   if (!container.value || !cardLine.value) return;
   containerWidth = container.value.offsetWidth;
-  const count = years.value.length;
+  const count = items.value.length;
   cardLineWidth = (CARD_W + CARD_GAP) * count;
 }
 
@@ -135,8 +137,8 @@ function onDrag(e) {
   if (!isDragging) return; e.preventDefault();
   const dx = e.clientX - lastMouseX; lastMouseX = e.clientX;
   position += dx; updateSpeedFromMouse(dx); setTransform(position); updateCardClipping();
-  // Emit facing based on drag direction
-  if (dx !== 0) emit('setFacing', dx > 0 ? 1 : -1);
+  // Emit motion to advance Timeline based on drag delta
+  emitTimelineControl(dx);
 }
 function endDrag() {
   if (!isDragging) return; isDragging = false; cardLine.value.classList.remove('dragging');
@@ -146,17 +148,59 @@ function endDrag() {
 function onWheel(e) {
   e.preventDefault(); const scrollSpeed = 20; const delta = e.deltaY > 0 ? scrollSpeed : -scrollSpeed;
   position += delta; updateCardPosition(); updateCardClipping();
-  emit('setFacing', delta > 0 ? 1 : -1);
+  // Emit motion to advance Timeline based on wheel
+  emitTimelineControl(delta);
 }
 
 function animateCards() {
   const now = performance.now(); const dt = (now - lastTime) / 1000; lastTime = now;
-  if (isAnimating && !isDragging) {
+  if (!externalControl && isAnimating && !isDragging) {
     velocity = velocity > minVelocity ? velocity * friction : Math.max(minVelocity, velocity);
     position += velocity * direction * dt;
     updateCardPosition();
   }
   requestAnimationFrame(animateCards);
+}
+
+// Follow Timeline motion (avatar direction/speed)
+function handleTimelineMotion(e) {
+  const detail = e?.detail || {};
+  const worldPos = detail.worldPos ?? null;
+  const facing = detail.facing ?? 0;
+  const speed = detail.speed ?? 0;
+  const evSpacing = detail.eventSpacing ?? null;
+  // Update spacing gap to match Timeline if provided
+  if (evSpacing !== null && cardLine.value) {
+    const gap = Math.max(0, evSpacing - CARD_W);
+    CARD_GAP = gap;
+    try { cardLine.value.style.setProperty('--ys-gap', gap + 'px'); } catch {}
+    // Recalculate dimensions to reflect new spacing
+    calculateDimensions();
+  }
+  // Disable internal animation when external control is active
+  externalControl = true; isAnimating = false;
+  // Translate the card line so the current worldPos is centered, mirroring Timeline
+  if (worldPos !== null) {
+    const centerX = window.innerWidth / 2;
+    const translateX = centerX - worldPos;
+    position = translateX; setTransform(position);
+    updateCardClipping();
+  }
+  // Keep direction for any manual interactions
+  direction = facing >= 0 ? 1 : -1;
+}
+
+// Emit control event so Timeline advances according to user drag/wheel
+function emitTimelineControl(deltaPx) {
+  const deltaWorld = -deltaPx * DRAG_SPEED_MULT; // map drag px to world movement
+  const facing = deltaWorld > 0 ? 1 : (deltaWorld < 0 ? -1 : 0);
+  // speedBoost based on mouseVelocity magnitude
+  const speedBoost = Math.min(1.5, Math.abs(mouseVelocity) / 600);
+  try {
+    window.dispatchEvent(new CustomEvent('yearstream-motion', {
+      detail: { deltaWorld, facing, speedBoost }
+    }));
+  } catch {}
 }
 
 function generateCode(width, height) {
@@ -240,13 +284,6 @@ function updateCardClipping() {
       const clipPercent = Math.max(0, Math.min(100, (centerOffsetPx / cw) * 100));
       normal.style.setProperty('--clip-right', `${clipPercent}%`);   // normal visible to the right of center
       ascii.style.setProperty('--clip-left', `${clipPercent}%`);     // ascii visible to the left of center
-      // Emit seek when center card changes
-      const idx = Number(w.dataset.index ?? -1);
-      if (!Number.isNaN(idx) && idx !== prevCenterIndex) {
-        prevCenterIndex = idx;
-        const year = Number(w.dataset.year);
-        if (!Number.isNaN(year)) emit('seek', year);
-      }
       if (!w.hasAttribute('data-scanned')) {
         w.setAttribute('data-scanned', 'true');
         const eff = document.createElement('div'); eff.className = 'ys-scan-effect'; w.appendChild(eff);
@@ -290,9 +327,13 @@ function initParticles() {
   const velocities = new Float32Array(three.count);
 
   const c = document.createElement('canvas'); c.width = 100; c.height = 100; const ctx = c.getContext('2d');
-  const half = c.width/2; const hue = 217;
+  const half = c.width/2;
+  // Blue glow without dark ring: white core fading to transparent blue
   const grad = ctx.createRadialGradient(half,half,0,half,half,half);
-  grad.addColorStop(0.025,'#fff'); grad.addColorStop(0.1,`hsl(${hue},61%,33%)`); grad.addColorStop(0.25,`hsl(${hue},64%,6%)`); grad.addColorStop(1,'transparent');
+  grad.addColorStop(0.0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.25, 'rgba(96,165,250,0.85)');
+  grad.addColorStop(0.6, 'rgba(96,165,250,0.35)');
+  grad.addColorStop(1.0, 'rgba(96,165,250,0)');
   ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(half,half,half,0,Math.PI*2); ctx.fill();
   const texture = new THREE.CanvasTexture(c);
 
@@ -311,7 +352,7 @@ function initParticles() {
   three.velocities = velocities; three.alphas = alphas;
 
   const material = new THREE.ShaderMaterial({
-    uniforms: { pointTexture: { value: texture }, size: { value: 15.0 } },
+    uniforms: { pointTexture: { value: texture }, size: { value: PARTICLE_SIZE } },
     vertexShader: `attribute float alpha; varying float vAlpha; varying vec3 vColor; uniform float size; void main(){ vAlpha=alpha; vColor=color; vec4 mvPosition=modelViewMatrix*vec4(position,1.0); gl_PointSize=size; gl_Position=projectionMatrix*mvPosition; }`,
     fragmentShader: `uniform sampler2D pointTexture; varying float vAlpha; varying vec3 vColor; void main(){ gl_FragColor=vec4(vColor, vAlpha)*texture2D(pointTexture, gl_PointCoord); }`,
     transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, vertexColors: true,
@@ -457,7 +498,7 @@ function onResize() {
 
 onMounted(() => {
   // Prepare ASCII contents
-  asciiContents.value = years.value.map(() => null);
+  asciiContents.value = items.value.map(() => null);
   // Populate initial ASCII code
   setTimeout(()=>{
     measureAndLayoutAscii();
@@ -469,7 +510,7 @@ onMounted(() => {
   }, 0);
 
   calculateDimensions();
-  console.log('[YearStream] mounted with years:', years.value);
+  console.log('[YearStream] mounted with items:', items.value.length);
   // Interaction events
   const line = cardLine.value;
   // Set gap to match Timeline's label spacing (eventSpacing)
@@ -484,6 +525,8 @@ onMounted(() => {
   line.addEventListener('selectstart', (e)=>e.preventDefault());
   line.addEventListener('dragstart', (e)=>e.preventDefault());
   window.addEventListener('resize', onResize);
+  // Listen for Timeline motion events
+  window.addEventListener('timeline-motion', handleTimelineMotion);
 
   // Systems
   initParticles();
@@ -492,8 +535,23 @@ onMounted(() => {
   periodicUpdates();
 });
 
+// Re-measure and reinitialize when items change (e.g., RTL or language changes)
+watch(items, () => {
+  asciiContents.value = items.value.map(() => null);
+  // Allow DOM to update before measuring
+  setTimeout(() => {
+    measureAndLayoutAscii();
+    const nodes = container.value?.querySelectorAll('.ys-ascii-content') ?? [];
+    nodes.forEach((node) => {
+      const { width, height } = computeCodeDimsForNode(node);
+      node.textContent = generateCode(width, height);
+    });
+  }, 0);
+});
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize);
+  window.removeEventListener('timeline-motion', handleTimelineMotion);
 });
 </script>
 
@@ -501,7 +559,7 @@ onBeforeUnmount(() => {
 .yearstream {
   /* Positionner en bas de la viewport timeline */
   position: absolute;
-  left: 0; right: 0; bottom: 0;
+  left: 0; right: 0; bottom: var(--ys-bottom-offset, -20px);
   width: 100%; height: 140px;
   display: flex; align-items: center; justify-content: center;
 }
@@ -515,13 +573,13 @@ onBeforeUnmount(() => {
 /* Normal card appearance: gradient + big year text */
 .ys-card-normal { background: transparent; box-shadow: 0 10px 28px rgba(0,0,0,0.38); z-index: 2; position: relative; overflow: hidden; }
 .ys-card-gradient { position: absolute; inset: 0; display: none; }
-.ys-card-year { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: var(--text); text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+.ys-card-year { position: absolute; inset: 0; display: flex; align-items: center;  font-size: 32px; font-weight: 900; color: var(--text); text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
 /* Ensure measurable inline box */
 .ys-year-text { display: inline-block; }
 
 /* ASCII overlay */
 .ys-card-ascii { background: transparent; z-index: 1; position: absolute; top: 0; left: 0; width: 160px; height: 100px; border-radius: 10px; overflow: hidden; }
-.ys-ascii-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: color-mix(in hsl, var(--text), transparent 40%); font-family: 'Courier New', monospace; overflow: hidden; white-space: pre; clip-path: inset(0 calc(100% - var(--clip-left, 0%)) 0 0); animation: ys-glitch 0.1s infinite linear alternate-reverse; margin: 0; padding: 0; text-align: left; vertical-align: top; box-sizing: border-box; -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.2) 100%); mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.2) 100%); }
+.ys-ascii-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: color-mix(in hsl, var(--text), transparent 40%); font-family: 'Courier New', monospace; overflow: hidden; white-space: pre; animation: ys-glitch 0.1s infinite linear alternate-reverse; margin: 0; padding: 0; text-align: left; vertical-align: top; box-sizing: border-box; }
 @keyframes ys-glitch { 0%{opacity:1;} 15%{opacity:0.9;} 16%{opacity:1;} 49%{opacity:0.8;} 50%{opacity:1;} 99%{opacity:0.9;} 100%{opacity:1;} }
 
 /* Clip properties driven by JS */
