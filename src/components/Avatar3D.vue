@@ -234,8 +234,10 @@ onMounted(() => {
     1000
   );
   // Ajuster la caméra pour que l'avatar agrandi tienne entièrement dans le cadre
-  // Reculer davantage (z plus grand) et relever légèrement la caméra pour inclure les pieds
-  camera.position.set(0, 1.6, 13.0);
+  // Inclure les pieds/chaussures: reculer légèrement et relever un peu la caméra,
+  // avec un léger lookAt vers le bas pour garder le haut du corps centré.
+  camera.position.set(0, 1.85, 14.5);
+  camera.lookAt(new THREE.Vector3(0, 1.1, 0));
 
   renderer = new THREE.WebGLRenderer({
     canvas: canvas.value,

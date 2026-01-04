@@ -398,6 +398,50 @@ html.has-scrolled .sub-section:focus-within::after {
   z-index: 5000;
 }
 
+/* =========================
+   YEARSTREAM (flux d'années + scanner + étoiles)
+   Styles centralisés depuis YearStream.vue
+========================= */
+.yearstream {
+  /* Positionner en bas de la viewport timeline */
+  position: absolute;
+  left: 0; right: 0; bottom: var(--ys-bottom-offset, -20px);
+  width: 100%; height: 140px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ys-card-stream { position: absolute; width: 100%; height: 120px; display: flex; align-items: center; overflow: visible; }
+.ys-card-line { position: relative; height: 100px; white-space: nowrap; cursor: grab; user-select: none; will-change: transform; direction: ltr; }
+.ys-card-line.dragging { cursor: grabbing; }
+
+.ys-card-wrapper { position: absolute; width: 160px; height: 100px; }
+.ys-card { position: absolute; top: 0; left: 0; width: 160px; height: 100px; border-radius: 10px; overflow: hidden; }
+
+/* Normal card appearance: gradient + big year text */
+.ys-card-normal { background: transparent; box-shadow: 0 10px 28px rgba(0,0,0,0.38); z-index: 2; position: relative; overflow: hidden; }
+.ys-card-gradient { position: absolute; inset: 0; display: none; }
+.ys-card-year { position: absolute; inset: 0; display: flex; align-items: center;  font-size: 32px; font-weight: 900; color: var(--text); text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+/* Ensure measurable inline box */
+.ys-year-text { display: inline-block; }
+.ys-year-text.rtl-text { direction: rtl; unicode-bidi: plaintext; text-align: right; }
+
+/* ASCII overlay */
+.ys-card-ascii { background: transparent; z-index: 1; position: absolute; top: 0; left: 0; width: 160px; height: 100px; border-radius: 10px; overflow: hidden; }
+.ys-ascii-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: color-mix(in hsl, var(--text), transparent 40%); font-family: 'Courier New', monospace; overflow: hidden; white-space: pre; animation: ys-glitch 0.1s infinite linear alternate-reverse; margin: 0; padding: 0; text-align: left; vertical-align: top; box-sizing: border-box; }
+@keyframes ys-glitch { 0%{opacity:1;} 15%{opacity:0.9;} 16%{opacity:1;} 49%{opacity:0.8;} 50%{opacity:1;} 99%{opacity:0.9;} 100%{opacity:1;} }
+
+/* Clip properties driven by JS */
+.ys-card-normal { clip-path: inset(0 0 0 var(--clip-right, 0%)); }
+.ys-card-ascii { clip-path: inset(0 calc(100% - var(--clip-left, 0%)) 0 0); }
+
+/* Scan effect sweep */
+.ys-scan-effect { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(0,255,255,0.4), transparent); animation: ys-scan 0.6s ease-out; pointer-events: none; z-index: 5; }
+@keyframes ys-scan { 0%{ transform: translateX(-100%); opacity: 0; } 50%{ opacity: 1; } 100%{ transform: translateX(100%); opacity: 0; } }
+
+/* Canvases layering */
+.ys-particles { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 100%; height: 80px; z-index: 0; pointer-events: none; }
+.ys-scanner { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 100%; height: 60px; z-index: 15; pointer-events: none; }
+/* center line overlay removed; original scanner visuals restored */
+
 .popup-content {
   background: var(--card-bg);
   border-radius: var(--radius);

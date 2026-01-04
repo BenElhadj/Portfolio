@@ -2,8 +2,8 @@
   <div class="yearstream" ref="container">
     <!-- Particles (stars) -->
     <canvas ref="particleCanvas" class="ys-particles"></canvas>
-    <!-- Light scanner canvas -->
-    <canvas ref="scannerCanvas" class="ys-scanner"></canvas>
+  <!-- Light scanner canvas -->
+  <canvas ref="scannerCanvas" class="ys-scanner"></canvas>
 
     <!-- Card stream -->
     <div class="ys-card-stream" ref="cardStream">
@@ -40,16 +40,17 @@ import { useI18n } from 'vue-i18n';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import { timelineEvents } from '../timelineEvents.js';
+// Toggle to disable the light scanner entirely (active by default)
+const SHOW_SCANNER = true;
+// Toggle to disable the sweeping overlay across cards (flashlight-like)
+const SHOW_SWEEP = false;
 
 // i18n (inclure locale pour reactivité sur changement de langue)
 const i18n = (() => { try { return useI18n(); } catch { return { t: (k) => k, locale: { value: 'fr' } }; } })();
 const { t, locale } = i18n;
 
-// Garder le même sens LTR pour l'arabe: pas d'inversion
-
 // Items derived from timelineEvents (match Timeline's labels order)
 const items = computed(() => {
-  // Dépend explicitement de la langue pour re-composer les labels sans changer l'ordre
   const _lang = locale?.value;
   return timelineEvents.map((ev) => ({
     label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim(),
@@ -178,10 +179,9 @@ function handleTimelineMotion(e) {
   const facing = detail.facing ?? 0;
   const speed = detail.speed ?? 0;
   const evSpacing = detail.eventSpacing ?? null;
-  // Update spacing gap to match Timeline if provided
+  // Update spacing from Timeline if provided
   if (evSpacing !== null && cardLine.value) {
     EVENT_SPACING = evSpacing;
-    // Recalculate dimensions and relayout wrappers to reflect new spacing
     calculateDimensions();
     layoutWrappers();
   }
@@ -242,33 +242,23 @@ function measureAndLayoutAscii() {
     // Measure text box
     const rect = yearSpan.getBoundingClientRect();
     // Clamp and position ASCII block
-  const measuredW = Math.min(rect.width, CARD_W); // match label width, clamp to card
-  const pxW = Math.max(8, Math.floor(measuredW));
-  // Fixed height for exactly three small lines
-  const pxH = ASCII_LINE_HEIGHT * 3;
-  const top = Math.floor((CARD_H - pxH) / 2);
-  // Anchor ASCII so its right edge sits at card center: skeleton extends to the left
-  const left = Math.floor((CARD_W / 2) - pxW);
-  asciiNode.style.width = pxW + 'px';
-  asciiNode.style.height = pxH + 'px';
-  asciiNode.style.top = top + 'px';
-  asciiNode.style.left = left + 'px';
+    const measuredW = Math.min(rect.width, CARD_W); // match label width, clamp to card
+    const pxW = Math.max(8, Math.floor(measuredW));
+    // Fixed height for exactly three small lines
+    const pxH = ASCII_LINE_HEIGHT * 3;
+    const top = Math.floor((CARD_H - pxH) / 2);
+    // Anchor ASCII so its right edge sits at card center: skeleton extends to the left
+    const left = Math.floor((CARD_W / 2) - pxW);
+    asciiNode.style.width = pxW + 'px';
+    asciiNode.style.height = pxH + 'px';
+    asciiNode.style.top = top + 'px';
+    asciiNode.style.left = left + 'px';
     // Set tiny font metrics for ASCII content
     asciiNode.style.fontSize = ASCII_FONT_SIZE + 'px';
     asciiNode.style.lineHeight = ASCII_LINE_HEIGHT + 'px';
     // Store px dims to compute char grid later
     asciiNode.dataset.pxw = String(pxW);
     asciiNode.dataset.pxh = String(pxH);
-  });
-}
-
-// Positionner explicitement chaque carte pour aligner son centre sur les marqueurs de Timeline
-function layoutWrappers() {
-  if (!cardLine.value) return;
-  const wrappers = cardLine.value.querySelectorAll('.ys-card-wrapper');
-  wrappers.forEach((w, i) => {
-    const leftPx = 80 + i * EVENT_SPACING - CARD_W / 2;
-    w.style.left = leftPx + 'px';
   });
 }
 
@@ -308,7 +298,8 @@ function updateCardClipping() {
       const clipPercent = Math.max(0, Math.min(100, (centerOffsetPx / cw) * 100));
       normal.style.setProperty('--clip-right', `${clipPercent}%`);   // normal visible to the right of center
       ascii.style.setProperty('--clip-left', `${clipPercent}%`);     // ascii visible to the left of center
-      if (!w.hasAttribute('data-scanned')) {
+      // Optional sweep effect across card when crossing center (disabled)
+      if (SHOW_SWEEP && !w.hasAttribute('data-scanned')) {
         w.setAttribute('data-scanned', 'true');
         const eff = document.createElement('div'); eff.className = 'ys-scan-effect'; w.appendChild(eff);
         setTimeout(()=>{ if(eff.parentNode) eff.parentNode.removeChild(eff); }, 600);
@@ -327,6 +318,7 @@ function updateCardClipping() {
       w.removeAttribute('data-scanned');
     }
   });
+  // Activate scanner visuals when crossing center
   scan.scanningActive = anyActive;
 }
 
@@ -363,7 +355,7 @@ function initParticles() {
 
   for (let i=0;i<three.count;i++) {
     positions[i*3] = (Math.random()-0.5)*window.innerWidth*2;
-  positions[i*3+1] = (Math.random()-0.5)*PARTICLE_H;
+    positions[i*3+1] = (Math.random()-0.5)*PARTICLE_H;
     positions[i*3+2] = 0;
     colors[i*3] = 1; colors[i*3+1] = 1; colors[i*3+2] = 1;
     const orbit = Math.random()*200+100; sizes[i] = (Math.random()*(orbit-60)+60)/8;
@@ -391,7 +383,7 @@ function initParticles() {
       const time = Date.now()*0.001;
       for(let i=0;i<three.count;i++) {
         positions[i*3] += three.velocities[i]*0.016;
-  if (positions[i*3] > window.innerWidth/2 + 100) { positions[i*3] = -window.innerWidth/2 - 100; positions[i*3+1] = (Math.random()-0.5)*PARTICLE_H; }
+        if (positions[i*3] > window.innerWidth/2 + 100) { positions[i*3] = -window.innerWidth/2 - 100; positions[i*3+1] = (Math.random()-0.5)*PARTICLE_H; }
         positions[i*3+1] += Math.sin(time + i*0.1)*0.5;
         const tw = Math.floor(Math.random()*10);
         if (tw===1 && alphas[i]>0) alphas[i]-=0.05; else if (tw===2 && alphas[i]<1) alphas[i]+=0.05;
@@ -517,9 +509,19 @@ function onResize() {
   // Re-measure year text and adjust ASCII blocks
   measureAndLayoutAscii();
   // update scanner dims
-  if (container.value) { scan.w = container.value.offsetWidth; scan.lightBarX = scan.w/2; const canvas = scannerCanvas.value; canvas.width = scan.w; canvas.height = SCANNER_H; canvas.style.width = scan.w+'px'; canvas.style.height = SCANNER_H+'px'; }
+  if (container.value) { scan.w = container.value.offsetWidth; scan.lightBarX = scan.w/2; const canvas = scannerCanvas.value; if (canvas) { canvas.width = scan.w; canvas.height = SCANNER_H; canvas.style.width = scan.w+'px'; canvas.style.height = SCANNER_H+'px'; } }
   // update particles renderer
   if (three.renderer) { three.camera.left = -window.innerWidth/2; three.camera.right = window.innerWidth/2; three.camera.updateProjectionMatrix(); three.renderer.setSize(window.innerWidth, PARTICLE_H); }
+}
+
+// Positionner explicitement chaque carte pour aligner son centre sur les marqueurs de Timeline
+function layoutWrappers() {
+  if (!cardLine.value) return;
+  const wrappers = cardLine.value.querySelectorAll('.ys-card-wrapper');
+  wrappers.forEach((w, i) => {
+    const leftPx = 80 + i * EVENT_SPACING - CARD_W / 2;
+    w.style.left = leftPx + 'px';
+  });
 }
 
 onMounted(() => {
@@ -538,7 +540,6 @@ onMounted(() => {
   calculateDimensions();
   // Position initial des cartes
   layoutWrappers();
-  console.log('[YearStream] mounted with items:', items.value.length);
   // Interaction events
   const line = cardLine.value;
   line.addEventListener('mousedown', (e)=>startDrag(e));
@@ -583,41 +584,5 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.yearstream {
-  /* Positionner en bas de la viewport timeline */
-  position: absolute;
-  left: 0; right: 0; bottom: var(--ys-bottom-offset, -20px);
-  width: 100%; height: 140px;
-  display: flex; align-items: center; justify-content: center;
-}
-.ys-card-stream { position: absolute; width: 100%; height: 120px; display: flex; align-items: center; overflow: visible; }
-.ys-card-line { position: relative; height: 100px; white-space: nowrap; cursor: grab; user-select: none; will-change: transform; direction: ltr; }
-.ys-card-line.dragging { cursor: grabbing; }
-.ys-card-wrapper { position: absolute; width: 160px; height: 100px; }
-.ys-card { position: absolute; top: 0; left: 0; width: 160px; height: 100px; border-radius: 10px; overflow: hidden; }
-
-/* Normal card appearance: gradient + big year text */
-.ys-card-normal { background: transparent; box-shadow: 0 10px 28px rgba(0,0,0,0.38); z-index: 2; position: relative; overflow: hidden; }
-.ys-card-gradient { position: absolute; inset: 0; display: none; }
-.ys-card-year { position: absolute; inset: 0; display: flex; align-items: center;  font-size: 32px; font-weight: 900; color: var(--text); text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-/* Ensure measurable inline box */
-.ys-year-text { display: inline-block; }
-.ys-year-text.rtl-text { direction: rtl; unicode-bidi: plaintext; text-align: right; }
-
-/* ASCII overlay */
-.ys-card-ascii { background: transparent; z-index: 1; position: absolute; top: 0; left: 0; width: 160px; height: 100px; border-radius: 10px; overflow: hidden; }
-.ys-ascii-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: color-mix(in hsl, var(--text), transparent 40%); font-family: 'Courier New', monospace; overflow: hidden; white-space: pre; animation: ys-glitch 0.1s infinite linear alternate-reverse; margin: 0; padding: 0; text-align: left; vertical-align: top; box-sizing: border-box; }
-@keyframes ys-glitch { 0%{opacity:1;} 15%{opacity:0.9;} 16%{opacity:1;} 49%{opacity:0.8;} 50%{opacity:1;} 99%{opacity:0.9;} 100%{opacity:1;} }
-
-/* Clip properties driven by JS */
-.ys-card-normal { clip-path: inset(0 0 0 var(--clip-right, 0%)); }
-.ys-card-ascii { clip-path: inset(0 calc(100% - var(--clip-left, 0%)) 0 0); }
-
-/* Scan effect sweep */
-.ys-scan-effect { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(0,255,255,0.4), transparent); animation: ys-scan 0.6s ease-out; pointer-events: none; z-index: 5; }
-@keyframes ys-scan { 0%{ transform: translateX(-100%); opacity: 0; } 50%{ opacity: 1; } 100%{ transform: translateX(100%); opacity: 0; } }
-
-/* Canvases layering */
-.ys-particles { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 100%; height: 80px; z-index: 0; pointer-events: none; }
-.ys-scanner { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 100%; height: 60px; z-index: 15; pointer-events: none; }
+/* Styles déplacés dans src/styles/styles.css pour respecter la source unique des styles */
 </style>
