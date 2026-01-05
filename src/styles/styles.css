@@ -1,5 +1,9 @@
 /* ===== RESET GLOBAL ===== */
 :root {
+  --formation-color: #2e86de;
+  --stage-color: #f9ca24;
+  --travail-color: #27ae60;
+  --autre-color: #dc6bff;
   --font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   --line-height: 1.5;
   --font-weight: 400;
@@ -26,6 +30,12 @@
   --scrollbar-thumb: #0b6fb8;
 
   --green-glow: #34D399;
+  
+  --cat-formation: #0ea5e9; /* cyan */
+  --cat-stage: #f59e0b;     /* amber */
+  --cat-travail: #22c55e;   /* green */
+  --cat-autre: #a78bfa;     /* violet */
+  --corner-qr-size: 80px;
 
   /* Font sizes */
   --fs-h1: 2.6rem;
@@ -100,6 +110,11 @@
   --scrollbar-track: #1e1e1e;
   --scrollbar-thumb: #3b82f6;
   --green-glow: #34D399;
+
+  --cat-formation: #38bdf8;
+  --cat-stage: #fbbf24;
+  --cat-travail: #4ade80;
+  --cat-autre: #c4b5fd;
 
   /* En sombre: le bandeau du nom doit être blanc */
   --name-banner-color: #ffffff;
@@ -473,7 +488,7 @@ html.has-scrolled .sub-section:focus-within::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--radius);
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
@@ -522,26 +537,26 @@ html.has-scrolled .sub-section:focus-within::after {
   justify-content: flex-start;
   gap: 2.2vh;
   padding: 10vh 6vw 4vh 6vw;
-  opacity: 0.14; /* discret, en fond */
+  opacity: 0.74;
 }
 .timeline-overlay .overlay-item {
   line-height: 1.1;
   text-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 .timeline-overlay .overlay-type {
-  font-size: clamp(16px, 1.8vw, 22px);
+  font-size: clamp(13px, 1.1vw, 16px);
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--text);
-  opacity: 0.9;
+  /* opacity: 0.; */
 }
 .timeline-overlay .overlay-info {
-  font-size: clamp(28px, 5.8vw, 72px);
+  font-size: clamp(15px, 1.3vw, 18px);
   font-weight: 800;
   color: var(--text);
 }
 .timeline-overlay .overlay-level {
-  font-size: clamp(14px, 1.6vw, 20px);
+  font-size: clamp(11px, 1vw, 14px);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -556,6 +571,63 @@ html.has-scrolled .sub-section:focus-within::after {
   /* Suppression des lignes verticales */
   background-image: none;
   background-size: initial;
+}
+
+
+/* ===== Timeline Overlay Styles ===== */
+.timeline-overlay {
+  pointer-events: none;
+}
+
+.overlay-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 45px;
+  /* margin: 2px auto; */
+  max-width: 620px;
+  background: rgba(30,30,30,0.85); /* Fond plus opaque */
+  border-radius: var(--radius);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  overflow: hidden;
+  font-size: 1rem;
+  color: #fff;
+  border-left: 12px solid var(--line-color, #53bc28);
+}
+
+/* Couleurs par activité */
+.overlay-item.formation {
+  --line-color: var(--formation-color);
+}
+.overlay-item.stage {
+  --line-color: var(--stage-color);
+}
+.overlay-item.travail {
+  --line-color: var(--travail-color);
+}
+.overlay-item.autre {
+  --line-color: var(--autre-color);
+}
+
+.overlay-type, .overlay-info, .overlay-level {
+  padding-left: 12px;
+  padding-right: 8px;
+  text-shadow: 0 0 8px rgba(0,0,0,0.18);
+}
+.overlay-type {
+  font-weight: 700;
+  font-size: 0.97rem;
+  margin-bottom: 2px;
+  letter-spacing: 0.01em;
+}
+.overlay-info {
+  font-size: 0.97rem;
+  margin-bottom: 2px;
+}
+.overlay-level {
+  font-size: 0.85rem;
+  color: #ffe;
+  margin-top: 2px;
 }
 
 /* Milestones */
@@ -582,18 +654,6 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 /* Couleurs par catégorie */
-:root {
-  --cat-formation: #0ea5e9; /* cyan */
-  --cat-stage: #f59e0b;     /* amber */
-  --cat-travail: #22c55e;   /* green */
-  --cat-autre: #a78bfa;     /* violet */
-}
-.dark {
-  --cat-formation: #38bdf8;
-  --cat-stage: #fbbf24;
-  --cat-travail: #4ade80;
-  --cat-autre: #c4b5fd;
-}
 
 .milestone.cat-formation .dot { border-color: var(--cat-formation); }
 .milestone.cat-formation .label { color: var(--cat-formation); }
@@ -640,7 +700,7 @@ html.has-scrolled .sub-section:focus-within::after {
   /* Keep the container flexible: prefer fixed height, allow width to expand where needed */
   height: 48px;              /* fixed height only (changeable) */
   width: auto;               /* don't force a fixed width so images can use full available width */
-  border-radius: 8px;
+  border-radius: var(--radius);
   overflow: visible;         /* allow image to be fully visible (object-fit will preserve ratio) */
   cursor: pointer;
   display: inline-flex;
@@ -698,7 +758,7 @@ html.has-scrolled .sub-section:focus-within::after {
   background: rgba(0, 0, 0, 0.85);
   color: #fff;
   padding: 6px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-size: 13px;
   pointer-events: none; /* don't block mouse events */
   z-index: 10000;
@@ -762,7 +822,7 @@ html.has-scrolled .sub-section:focus-within::after {
   bottom: 12px;
   width: var(--corner-qr-size);
   height: var(--corner-qr-size);
-  border-radius: 10px;
+  border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 6px 18px var(--card-shadow);
   /* scale from the bottom so the QR enlarges upward (no layout shift at the card bottom) */
@@ -796,7 +856,6 @@ html.has-scrolled .sub-section:focus-within::after {
 /* Responsive: reduce QR size on small screens to avoid layout breaking */
 @media (max-width: 640px) {
   /* mobile: set smaller corner size via variable */
-  :root { --corner-qr-size: 80px; }
   .card.corner {
     padding-inline-end: calc(var(--corner-qr-size) + 24px);
     min-height: calc(var(--corner-qr-size) + 96px);
@@ -804,7 +863,7 @@ html.has-scrolled .sub-section:focus-within::after {
   .card.corner .corner-qr {
     width: var(--corner-qr-size);
     height: var(--corner-qr-size);
-    border-radius: 6px;
+    border-radius: var(--radius);
   }
 }
 /* Marges uniformes pour QR-block en LTR/RTL via propriétés logiques */
@@ -833,7 +892,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .contact-form textarea {
   width:100%;
   padding:0.6rem .75rem;
-  border-radius:8px;
+  border-radius: var(--radius);
   border:1px solid var(--border);
   background: transparent;
   color:var(--text);
@@ -1013,7 +1072,7 @@ html.has-scrolled .sub-section:focus-within::after {
   bottom: 8px;
   width: 4px;
   background: linear-gradient(180deg, var(--blue), rgba(96, 165, 250, 0.55));
-  border-radius: 4px;
+  border-radius: var(--radius);
 }
 
 /* items */
@@ -1242,7 +1301,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .bar {
   background: var(--bar-bg);
-  border-radius: 6px;
+  border-radius: var(--radius);
   overflow: hidden;
   height: 6px;
   margin: 4px 0;
@@ -1341,7 +1400,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .nav-links li {
   cursor: pointer;
   padding: 8px 6px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   color: var(--text);
   font-weight: 500;
   white-space: nowrap;
@@ -1404,7 +1463,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .lang-switcher img {
   width: 28px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
   opacity: 0.55;
   cursor: pointer;
@@ -1423,7 +1482,7 @@ html.has-scrolled .sub-section:focus-within::after {
   font-size: 1.2rem;
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   color: var(--text);
 }
 

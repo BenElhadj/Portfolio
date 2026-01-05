@@ -22,7 +22,7 @@
     <!-- Overlay d'infos actives: du Début à la Fin -->
     <div class="timeline-overlay" aria-hidden="true">
 
-      <div v-for="entry in activeInfoList" :key="entry.key" class="overlay-item">
+  <div v-for="entry in activeInfoList" :key="entry.key" :class="['overlay-item', getCategory(entry.type)]">
   <div class="overlay-type">{{ t(`timeline.types.${sanitizeKey(entry.type)}`) ?? entry.type }}</div>
   <div class="overlay-info">{{ t(`timeline.infos.${sanitizeKey(entry.info)}`) ?? entry.info }}</div>
   <div v-if="entry.Niveau" class="overlay-level">{{ t(`timeline.levels.${sanitizeKey(entry.Niveau)}`) ?? entry.Niveau }}</div>
