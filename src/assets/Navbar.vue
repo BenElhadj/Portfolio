@@ -6,21 +6,25 @@
       <span v-if="theme === 'light'">🌙</span>
       <span v-else>☀️</span>
     </button>
-    <!-- Navigation Pages -->
-    <ul class="nav-links" role="menubar">
-      <li
-        v-for="(key, i) in navKeys"
-        :key="key"
-        role="menuitem"
-        tabindex="0"
-        :class="{ active: currentIndex === i }"
-        @click="goToIndex(i)"
-        @keydown.enter="goToIndex(i)"
-        :aria-current="currentIndex === i ? 'true' : 'false'"
-      >
-        {{ getLabel(key) }}
-      </li>
-    </ul>
+    <!-- Navigation Pages avec flèches -->
+    <div class="nav-arrows-container">
+      <button v-if="showArrows" class="nav-arrow left" @click="scrollNav(-1)" aria-label="Pages précédentes">&#60;</button>
+      <ul class="nav-links" role="menubar" ref="navLinksRef">
+        <li
+          v-for="(key, i) in navKeys"
+          :key="key"
+          role="menuitem"
+          tabindex="0"
+          :class="{ active: currentIndex === i }"
+          @click="goToIndex(i)"
+          @keydown.enter="goToIndex(i)"
+          :aria-current="currentIndex === i ? 'true' : 'false'"
+        >
+          {{ getLabel(key) }}
+        </li>
+      </ul>
+      <button v-if="showArrows" class="nav-arrow right" @click="scrollNav(1)" aria-label="Pages suivantes">&#62;</button>
+    </div>
 
     <!-- Sélecteur de langues -->
     <div class="lang-switcher">
@@ -32,7 +36,32 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { onBeforeUnmount } from "vue";
+// Affichage conditionnel des flèches
+const showArrows = ref(false);
+
+function checkNavOverflow() {
+  const nav = navLinksRef.value;
+  if (!nav) return;
+  // On compare le scrollWidth (contenu total) à la largeur visible
+  showArrows.value = nav.scrollWidth > nav.offsetWidth + 2; // +2 pour tolérance
+}
+
+let resizeObserver = null;
+import { ref, onMounted, onUnmounted, computed, nextTick, watch } from "vue";
+// Référence vers la liste des liens de navigation
+const navLinksRef = ref(null);
+
+// Scroll horizontal via flèches
+function scrollNav(direction) {
+  const nav = navLinksRef.value;
+  if (!nav) return;
+  const scrollAmount = nav.offsetWidth * 0.6; // scroll de 60% de la largeur visible
+  nav.scrollBy({
+    left: direction * scrollAmount,
+    behavior: 'smooth'
+  });
+}
 import { useI18n } from "vue-i18n";
 
 /* i18n */
@@ -97,6 +126,13 @@ function goToIndex(i) {
   }
   currentIndex.value = i;
   localStorage.setItem("lastPageIndex", String(i));
+  // S'assurer que l'onglet sélectionné est visible
+  nextTick(() => {
+    const nav = navLinksRef.value;
+    if (nav && nav.children[i]) {
+      nav.children[i].scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
+    }
+  });
 }
 
 /* Langue */
@@ -139,6 +175,33 @@ function toggleTheme() {
 
 /* Init */
 onMounted(() => {
+  // Observer le redimensionnement pour afficher/masquer les flèches
+  nextTick(() => {
+    checkNavOverflow();
+    const nav = navLinksRef.value;
+    if (window.ResizeObserver && nav) {
+      resizeObserver = new ResizeObserver(checkNavOverflow);
+      resizeObserver.observe(nav);
+    } else {
+      window.addEventListener('resize', checkNavOverflow);
+    }
+  });
+
+  // Watch for language change to re-check overflow
+  watch(locale, () => {
+    nextTick(checkNavOverflow);
+  });
+onBeforeUnmount(() => {
+  if (resizeObserver) resizeObserver.disconnect();
+  window.removeEventListener('resize', checkNavOverflow);
+});
+  // S'assurer que la sélection active est visible au chargement
+  nextTick(() => {
+    const nav = navLinksRef.value;
+    if (nav && nav.children[currentIndex.value]) {
+      nav.children[currentIndex.value].scrollIntoView({ inline: 'center', behavior: 'auto', block: 'nearest' });
+    }
+  });
   pagesContainer = document.querySelector(".pages");
   pageEls = Array.from(document.querySelectorAll(".pages .page"));
   if (!pageEls.length) pageEls = Array.from(document.querySelectorAll(".page"));

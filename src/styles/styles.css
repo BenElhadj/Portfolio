@@ -1,3 +1,35 @@
+/* ===== NAVBAR FLÈCHES ===== */
+.nav-arrows-container {
+  display: flex;
+  align-items: center;
+  /* position: relative; */
+  /* flex: 1; */
+  min-width: 0;
+}
+/* Nettoyage: une seule déclaration .nav-arrow, version compacte */
+.nav-arrow {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 1.05rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 1px;
+  transition: color 0.18s, background 0.18s;
+  z-index: 1;
+}
+.nav-arrow:hover {
+  color: var(--blue);
+  background: transparent;
+}
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
 /* ===== RESET GLOBAL ===== */
 :root {
   --font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -274,9 +306,9 @@ button:hover { filter: brightness(1.05); }
 }
 
 /* ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
-::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+/* ::-webkit-scrollbar { width: 6px; height: 6px; } */
+/* ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; } */
+/* ::-webkit-scrollbar-track { background: var(--scrollbar-track); } */
 
 /* ===== LIENS ===== */
 a { color: var(--blue); text-decoration: none; }
@@ -1279,9 +1311,9 @@ html.has-scrolled .sub-section:focus-within::after {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.pages::-webkit-scrollbar {
+/* .pages::-webkit-scrollbar {
   display: none;
-}
+} */
 
 .page {
   /* La page occupe exactement la hauteur du viewport; la navbar est fixe au-dessus */
@@ -1299,9 +1331,9 @@ html.has-scrolled .sub-section:focus-within::after {
   padding-top: calc(var(--navbar-height) + var(--page-padding-y) + var(--name-banner-offset));
   padding-bottom: var(--page-padding-y);
 }
-.page::-webkit-scrollbar {
+/* .page::-webkit-scrollbar {
   display: none;
-}
+} */
 
 /* ===== NAVBAR ===== */
 .navbar {
