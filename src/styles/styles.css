@@ -667,24 +667,6 @@ html.has-scrolled .sub-section:focus-within::after {
 .milestone.cat-autre .dot { border-color: var(--cat-autre); }
 .milestone.cat-autre .label { color: var(--cat-autre); }
 
-/* Soleil en mode clair */
-.sky-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ffd700, #f59e0b);
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
-  transition: background 0.3s, opacity 0.3s;
-}
-
-/* Lune en mode sombre */
-.dark .sky-icon {
-  background: radial-gradient(circle at 30% 30%, #cbd5e1, #1e293b);
-  box-shadow: 0 0 12px rgba(148, 163, 184, 0.6);
-}
 
 .wrapper {
   width: 100%;

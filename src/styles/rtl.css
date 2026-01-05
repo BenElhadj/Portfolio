@@ -77,11 +77,6 @@
   float: left;
 }
 
-/* Soleil/Lune reste à gauche */
-[dir="rtl"] .sky-icon {
-  left: 20px;
-  right: auto;
-}
 
 /* Iframes toujours LTR */
 [dir="rtl"] .iframe-container {

@@ -29,7 +29,6 @@
       </div>
     </div>
 
-    <div class="sky-icon"></div>
   </div>
 </template>
 
