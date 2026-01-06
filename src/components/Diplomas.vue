@@ -34,7 +34,7 @@
                     @keydown.space.prevent="openLogo(d)"
                     :title="'Voir logo ' + d.institution"
                   >
-                    <img v-if="d.image" :src="getAssetPath('/degrees/' + d.image)" :alt="d.degree" />
+              <img v-if="d.image" :src="getAssetPath('/degrees/' + d.image)" :alt="d.degree" loading="lazy" />
                   </div>
 
                   <div
@@ -104,6 +104,7 @@
             alt="diploma"
             draggable="false"
             @dragstart.prevent
+            loading="lazy"
           />
         </div>
         <div v-else class="logo-wrapper">
@@ -111,6 +112,7 @@
             :src="popupImage"
             class="popup-image"
             alt="logo"
+              loading="lazy"
           />
         </div>
       </div>

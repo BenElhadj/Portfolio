@@ -31,7 +31,7 @@
                   :title="linkTitle(exp)"
               >
                 <div class="degree-thumb">
-                  <img
+                  <img loading="lazy"
                     :src="logoSrc(exp.logo)"
                     :alt="exp.company + ' logo'"
                     @error="(e) => e.target.style.display = 'none'"
