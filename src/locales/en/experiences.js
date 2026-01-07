@@ -9,7 +9,7 @@ export default {
                 {
                     dates: "April 2024 - Present",
                     company: "Freelance",
-                    logo: "independant.png",
+                    logo: "independant.webp",
                     link: "https://github.com/BenElhadj",
                     role: "AI/ML Developer",
                     details: [
@@ -23,7 +23,7 @@ export default {
                 {
                     dates: "October 2022 - October 2023",
                     company: "KEAKR",
-                    logo: "KEAKR.png",
+                    logo: "KEAKR.webp",
                     link: "https://www.linkedin.com/company/keakr/",
                     role: "Full-Stack Web/Mobile Developer",
                     details: [
@@ -36,7 +36,7 @@ export default {
                 {
                     dates: "June 2021 - July 2022",
                     company: "MULTISERV PLUS",
-                    logo: "MULTISERV_PLUS.png",
+                    logo: "MULTISERV_PLUS.webp",
                     link: "https://linkedin.com/search/results/all/?keywords=MULTISERV%20PLUS",
                     role: "Full-Stack Web Development",
                     details: [
@@ -50,7 +50,7 @@ export default {
                 {
                     dates: "October 2019 - September 2020",
                     company: "Brain and Spine Institute (ICM)",
-                    logo: "ICM.png",
+                    logo: "ICM.webp",
                     link: "https://institutducerveau.org/",
                     role: "Mobile Application Developer",
                     details: [
@@ -62,7 +62,7 @@ export default {
                 {
                     dates: "January 2019 - July 2019",
                     company: "MULTISERV PLUS",
-                    logo: "MULTISERV_PLUS.png",
+                    logo: "MULTISERV_PLUS.webp",
                     link: "https://linkedin.com/search/results/all/?keywords=MULTISERV%20PLUS",
                     role: "Developer Intern",
                     details: [
@@ -75,7 +75,7 @@ export default {
                 {
                     dates: "October 2021 - December 2021",
                     company: "GRETA METEHOR Paris",
-                    logo: "GRETA.png",
+                    logo: "GRETA.webp",
                     link: "https://www.gpi2d.greta.fr/",
                     role: "Android Developer Training",
                     details: [
@@ -91,7 +91,7 @@ export default {
                 {
                     dates: "November 2020 - June 2021",
                     company: "AP-HP (Charles-Foix Hospital)",
-                    logo: "AP-HP.png",
+                    logo: "AP-HP.webp",
                     link: "https://charlesfoix.aphp.fr/",
                     role: "On-site Technician",
                     details: ["IT asset management", "Processing intervention requests", "System and network maintenance"]
@@ -99,7 +99,7 @@ export default {
                 {
                     dates: "October 2020 - November 2020",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
@@ -107,7 +107,7 @@ export default {
                 {
                     dates: "September 2020 - October 2020",
                     company: "DIM",
-                    logo: "Dim.png",
+                    logo: "Dim.webp",
                     link: "https://www.dim.fr/",
                     role: "VIP Technician (HELPLINE)",
                     details: ["VIP on-site technician", "Workstation imaging", "Smartphone enrollment"]
@@ -115,7 +115,7 @@ export default {
                 {
                     dates: "September 2019 - October 2019",
                     company: "DIM",
-                    logo: "Dim.png",
+                    logo: "Dim.webp",
                     link: "https://www.dim.fr/",
                     role: "VIP Technician (HELPLINE)",
                     details: ["VIP on-site technician", "Workstation imaging", "Smartphone enrollment"]
@@ -123,7 +123,7 @@ export default {
                 {
                     dates: "July 2019 - August 2019",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
@@ -131,7 +131,7 @@ export default {
                 {
                     dates: "February 2019 - April 2019",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
@@ -139,7 +139,7 @@ export default {
                 {
                     dates: "December 2018 - January 2019",
                     company: "ATOUTEK - IT Refurbishment Factory",
-                    logo: "ATOUTEK.png",
+                    logo: "ATOUTEK.webp",
                     link: "https://atoutek.fr/",
                     role: "IT Maintenance Technician (KIATOO)",
                     details: ["Software and hardware maintenance"]
@@ -147,7 +147,7 @@ export default {
                 {
                     dates: "November 2018 - December 2018",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "IT Asset Manager/Logistician (HELPLINE)",
                     details: ["IT equipment stock management", "Scheduling VIP technician interventions"]
@@ -155,7 +155,7 @@ export default {
                 {
                     dates: "July 2018 - August 2018",
                     company: "CHANEL",
-                    logo: "chanel.png",
+                    logo: "chanel.webp",
                     link: "https://www.linkedin.com/company/chanel/",
                     role: "VIP On-site Technician (HELPLINE)",
                     details: ["Intervention scheduling management", "VIP on-site technician", "Workstation imaging"]
@@ -163,7 +163,7 @@ export default {
                 {
                     dates: "July 2017 - January 2018",
                     company: "Parkeon",
-                    logo: "Parkeon.png",
+                    logo: "Parkeon.webp",
                     link: "https://www.linkedin.com/products/itr-of-georgia-inc--flowbirdparkeon/",
                     role: "Field Technician",
                     details: [
@@ -174,7 +174,7 @@ export default {
                 {
                     dates: "July 2016 - September 2016",
                     company: "Solutions30 France",
-                    logo: "solutions-30.png",
+                    logo: "solutions-30.webp",
                     link: "https://solutions30.com/?lang=fr",
                     role: "IT Maintenance Technician (HELP 1FO)",
                     details: ["Mobile customer service", "Software and hardware maintenance"]
@@ -182,7 +182,7 @@ export default {
                 {
                     dates: "January 2016 - May 2016",
                     company: "MSS Fnac",
-                    logo: "MSS_Fnac.png",
+                    logo: "MSS_Fnac.webp",
                     link: "https://www.linkedin.com/company/global-info-tn/",
                     role: "IT Technician",
                     details: ["Customer service", "Software and hardware maintenance"]
@@ -190,7 +190,7 @@ export default {
                 {
                     dates: "February 2015 - May 2015",
                     company: "EUROPEAN TRADE LA FORCE DE VENTE",
-                    logo: "EUROPEAN_TRADE.png",
+                    logo: "EUROPEAN_TRADE.webp",
                     link: "https://europeantrade.fr/",
                     role: "Field Salesman",
                     details: ["GDF contract marketing"]
@@ -198,7 +198,7 @@ export default {
                 {
                     dates: "January 2010 - August 2014",
                     company: "Global Info",
-                    logo: "Global_Info.png",
+                    logo: "Global_Info.webp",
                     link: "https://www.linkedin.com/company/global-info-tn/",
                     role: "Owner Manager",
                     details: [
@@ -210,7 +210,7 @@ export default {
                 {
                     dates: "August 2008 - November 2009",
                     company: "Aquarium Informatique",
-                    logo: "Aquarium_Informatique.png",
+                    logo: "Aquarium_Informatique.webp",
                     link: "https://www.linkedin.com/company/l-aquarium-informatique",
                     role: "Associate Manager",
                     details: [
@@ -222,7 +222,7 @@ export default {
                 {
                     dates: "February 2013 - April 2013",
                     company: "STIE",
-                    logo: "STIE.png",
+                    logo: "STIE.webp",
                     link: "http://stietunisie.com/",
                     role: "IT Maintenance Technician Intern",
                     details: [
@@ -233,7 +233,7 @@ export default {
                 {
                     dates: "April 2012 - June 2012",
                     company: "TRANSTU TGM",
-                    logo: "TRANSTU.png",
+                    logo: "TRANSTU.webp",
                     link: "https://www.transtu.tn/fr/",
                     role: "Industrial Maintenance Technician Intern",
                     details: [
@@ -244,7 +244,7 @@ export default {
                 {
                     dates: "September 2011 - November 2011",
                     company: "Retronix Tunisia",
-                    logo: "Retronix.png",
+                    logo: "Retronix.webp",
                     link: "https://retronix.com/",
                     role: "Electronics Maintenance Technician Intern",
                     details: [
@@ -255,7 +255,7 @@ export default {
                 {
                     dates: "December 2007 - February 2008",
                     company: "Sagemcom",
-                    logo: "Sagem.png",
+                    logo: "Sagem.webp",
                     link: "https://www.sagemcom.com/fr",
                     role: "Electronics Manufacturing Technician Intern",
                     details: [
@@ -267,7 +267,7 @@ export default {
                 {
                     dates: "June 2007 - July 2007",
                     company: "Microlux-Dimatec",
-                    logo: "Microlux.png",
+                    logo: "Microlux.webp",
                     link: "https://www.tunisieindex.com/entreprises/Micro-Ordinateurs-Distribution-1759.html",
                     role: "Computer Assembly & Maintenance Intern",
                     details: ["Computer assembly and maintenance"]
@@ -275,7 +275,7 @@ export default {
                 {
                     dates: "January 2007 - February 2007",
                     company: "TEKNE-TUNISIE",
-                    logo: "TEKNE-TUNISIE.png",
+                    logo: "TEKNE-TUNISIE.webp",
                     link: "https://en.tekne.it/",
                     role: "Car Electrical Cable Assembler Intern",
                     details: ["Car electrical cable assembly"]

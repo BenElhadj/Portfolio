@@ -19,7 +19,10 @@
               :class="{ visible: visibleSkills.includes(skill.key) }"
               @click="openPopup(skill)"
             >
-              <img :src="getAssetPath(`/logos/skills/${skill.logo}`)" :alt="$t(`skills.items.${skill.key}.name`)" class="logo" loading="lazy" />
+              <picture>
+                <source :srcset="getAssetPath(`/logos/skills/${skill.logo.replace(/\.[a-zA-Z]+$/, '.webp')}`)" type="image/webp" />
+                <img :src="getAssetPath(`/logos/skills/${skill.logo}`)" :alt="$t(`skills.items.${skill.key}.name`)" class="logo" loading="lazy" />
+              </picture>
               <div class="info">
                 <div class="name">{{ $t(`skills.items.${skill.key}.name`) }}</div>
                 <div class="bar">

@@ -31,12 +31,10 @@
                   :title="linkTitle(exp)"
               >
                 <div class="degree-thumb">
-                  <img loading="lazy"
-                    :src="logoSrc(exp.logo)"
-                    :alt="exp.company + ' logo'"
-                    @error="(e) => e.target.style.display = 'none'"
-                    aria-hidden="true"
-                  />
+                  <picture>
+                    <source :srcset="getAssetPath(`/experiences/${exp.logo.replace(/\.[a-zA-Z]+$/, '.webp')}`)" type="image/webp" />
+                    <img :src="getAssetPath(`/experiences/${exp.logo}`)" :alt="exp.company" loading="lazy" />
+                  </picture>
                 </div>
               </a>
 
@@ -80,9 +78,11 @@
 </template>
 
 <script setup>
+
 import PageLayout from "../assets/PageLayout.vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { getAssetPath } from "../utils/assets.js";
 
 const { tm } = useI18n();
 

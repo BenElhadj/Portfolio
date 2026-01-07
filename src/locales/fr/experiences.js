@@ -9,7 +9,7 @@ export default {
                 {
                     dates: "avril 2024 - Présent",
                     company: "Indépendant",
-                    logo: "independant.png",
+                    logo: "independant.webp",
                     link: "https://github.com/BenElhadj",
                     role: "Développeur IA/ML",
                     details: [
@@ -23,7 +23,7 @@ export default {
                 {
                     dates: "octobre 2022 - octobre 2023",
                     company: "KEAKR",
-                    logo: "KEAKR.png",
+                    logo: "KEAKR.webp",
                     link: "https://www.linkedin.com/company/keakr/",
                     role: "Développeur Full-Stack Web/Mobile",
                     details: [
@@ -36,7 +36,7 @@ export default {
                 {
                     dates: "juin 2021 - juillet 2022",
                     company: "MULTISERV PLUS",
-                    logo: "MULTISERV_PLUS.png",
+                    logo: "MULTISERV_PLUS.webp",
                     link: "https://linkedin.com/search/results/all/?keywords=MULTISERV%20PLUS",
                     role: "Développement web full-stack",
                     details: [
@@ -50,7 +50,7 @@ export default {
                 {
                     dates: "octobre 2019 - septembre 2020",
                     company: "Institut du Cerveau et de la Moelle Epinière (ICM)",
-                    logo: "ICM.png",
+                    logo: "ICM.webp",
                     link: "https://institutducerveau.org/",
                     role: "Développeur applications mobiles",
                     details: [
@@ -62,7 +62,7 @@ export default {
                 {
                     dates: "janvier 2019 - juillet 2019",
                     company: "MULTISERV PLUS",
-                    logo: "MULTISERV_PLUS.png",
+                    logo: "MULTISERV_PLUS.webp",
                     link: "https://linkedin.com/search/results/all/?keywords=MULTISERV%20PLUS",
                     role: "Stagiaire Développeur",
                     details: [
@@ -75,7 +75,7 @@ export default {
                 {
                     dates: "octobre 2021 - décembre 2021",
                     company: "GRETA METEHOR Paris",
-                    logo: "GRETA.png",
+                    logo: "GRETA.webp",
                     link: "https://www.gpi2d.greta.fr/",
                     role: "Formation Développeur Android",
                     details: [
@@ -91,7 +91,7 @@ export default {
                 {
                     dates: "novembre 2020 - juin 2021",
                     company: "AP-HP (Hôpital Charles-Foix)",
-                    logo: "AP-HP.png",
+                    logo: "AP-HP.webp",
                     link: "https://charlesfoix.aphp.fr/",
                     role: "Technicien de proximité",
                     details: ["Gestion de parc informatique", "Traitement des demandes d'intervention", "Maintenance système et réseau"]
@@ -99,7 +99,7 @@ export default {
                 {
                     dates: "octobre 2020 - novembre 2020",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
@@ -107,7 +107,7 @@ export default {
                 {
                     dates: "septembre 2020 - octobre 2020",
                     company: "DIM",
-                    logo: "Dim.png",
+                    logo: "Dim.webp",
                     link: "https://www.dim.fr/",
                     role: "Technicien VIP (HELPLINE)",
                     details: ["Technicien de proximité VIP", "Masterisation des postes", "Enrôlement smartphones"]
@@ -115,7 +115,7 @@ export default {
                 {
                     dates: "septembre 2019 - octobre 2019",
                     company: "DIM",
-                    logo: "Dim.png",
+                    logo: "Dim.webp",
                     link: "https://www.dim.fr/",
                     role: "Technicien VIP (HELPLINE)",
                     details: ["Technicien de proximité VIP", "Masterisation des postes", "Enrôlement smartphones"]
@@ -123,7 +123,7 @@ export default {
                 {
                     dates: "juillet 2019 - août 2019",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
@@ -131,7 +131,7 @@ export default {
                 {
                     dates: "février 2019 - avril 2019",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
@@ -139,7 +139,7 @@ export default {
                 {
                     dates: "décembre 2018 - janvier 2019",
                     company: "ATOUTEK - Usine de Reconditionnement Informatique",
-                    logo: "ATOUTEK.png",
+                    logo: "ATOUTEK.webp",
                     link: "https://atoutek.fr/",
                     role: "Technicien de maintenance informatique KIATOO",
                     details: ["Maintenance software + hardware"]
@@ -147,7 +147,7 @@ export default {
                 {
                     dates: "novembre 2018 - décembre 2018",
                     company: "LVMH Fragrance Brands",
-                    logo: "LVMH.png",
+                    logo: "LVMH.webp",
                     link: "https://www.lvmh.com/fr",
                     role: "Gestionnaire/Logisticien de parc informatique (HELPLINE)",
                     details: ["Gestion du stock de matériels informatiques", "Gestion des plannings d'intervention des techniciens VIP"]
@@ -155,7 +155,7 @@ export default {
                 {
                     dates: "juillet 2018 - août 2018",
                     company: "CHANEL",
-                    logo: "chanel.png",
+                    logo: "chanel.webp",
                     link: "https://www.linkedin.com/company/chanel/",
                     role: "Technicien de proximité VIP (HELPLINE)",
                     details: ["Gestion des plannings d'intervention", "Technicien de proximité VIP", "Masterisation des postes"]
@@ -163,7 +163,7 @@ export default {
                 {
                     dates: "juillet 2017 - janvier 2018",
                     company: "Parkeon",
-                    logo: "Parkeon.png",
+                    logo: "Parkeon.webp",
                     link: "https://www.linkedin.com/products/itr-of-georgia-inc--flowbirdparkeon/",
                     role: "Technicien en itinérant",
                     details: [
@@ -174,7 +174,7 @@ export default {
                 {
                     dates: "juillet 2016 - septembre 2016",
                     company: "Solutions30 France",
-                    logo: "solutions-30.png",
+                    logo: "solutions-30.webp",
                     link: "https://solutions30.com/?lang=fr",
                     role: "Technicien de maintenance informatique (HELP 1FO)",
                     details: ["SAV itinérant", "Maintenance software + hardware"]
@@ -182,7 +182,7 @@ export default {
                 {
                     dates: "janvier 2016 - mai 2016",
                     company: "MSS Fnac",
-                    logo: "MSS_Fnac.png",
+                    logo: "MSS_Fnac.webp",
                     link: "https://www.linkedin.com/company/global-info-tn/",
                     role: "Technicien informatique",
                     details: ["SAV", "Maintenance software + hardware"]
@@ -190,7 +190,7 @@ export default {
                 {
                     dates: "février 2015 - mai 2015",
                     company: "EUROPEAN TRADE LA FORCE DE VENTE",
-                    logo: "EUROPEAN_TRADE.png",
+                    logo: "EUROPEAN_TRADE.webp",
                     link: "https://europeantrade.fr/",
                     role: "Commercial terrain",
                     details: ["Commercialisation des contrats GDF"]
@@ -198,7 +198,7 @@ export default {
                 {
                     dates: "janvier 2010 - août 2014",
                     company: "Global Info",
-                    logo: "Global_Info.png",
+                    logo: "Global_Info.webp",
                     link: "https://www.linkedin.com/company/global-info-tn/",
                     role: "Propriétaire gérant",
                     details: [
@@ -210,7 +210,7 @@ export default {
                 {
                     dates: "août 2008 - novembre 2009",
                     company: "Aquarium Informatique",
-                    logo: "Aquarium_Informatique.png",
+                    logo: "Aquarium_Informatique.webp",
                     link: "https://www.linkedin.com/company/l-aquarium-informatique",
                     role: "Associé gérant",
                     details: [
@@ -222,7 +222,7 @@ export default {
                 {
                     dates: "février 2013 - avril 2013",
                     company: "STIE",
-                    logo: "STIE.png",
+                    logo: "STIE.webp",
                     link: "http://stietunisie.com/",
                     role: "Technicien supérieur en maintenance informatique (Stagiaire)",
                     details: [
@@ -233,7 +233,7 @@ export default {
                 {
                     dates: "avril 2012 - juin 2012",
                     company: "TRANSTU TGM",
-                    logo: "TRANSTU.png",
+                    logo: "TRANSTU.webp",
                     link: "https://www.transtu.tn/fr/",
                     role: "Technicien supérieur en maintenance industrielle (Stagiaire)",
                     details: [
@@ -244,7 +244,7 @@ export default {
                 {
                     dates: "septembre 2011 - novembre 2011",
                     company: "Retronix Tunisie",
-                    logo: "Retronix.png",
+                    logo: "Retronix.webp",
                     link: "https://retronix.com/",
                     role: "Technicien supérieur en maintenance électronique (Stagiaire)",
                     details: [
@@ -255,7 +255,7 @@ export default {
                 {
                     dates: "décembre 2007 - février 2008",
                     company: "Sagemcom",
-                    logo: "Sagem.png",
+                    logo: "Sagem.webp",
                     link: "https://www.sagemcom.com/fr",
                     role: "Technicien en fabrication électronique (Stagiaire)",
                     details: [
@@ -267,7 +267,7 @@ export default {
                 {
                     dates: "juin 2007 - juillet 2007",
                     company: "Microlux-Dimatec",
-                    logo: "Microlux.png",
+                    logo: "Microlux.webp",
                     link: "https://www.tunisieindex.com/entreprises/Micro-Ordinateurs-Distribution-1759.html",
                     role: "Stagiaire montage et maintenance d'ordinateur",
                     details: ["Montage et maintenance d'ordinateur"]
@@ -275,7 +275,7 @@ export default {
                 {
                     dates: "janvier 2007 - février 2007",
                     company: "TEKNE-TUNISIE",
-                    logo: "TEKNE-TUNISIE.png",
+                    logo: "TEKNE-TUNISIE.webp",
                     link: "https://en.tekne.it/",
                     role: "Stagiaire monteur de câbles électriques",
                     details: ["Montage des câbles électriques de voiture"]

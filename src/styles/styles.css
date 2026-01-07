@@ -1,3 +1,9 @@
+/* Désactive l'effet hover sur le formulaire de contact (ContactForm) */
+.contact-form.card.line-card:hover,
+.contact-form.card.line-card:focus-visible {
+  transform: none !important;
+  box-shadow: none !important;
+}
 /* ===== RESET GLOBAL ===== */
 :root {
   --formation-color: #2e86de;

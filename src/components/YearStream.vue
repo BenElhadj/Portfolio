@@ -28,6 +28,7 @@
           <div class="ys-card ys-card-ascii">
             <div class="ys-ascii-content" ref="asciiContents[i]"></div>
           </div>
+          <!-- Pas d'image à afficher pour chaque événement, balise <picture> supprimée -->
         </div>
       </div>
     </div>

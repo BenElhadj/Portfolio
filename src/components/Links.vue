@@ -3,25 +3,42 @@
     <h2 class="title">{{ $t('links.title') }}</h2>
 
     <PageLayout :columns="2" :rows="2">
-    <template #slot1>
-      <div class="slot-content tl">
-        <div class="card line-card corner">
-          <div class="corner-qr-block">
-            <a :href="$t('links.items.github.url')" target="_blank" rel="noopener noreferrer" class="corner-qr"><img :src="$t('links.items.github.qr') || qrFor($t('links.items.github.url'))" alt="github-qr" loading="lazy" /></a>
-            <div class="qr-caption">
-              <div class="qr-name">{{ $t('links.items.github.name') }}</div>
-              <div class="qr-short">{{ $t('links.items.github.short') }}</div>
+      <template #slot1>
+        <div class="slot-content tl">
+          <div class="card line-card corner">
+            <div class="corner-qr-block">
+              <a :href="$t('links.items.github.url')" target="_blank" rel="noopener noreferrer" class="corner-qr">
+                <picture>
+                  <source :srcset="$t('links.items.github.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor($t('links.items.github.url'))" type="image/webp" />
+                  <img
+                    ref="githubQrLazy.imageRef"
+                    :src="githubQrLazy.isVisible ? ($t('links.items.github.qr') || qrFor($t('links.items.github.url'))) : githubQrLazy.placeholder"
+                    alt="github-qr"
+                    loading="lazy"
+                    :class="{ 'fade-in': githubQrLazy.loaded }"
+                    @load="githubQrLazy.onLoad"
+                  />
+                </picture>
+              </a>
+              <div class="qr-caption">
+                <div class="qr-name">{{ $t('links.items.github.name') }}</div>
+                <div class="qr-short">{{ $t('links.items.github.short') }}</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </template>
+      </template>
 
     <template #slot2>
       <div class="slot-content tr">
         <div class="card line-card corner">
           <div class="corner-qr-block">
-            <a :href="$t('links.items.linkedin.url')" target="_blank" rel="noopener noreferrer" class="corner-qr"><img :src="$t('links.items.linkedin.qr') || qrFor($t('links.items.linkedin.url'))" alt="linkedin-qr" loading="lazy" /></a>
+            <a :href="$t('links.items.linkedin.url')" target="_blank" rel="noopener noreferrer" class="corner-qr">
+              <picture>
+                <source :srcset="$t('links.items.linkedin.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor($t('links.items.linkedin.url'))" type="image/webp" />
+                <img :src="$t('links.items.linkedin.qr') || qrFor($t('links.items.linkedin.url'))" alt="linkedin-qr" loading="lazy" />
+              </picture>
+            </a>
             <div class="qr-caption">
               <div class="qr-name">{{ $t('links.items.linkedin.name') }}</div>
               <div class="qr-short">{{ $t('links.items.linkedin.short') }}</div>
@@ -35,7 +52,12 @@
       <div class="slot-content bl">
         <div class="card line-card corner">
           <div class="corner-qr-block">
-            <a :href="'mailto:' + emailAddress" class="corner-qr"><img :src="$t('links.items.email.qr') || qrFor('mailto:' + emailAddress)" alt="email-qr" loading="lazy" /></a>
+            <a :href="'mailto:' + emailAddress" class="corner-qr">
+              <picture>
+                <source :srcset="$t('links.items.email.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor('mailto:' + emailAddress)" type="image/webp" />
+                <img :src="$t('links.items.email.qr') || qrFor('mailto:' + emailAddress)" alt="email-qr" loading="lazy" />
+              </picture>
+            </a>
             <div class="qr-caption">
               <div class="qr-name">{{ $t('links.items.email.name') }}</div>
               <div class="qr-short">{{ $t('links.items.email.short') }}</div>
@@ -50,7 +72,10 @@
         <div class="card line-card corner">
           <div class="corner-qr-block">
             <a :href="'#contact'" class="corner-qr" @click.prevent="openContact" :title="$t('links.items.contact.name')">
-              <img :src="$t('links.items.contact.qr') || qrFor(contactUrl)" :alt="$t('links.items.contact.name')" loading="lazy" />
+              <picture>
+                <source :srcset="$t('links.items.contact.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor(contactUrl)" type="image/webp" />
+                <img :src="$t('links.items.contact.qr') || qrFor(contactUrl)" :alt="$t('links.items.contact.name')" loading="lazy" />
+              </picture>
             </a>
             <div class="qr-caption">
               <div class="qr-name">{{ $t('links.items.contact.name') }}</div>
@@ -58,27 +83,33 @@
             </div>
           </div>
         </div>
-        <Popup :visible="showContact" :title="$t('links.items.contact.name')" @close="closeContact">
-          <ContactForm />
-        </Popup>
+
       </div>
     </template>
     </PageLayout>
-    
+
+    <!-- Popup ContactForm rendered globally as modal -->
+    <teleport to="body">
+      <Popup :visible="showContact" :title="$t('links.items.contact.name')" @close="closeContact">
+        <ContactForm />
+      </Popup>
+    </teleport>
+
     <div class="favicon-center">
-  <img loading="lazy"
-        :src="faviconSrc"
-        alt="favicon"
-        role="button"
-        tabindex="0"
-        class="clickable-favicon"
-        :aria-label="$t('links.cvLabel')"
-        @click="downloadCV"
-        @keydown.enter="downloadCV"
-        @mouseenter="onCvMouseEnter"
-        @mouseleave="onCvMouseLeave"
-        @mousemove="onCvMouseMove"
-      />
+  <picture>
+    <source :srcset="faviconSrc.replace(/\.[a-zA-Z]+$/, '.webp')" type="image/webp" />
+    <img :src="faviconSrc" alt="favicon" loading="lazy"
+      role="button"
+      tabindex="0"
+      class="clickable-favicon"
+      :aria-label="$t('links.cvLabel')"
+      @click="downloadCV"
+      @keydown.enter="downloadCV"
+      @mouseenter="onCvMouseEnter"
+      @mouseleave="onCvMouseLeave"
+      @mousemove="onCvMouseMove"
+    />
+  </picture>
       <teleport to="body">
         <div
           v-if="showCvTooltip"
@@ -90,7 +121,7 @@
           {{ $t('links.cvLabel') }}
         </div>
       </teleport>
-    </div>
+  </div>
   </div>
 </template>
 
@@ -100,6 +131,9 @@ import ContactForm from './ContactForm.vue';
 import Popup from './Popup.vue';
 
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useLazyImage } from '../composables/useLazyImage.js';
+// Lazy loading avancé pour le QR GitHub
+const githubQrLazy = useLazyImage('/public/qr/qr_GitHub.png');
 import { useI18n } from 'vue-i18n';
 
 const { t, locale } = useI18n();

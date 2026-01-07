@@ -1,3 +1,11 @@
+/* Fade-in effect for lazy loaded images */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.6s;
+}
+img[loading="lazy"] {
+  opacity: 0;
+}
 <template>
   <div class="wrapper diplomas-page">
     <h2 class="title">{{ $t("diplomas.title") }}</h2>
@@ -34,7 +42,21 @@
                     @keydown.space.prevent="openLogo(d)"
                     :title="'Voir logo ' + d.institution"
                   >
-              <img v-if="d.image" :src="getAssetPath('/degrees/' + d.image)" :alt="d.degree" loading="lazy" />
+                    <picture v-if="d.image && i === 0 && catIndex === 0">
+                      <source :srcset="getAssetPath('/degrees/' + d.image.replace(/\.[a-zA-Z]+$/, '.webp'))" type="image/webp" />
+                      <img
+                        ref="firstLogoLazy.imageRef"
+                        :src="firstLogoLazy.isVisible ? getAssetPath('/degrees/' + d.image.replace(/\.[a-zA-Z]+$/, '.webp')) : firstLogoLazy.placeholder"
+                        :alt="d.degree"
+                        loading="lazy"
+                        :class="{ 'fade-in': firstLogoLazy.loaded }"
+                        @load="firstLogoLazy.onLoad"
+                      />
+                    </picture>
+                    <picture v-else-if="d.image">
+                      <source :srcset="getAssetPath('/degrees/' + d.image.replace(/\.[a-zA-Z]+$/, '.webp'))" type="image/webp" />
+                      <img :src="getAssetPath('/degrees/' + d.image)" :alt="d.degree" loading="lazy" />
+                    </picture>
                   </div>
 
                   <div
@@ -121,6 +143,9 @@
 </template>
 
 <script setup>
+import { useLazyImage } from '../composables/useLazyImage.js';
+// Lazy loading avancé pour le premier logo d'institution
+const firstLogoLazy = useLazyImage('/public/degrees/placeholder.png');
 import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import PageLayout from "../assets/PageLayout.vue";

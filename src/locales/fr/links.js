@@ -16,18 +16,18 @@ export default {
             name: "GitHub",
             short: "Mes projets open-source et contributions.",
             url: "https://github.com/BenElhadj",
-            qr: "qr/qr_GitHub.png"
+            qr: "qr/qr_GitHub.webp"
         },
         linkedin: {
             name: "LinkedIn",
             short: "Mon profil professionnel — CV et réseau.",
             url: "https://www.linkedin.com/in/benelhadjhamdi/",
-            qr: "qr/qr_LinkedIn.png"
+            qr: "qr/qr_LinkedIn.webp"
         },
         email: {
             name: "Email",
             short: "Envoyez-moi directement un message par e-mail.",
-            qr: "qr/qr_Email.png",
+            qr: "qr/qr_Email.webp",
             // store as "42bhamdi[at]gmail.com" and decode in the component
             address: "42bhamdi[at]gmail.com"
         },
@@ -35,7 +35,7 @@ export default {
             name: "Me contacter",
             short: "Formulaire de contact ou message direct.",
             url: "mailto:42bhamdi[at]gmail.com",
-            qr: "qr/qr_Contact.png",
+            qr: "qr/qr_Contact.webp",
             form: {
                 nameLabel: "Votre nom",
                 emailLabel: "Votre e-mail (optionnel)",

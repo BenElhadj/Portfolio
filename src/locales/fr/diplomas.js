@@ -9,7 +9,7 @@ export default {
             period: "2016 - 2023",
             institution: "Ecole 42 — Paris",
             degree: "Expert en architecture des BDD et data",
-            image: "42.svg",
+            image: "42.webp",
             diplomaImage: "bac+5-42.svg"
           }
         ]
@@ -21,14 +21,14 @@ export default {
             period: "2017 - 2019",
             institution: "GRETA — Paris",
             degree: "Systèmes Numériques, informatique et réseau",
-            image: "GRETA.svg",
+            image: "GRETA.webp",
             diplomaImage: "bac+2-greta.svg"
           },
           {
             period: "2011 - 2013",
             institution: "CSFIEE — Tunis",
             degree: "Production électronique",
-            image: "MEFP.svg",
+            image: "MEFP.webp",
             diplomaImage: "bac+2-csfiee.svg"
           }
         ]
@@ -40,14 +40,14 @@ export default {
             period: "2006 - 2008",
             institution: "CSFIEE — Tunis",
             degree: "Fabrication électronique",
-            image: "MEFP.svg",
+            image: "MEFP.webp",
             diplomaImage: "bac-csfiee.svg"
           },
           {
             period: "2003 - 2005",
             institution: "IPH — Tunis",
             degree: "Maintenance informatique",
-            image: "MEFP.svg",
+            image: "MEFP.webp",
             diplomaImage: "bac-iph.svg"
           }
         ]

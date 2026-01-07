@@ -16,18 +16,18 @@ export default {
             name: "GitHub",
             short: "My open-source projects and contributions.",
             url: "https://github.com/USERNAME",
-            qr: "qr/qr_GitHub.png"
+            qr: "qr/qr_GitHub.webp"
         },
         linkedin: {
             name: "LinkedIn",
             short: "My professional profile — CV & network.",
             url: "https://www.linkedin.com/in/USERNAME",
-            qr: "qr/qr_LinkedIn.png"
+            qr: "qr/qr_LinkedIn.webp"
         },
         email: {
             name: "Email",
             short: "Send me a message directly by email.",
-            qr: "qr/qr_Email.png",
+            qr: "qr/qr_Email.webp",
             // store as "42bhamdi[at]gmail.com" and decode in the component
             address: "42bhamdi[at]gmail.com"
         },
@@ -35,7 +35,7 @@ export default {
             name: "Contact me",
             short: "Contact form or direct message.",
             url: "mailto:42bhamdi[at]gmail.com",
-            qr: "qr/qr_Contact.png",
+            qr: "qr/qr_Contact.webp",
             form: {
                 nameLabel: "Your name",
                 emailLabel: "Your email (optional)",

@@ -28,9 +28,18 @@
 
     <!-- Sélecteur de langues -->
     <div class="lang-switcher">
-  <img src="/logos/flags/fr.svg" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" loading="lazy" />
-  <img src="/logos/flags/en.svg" alt="EN" :class="{ active: locale === 'en' }" @click="changeLang('en')" loading="lazy" />
-  <img src="/logos/flags/ar.svg" alt="AR" :class="{ active: locale === 'ar' }" @click="changeLang('ar')" loading="lazy" />
+  <picture>
+    <source srcset="/logos/flags/fr.webp" type="image/webp" />
+  <img src="/logos/flags/fr.webp" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" loading="lazy" />
+  </picture>
+  <picture>
+    <source srcset="/logos/flags/en.webp" type="image/webp" />
+  <img src="/logos/flags/en.webp" alt="EN" :class="{ active: locale === 'en' }" @click="changeLang('en')" loading="lazy" />
+  </picture>
+  <picture>
+    <source srcset="/logos/flags/ar.webp" type="image/webp" />
+  <img src="/logos/flags/ar.webp" alt="AR" :class="{ active: locale === 'ar' }" @click="changeLang('ar')" loading="lazy" />
+  </picture>
     </div>
   </div>
 </template>
