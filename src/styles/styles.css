@@ -1,3 +1,15 @@
+/* Import Montserrat depuis Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+/* Police Montserrat pour tout sauf arabe */
+html, body, :not([lang="ar"]):not([dir="rtl"]) {
+  font-family: 'Montserrat', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Pour l'arabe, garder la police système ou une police arabe dédiée */
+[lang="ar"], [dir="rtl"] {
+  font-family: system-ui, "BArabics", "Amiri", "Cairo", Arial, sans-serif;
+}
 /* Désactive l'effet hover sur le formulaire de contact (ContactForm) */
 .contact-form.card.line-card:hover,
 .contact-form.card.line-card:focus-visible {
