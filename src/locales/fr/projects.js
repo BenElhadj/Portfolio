@@ -12,8 +12,8 @@ export default {
     {
       name: "Conception AI",
       year: "2025",
-      description: "Application d'intelligence artificielle permettant la conception d'interfaces et d'agents interactifs via des modèles d'IA générative.",
-      stack: "Vue.js, Python, FastAPI, Docker",
+  description: "Application d'intelligence artificielle permettant la conception d'interfaces et d'agents interactifs via des modèles d'IA générative.",
+  stack: "Vue.js, Python, FastAPI, Docker",
       link: "https://benelhadj.github.io/Conception-AI/"
     },
     {

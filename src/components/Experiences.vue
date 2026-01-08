@@ -66,9 +66,18 @@
                 </a>
               </div>
               <div class="role">{{ exp.role }}</div>
-              <ul class="details">
-                <li v-for="(d, j) in exp.details" :key="j">{{ d }}</li>
-              </ul>
+              <div class="details">
+                <div class="exp-role"><strong>{{ exp.role }}</strong></div>
+                <div v-for="(d, j) in exp.details" :key="j" class="exp-detail">
+                  <template v-if="d.includes(':')">
+                    <strong>{{ d.split(':')[0] }}: </strong>
+                    <span class="highlight">{{ d.split(':').slice(1).join(':').trim() }}</span>
+                  </template>
+                  <template v-else>
+                    <span class="highlight">{{ d }}</span>
+                  </template>
+                </div>
+              </div>
             </div>
           </div>
         </div>
