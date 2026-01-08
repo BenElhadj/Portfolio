@@ -1,9 +1,9 @@
 export default {
-    timeline: "Frise Chronologique",
+    timeline: "Frise chronologique",
     diplomas: "Diplômes",
     experiences: "Expériences",
-    skills: "Compétences Techniques",
-    softSkills: "Compétences Comportementales",
+    skills: "Compétences techniques",
+    softSkills: "Compétences comportementales",
     projects: "Projets",
-    links: "Liens Utiles",
+    links: "Liens utiles",
 };
