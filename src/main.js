@@ -79,6 +79,14 @@ app.mount("#app");
     if (hasScrolled) return;
     try {
       const scroller = document.querySelector('.pages');
+  // Enregistrement du Service Worker pour le cache
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        // .then(reg => console.log('Service Worker enregistré', reg))
+        .catch(err => console.error('Erreur Service Worker', err));
+    });
+  }
       const scrolledAmt = scroller ? scroller.scrollTop : window.pageYOffset || document.documentElement.scrollTop || 0;
       if (scrolledAmt > 10) {
         hasScrolled = true;
