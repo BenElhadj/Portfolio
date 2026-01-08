@@ -168,7 +168,3 @@ onUnmounted(() => {
 // Le rechargement instantané est géré par l'évènement 'language-changed'
 watch(() => locale.value, () => {})
 </script>
-
-<style scoped>
-/* Styles déplacés dans src/styles/styles.css pour respecter la source unique des styles */
-</style>
