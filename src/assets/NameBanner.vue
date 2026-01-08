@@ -45,7 +45,7 @@ function getModeCode() {
   return isDark ? 'w' : 'b'
 }
 
-const buildUrl = (key) => `${normalizedBase}logos/texts/${langCode.value}-${getModeCode()}-${key}=`
+const buildUrl = (key) => `${normalizedBase}logos/texts/${langCode.value}-${getModeCode()}-${key}.svg`
 
 let currentRenderToken = 0
 
