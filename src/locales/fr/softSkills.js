@@ -1,5 +1,5 @@
 export default {
-  title: "Compétences Comportementales",
+  title: "Compétences comportementales",
   groups: {
     part1: "Collaboration & compétences humaines",
     part2: "Organisation, Adaptation & Résilience",

@@ -17,8 +17,8 @@ export default {
       short: "Builds authentic relationships.",
       info: "Shows genuine interest in others, listens actively and adapts communication to people."
     },
-    communication: {
-      name: "Concise Communication",
+    empathicCommunication: {
+      name: "Concise communication",
       short: "Gets to the point, expresses clearly.",
       info: "Prefers clear, concise messages while sharing feelings to keep interactions transparent."
     },
@@ -80,7 +80,7 @@ export default {
       info: "I create simple, direct and sincere exchanges. I truly listen to others, understand their needs and adapt to their way of thinking. This empathy prevents misunderstandings and eases cooperation within teams."
     },
     teamSpirit: {
-      name: "Team Spirit",
+      name: "Team spirit",
       short: "Naturally works in a team.",
       info: "I involve others, ask for their views and value their contributions. I believe the best solutions come from collective intelligence."
     },
@@ -95,12 +95,17 @@ export default {
       info: "I build relationships based on honesty, trust and respect. I stay calm, professional and loyal even during difficult moments."
     },
     calmUnderPressure: {
-      name: "Calm Under Pressure",
+      name: "Calm under pressure",
       short: "Remains composed and effective under pressure.",
       info: "I keep a cool head in stressful situations. Unexpected events, tight deadlines or emergencies don't throw me off: I focus on solutions rather than the problem."
     },
+    teamSpirit: {
+      name: "Team spirit",
+      short: "Naturally works in a team.",
+      info: "I involve others, ask for their views and value their contributions. I believe the best solutions come from collective intelligence."
+    },
     agileFlexible: {
-      name: "Agile & Flexible",
+      name: "Agile & flexible",
       short: "Flexible, agile, able to improvise wisely.",
       info: "I can change direction quickly without losing effectiveness. I know how to improvise, but always with logic, structure and reflection."
     },
