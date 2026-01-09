@@ -52,19 +52,25 @@ if (afterArr.length < 2) {
 }
 const after = afterArr[1];
 
+// Ajoute dynamiquement tous les JS/CSS générés dans dist/assets et dist/assets/css
+function getAssetFiles(subdir = '') {
+  const dir = path.join(distDir, 'assets', subdir);
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir)
+    .filter(f => fs.statSync(path.join(dir, f)).isFile() && !f.endsWith('.gz'))
+    .map(f => `${PREFIX}/assets${subdir ? '/' + subdir : ''}/${f}`);
+}
+
 const staticFiles = [
   `${PREFIX}/`,
   `${PREFIX}/index.html`,
-  `${PREFIX}/assets/index-Djt-6e3O.js`,
-  `${PREFIX}/assets/vue-vendor-4Q8CldyY.js`,
-  `${PREFIX}/assets/gsap-vendor-DDlvirwQ.js`,
-  `${PREFIX}/assets/three-vendor-D_1aLpCO.js`,
-  `${PREFIX}/assets/css/index-jazTp3M_.css`,
   `${PREFIX}/favicon.ico`,
   `${PREFIX}/favicon.webp`,
   `${PREFIX}/degrees/42.webp`,
   `${PREFIX}/degrees/GRETA.webp`,
   `${PREFIX}/degrees/MEFP.webp`,
+  ...getAssetFiles(),
+  ...getAssetFiles('css'),
 ];
 
 const newUrls = staticFiles.concat(filesToCache);
