@@ -1,3 +1,5 @@
+// Préfixe pour le sous-dossier GitHub Pages
+const PREFIX = '/Portfolio';
 // Script Node.js ES module pour générer la liste des fichiers à mettre en cache dans le service worker
 // Usage : node generate-cache-list.js
 
@@ -26,7 +28,7 @@ folders.forEach(folder => {
   if (fs.existsSync(dirPath)) {
     const files = fs.readdirSync(dirPath)
       .filter(f => fs.statSync(path.join(dirPath, f)).isFile())
-      .map(f => `/${folder}/${f}`);
+      .map(f => `${PREFIX}/${folder}/${f}`);
     filesToCache = filesToCache.concat(files);
   }
 });
@@ -51,18 +53,18 @@ if (afterArr.length < 2) {
 const after = afterArr[1];
 
 const staticFiles = [
-  '/',
-  '/index.html',
-  '/assets/index-Djt-6e3O.js',
-  '/assets/vue-vendor-4Q8CldyY.js',
-  '/assets/gsap-vendor-DDlvirwQ.js',
-  '/assets/three-vendor-D_1aLpCO.js',
-  '/assets/css/index-jazTp3M_.css',
-  '/favicon.ico',
-  '/favicon.webp',
-  '/degrees/42.webp',
-  '/degrees/GRETA.webp',
-  '/degrees/MEFP.webp',
+  `${PREFIX}/`,
+  `${PREFIX}/index.html`,
+  `${PREFIX}/assets/index-Djt-6e3O.js`,
+  `${PREFIX}/assets/vue-vendor-4Q8CldyY.js`,
+  `${PREFIX}/assets/gsap-vendor-DDlvirwQ.js`,
+  `${PREFIX}/assets/three-vendor-D_1aLpCO.js`,
+  `${PREFIX}/assets/css/index-jazTp3M_.css`,
+  `${PREFIX}/favicon.ico`,
+  `${PREFIX}/favicon.webp`,
+  `${PREFIX}/degrees/42.webp`,
+  `${PREFIX}/degrees/GRETA.webp`,
+  `${PREFIX}/degrees/MEFP.webp`,
 ];
 
 const newUrls = staticFiles.concat(filesToCache);
