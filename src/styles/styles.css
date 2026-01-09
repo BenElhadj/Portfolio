@@ -1437,11 +1437,14 @@ html.has-scrolled .sub-section:focus-within::after {
   margin: 0 1px;
   transition: color 0.18s, background 0.18s;
   z-index: 1;
+  outline: none;
 }
-.nav-arrow:hover {
+.nav-arrow:active {
   color: var(--blue);
-  background: transparent;
+  background: rgba(11,111,184,0.08);
+  transition: color 0.12s, background 0.12s;
 }
+
 .nav-links::-webkit-scrollbar {
   display: none;
 }

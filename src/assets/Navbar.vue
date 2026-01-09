@@ -8,7 +8,7 @@
     </button>
     <!-- Navigation Pages avec flèches -->
     <div class="nav-arrows-container">
-      <button v-if="showArrows" class="nav-arrow left" @click="scrollNav(-1)" aria-label="Pages précédentes">&#60;</button>
+      <button v-if="showArrows" class="nav-arrow left" @click="scrollNav(-1);handleArrowClick($event)" :disabled="isAtStart" aria-label="Pages précédentes">&#60;</button>
       <ul class="nav-links" role="menubar" ref="navLinksRef">
         <li
           v-for="(key, i) in navKeys"
@@ -23,23 +23,23 @@
           {{ getLabel(key) }}
         </li>
       </ul>
-      <button v-if="showArrows" class="nav-arrow right" @click="scrollNav(1)" aria-label="Pages suivantes">&#62;</button>
+      <button v-if="showArrows" class="nav-arrow right" @click="scrollNav(1);handleArrowClick($event)" :disabled="isAtEnd" aria-label="Pages suivantes">&#62;</button>
     </div>
 
     <!-- Sélecteur de langues -->
     <div class="lang-switcher">
-  <picture>
-    <source srcset="/logos/flags/fr.webp" type="image/webp" />
-  <img src="/logos/flags/fr.webp" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" loading="lazy" />
-  </picture>
-  <picture>
-    <source srcset="/logos/flags/en.webp" type="image/webp" />
-  <img src="/logos/flags/en.webp" alt="EN" :class="{ active: locale === 'en' }" @click="changeLang('en')" loading="lazy" />
-  </picture>
-  <picture>
-    <source srcset="/logos/flags/ar.webp" type="image/webp" />
-  <img src="/logos/flags/ar.webp" alt="AR" :class="{ active: locale === 'ar' }" @click="changeLang('ar')" loading="lazy" />
-  </picture>
+      <picture>
+        <source srcset="/logos/flags/fr.webp" type="image/webp" />
+      <img src="/logos/flags/fr.webp" alt="FR" :class="{ active: locale === 'fr' }" @click="changeLang('fr')" loading="lazy" />
+      </picture>
+      <picture>
+        <source srcset="/logos/flags/en.webp" type="image/webp" />
+      <img src="/logos/flags/en.webp" alt="EN" :class="{ active: locale === 'en' }" @click="changeLang('en')" loading="lazy" />
+      </picture>
+      <picture>
+        <source srcset="/logos/flags/ar.webp" type="image/webp" />
+      <img src="/logos/flags/ar.webp" alt="AR" :class="{ active: locale === 'ar' }" @click="changeLang('ar')" loading="lazy" />
+      </picture>
     </div>
   </div>
 </template>
@@ -48,12 +48,26 @@
 import { onBeforeUnmount } from "vue";
 // Affichage conditionnel des flèches
 const showArrows = ref(false);
+const isAtStart = ref(true);
+const isAtEnd = ref(false);
 
 function checkNavOverflow() {
   const nav = navLinksRef.value;
   if (!nav) return;
   // On compare le scrollWidth (contenu total) à la largeur visible
   showArrows.value = nav.scrollWidth > nav.offsetWidth + 2; // +2 pour tolérance
+  updateArrowState();
+}
+
+function updateArrowState() {
+  const nav = navLinksRef.value;
+  if (!nav) return;
+  isAtStart.value = nav.scrollLeft <= 2;
+  isAtEnd.value = nav.scrollLeft + nav.offsetWidth >= nav.scrollWidth - 2;
+}
+
+function onNavScroll() {
+  updateArrowState();
 }
 
 let resizeObserver = null;
@@ -92,7 +106,6 @@ const navKeys = [
   "navbar.softSkills",
   "navbar.links"
 ];
-
 
 /* libellés fallback */
 const fallback = {
@@ -135,11 +148,16 @@ function goToIndex(i) {
   }
   currentIndex.value = i;
   localStorage.setItem("lastPageIndex", String(i));
-  // S'assurer que l'onglet sélectionné est visible
+  // Centrer l'élément actif dans la navbar
   nextTick(() => {
     const nav = navLinksRef.value;
     if (nav && nav.children[i]) {
-      nav.children[i].scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
+      const activeEl = nav.children[i];
+      const navRect = nav.getBoundingClientRect();
+      const elRect = activeEl.getBoundingClientRect();
+      const scrollLeft = nav.scrollLeft;
+      const offset = elRect.left - navRect.left - (navRect.width / 2) + (elRect.width / 2);
+      nav.scrollTo({ left: scrollLeft + offset, behavior: 'smooth' });
     }
   });
 }
@@ -182,6 +200,49 @@ function toggleTheme() {
   } catch {}
 }
 
+/* Effet temporaire de clic sur les flèches de navigation */
+function handleArrowClick(event) {
+  const btn = event.currentTarget;
+  // Supprimer le focus et l'état actif immédiatement (empêche l'effet bleu sur mobile)
+  btn.blur && btn.blur();
+  btn.classList.remove('clicked');
+  // Forcer le repaint
+  void btn.offsetWidth;
+  // Appliquer l'effet temporaire
+  btn.classList.add('clicked');
+  setTimeout(() => {
+    btn.classList.remove('clicked');
+    // Forcer le repaint à nouveau
+    void btn.offsetWidth;
+    // Supprimer le focus une seconde fois au cas où
+    btn.blur && btn.blur();
+  }, 180);
+}
+
+// Ajout logique Vue pour sélecteur de langue mobile
+const langSwitcherRef = ref(null);
+const isLangOpen = ref(false);
+
+function toggleLangSwitcher() {
+  isLangOpen.value = !isLangOpen.value;
+  // Ajoute ou retire la classe .open sur le conteneur
+  const el = langSwitcherRef.value;
+  if (el) {
+    if (isLangOpen.value) {
+      el.classList.add('open');
+    } else {
+      el.classList.remove('open');
+    }
+  }
+}
+
+// function selectLang(lang) {
+//   changeLang(lang);
+//   isLangOpen.value = false;
+//   const el = langSwitcherRef.value;
+//   if (el) el.classList.remove('open');
+// }
+
 /* Init */
 onMounted(() => {
   // Observer le redimensionnement pour afficher/masquer les flèches
@@ -200,17 +261,30 @@ onMounted(() => {
   watch(locale, () => {
     nextTick(checkNavOverflow);
   });
+  nextTick(() => {
+    const nav = navLinksRef.value;
+    if (nav) nav.addEventListener('scroll', onNavScroll, { passive: true });
+  });
 onBeforeUnmount(() => {
   if (resizeObserver) resizeObserver.disconnect();
   window.removeEventListener('resize', checkNavOverflow);
 });
-  // S'assurer que la sélection active est visible au chargement
-  nextTick(() => {
+  // Centrer l'élément actif dans la navbar au chargement et lors du resize
+  function centerActiveNav() {
     const nav = navLinksRef.value;
     if (nav && nav.children[currentIndex.value]) {
-      nav.children[currentIndex.value].scrollIntoView({ inline: 'center', behavior: 'auto', block: 'nearest' });
+      const activeEl = nav.children[currentIndex.value];
+      const navRect = nav.getBoundingClientRect();
+      const elRect = activeEl.getBoundingClientRect();
+      const scrollLeft = nav.scrollLeft;
+      const offset = elRect.left - navRect.left - (navRect.width / 2) + (elRect.width / 2);
+      nav.scrollTo({ left: scrollLeft + offset, behavior: 'auto' });
     }
-  });
+  }
+  nextTick(centerActiveNav);
+  window.addEventListener('resize', centerActiveNav);
+  // Centrage aussi lors du changement d'index
+  watch(currentIndex, () => nextTick(centerActiveNav));
   pagesContainer = document.querySelector(".pages");
   pageEls = Array.from(document.querySelectorAll(".pages .page"));
   if (!pageEls.length) pageEls = Array.from(document.querySelectorAll(".page"));
