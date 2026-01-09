@@ -1,5 +1,3 @@
-// Préfixe pour le sous-dossier GitHub Pages
-const PREFIX = '/Portfolio';
 // Script Node.js ES module pour générer la liste des fichiers à mettre en cache dans le service worker
 // Usage : node generate-cache-list.js
 
@@ -28,7 +26,7 @@ folders.forEach(folder => {
   if (fs.existsSync(dirPath)) {
     const files = fs.readdirSync(dirPath)
       .filter(f => fs.statSync(path.join(dirPath, f)).isFile())
-      .map(f => `${PREFIX}/${folder}/${f}`);
+      .map(f => `/${folder}/${f}`);
     filesToCache = filesToCache.concat(files);
   }
 });
@@ -52,25 +50,19 @@ if (afterArr.length < 2) {
 }
 const after = afterArr[1];
 
-// Ajoute dynamiquement tous les JS/CSS générés dans dist/assets et dist/assets/css
-function getAssetFiles(subdir = '') {
-  const dir = path.join(distDir, 'assets', subdir);
-  if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir)
-    .filter(f => fs.statSync(path.join(dir, f)).isFile() && !f.endsWith('.gz'))
-    .map(f => `${PREFIX}/assets${subdir ? '/' + subdir : ''}/${f}`);
-}
-
 const staticFiles = [
-  `${PREFIX}/`,
-  `${PREFIX}/index.html`,
-  `${PREFIX}/favicon.ico`,
-  `${PREFIX}/favicon.webp`,
-  `${PREFIX}/degrees/42.webp`,
-  `${PREFIX}/degrees/GRETA.webp`,
-  `${PREFIX}/degrees/MEFP.webp`,
-  ...getAssetFiles(),
-  ...getAssetFiles('css'),
+  '/',
+  '/index.html',
+  '/assets/index-Djt-6e3O.js',
+  '/assets/vue-vendor-4Q8CldyY.js',
+  '/assets/gsap-vendor-DDlvirwQ.js',
+  '/assets/three-vendor-D_1aLpCO.js',
+  '/assets/css/index-jazTp3M_.css',
+  '/favicon.ico',
+  '/favicon.webp',
+  '/degrees/42.webp',
+  '/degrees/GRETA.webp',
+  '/degrees/MEFP.webp',
 ];
 
 const newUrls = staticFiles.concat(filesToCache);

@@ -112,8 +112,12 @@ jobs:
         if: hashFiles('**/package-lock.json') == ''
         run: npm i
 
+
       - name: Build
         run: npm run build
+
+      - name: Génère la liste de cache pour le service worker
+        run: node generate-cache-list.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
