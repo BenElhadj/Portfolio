@@ -15,13 +15,13 @@ export default {
         github: {
             name: "GitHub",
             short: "مشاريعي المفتوحة المصدر ومساهماتي.",
-            url: "https://github.com/USERNAME",
+            url: "https://github.com/BenElhadj",
             qr: "qr/qr_GitHub.webp"
         },
         linkedin: {
             name: "LinkedIn",
             short: "ملفي المهني — السيرة الذاتية والشبكة.",
-            url: "https://www.linkedin.com/in/USERNAME",
+            url: "https://www.linkedin.com/in/benelhadjhamdi/",
             qr: "qr/qr_LinkedIn.webp"
         },
         email: {
