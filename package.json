@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
   "predev": "node generate-cache-manifest.cjs",
-  "prebuild": "node generate-cache-manifest.cjs",
+  "prebuild": "vite build && node generate-cache-manifest.cjs",
   "predeploy": "node generate-cache-manifest.cjs",
   "dev": "vite --open",
   "build": "vite build",

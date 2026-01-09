@@ -4,8 +4,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const publicDir = path.join(__dirname, 'public');
-const output = path.join(publicDir, 'cache-manifest.json');
+// On scanne désormais le dossier dist/ après le build
+const distDir = path.join(__dirname, 'dist');
+const output = path.join(distDir, 'cache-manifest.json');
 
 
 // Extensions autorisées (fichiers statiques web)
@@ -43,7 +44,7 @@ function walk(dir, baseUrl = '') {
   return results;
 }
 
-const files = walk(publicDir, '').map(f => f.replace(/\\/g, '/'));
+const files = walk(distDir, '').map(f => f.replace(/\\/g, '/'));
 
 fs.writeFileSync(output, JSON.stringify(files, null, 2));
-console.log('cache-manifest.json généré avec', files.length, 'fichiers.');
+console.log('cache-manifest.json généré dans dist/ avec', files.length, 'fichiers.');

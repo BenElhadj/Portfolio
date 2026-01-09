@@ -16,7 +16,15 @@ async function getUrlsToCache() {
   }
 }
 
+
+// Désactive le service worker en dev (localhost)
 self.addEventListener('install', event => {
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    console.warn('Service Worker désactivé en développement.');
+    // On stoppe l'installation, rien n'est fait
+    self.skipWaiting();
+    return;
+  }
   event.waitUntil(
     (async () => {
       const urlsToCache = await getUrlsToCache();
@@ -35,6 +43,10 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    // En dev, ne rien intercepter
+    return;
+  }
   event.respondWith(
     caches.match(event.request)
       .then(response => response || fetch(event.request))
