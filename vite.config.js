@@ -10,7 +10,7 @@ export default defineConfig({
       ext: '.gz',
     })
   ],
-  base: './',
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
