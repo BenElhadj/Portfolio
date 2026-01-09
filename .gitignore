@@ -20,9 +20,11 @@
 # production
 /build
 
+
 # misc
 .DS_Store
 *.pem
+public/cache-manifest.json
 
 # debug
 npm-debug.log*

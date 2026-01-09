@@ -4,11 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --open",
-    "build": "vite build",
-    "preview": "vite preview",
-    "deploy": "vite build && node -e \"const fs=require('fs'),path=require('path');(function d(p){fs.readdirSync(p).forEach(f=>{const q=path.join(p,f);if(fs.statSync(q).isDirectory())d(q);else if(q.endsWith('.gz'))fs.unlinkSync(q)})})(process.argv[1])\" dist && gh-pages -d dist",
-    "build:analyze": "vite build --mode analyze"
+  "predev": "node generate-cache-manifest.cjs",
+  "prebuild": "node generate-cache-manifest.cjs",
+  "predeploy": "node generate-cache-manifest.cjs",
+  "dev": "vite --open",
+  "build": "vite build",
+  "preview": "vite preview",
+  "deploy": "vite build && node -e \"const fs=require('fs'),path=require('path');(function d(p){fs.readdirSync(p).forEach(f=>{const q=path.join(p,f);if(fs.statSync(q).isDirectory())d(q);else if(q.endsWith('.gz'))fs.unlinkSync(q)})})(process.argv[1])\" dist && gh-pages -d dist",
+  "build:analyze": "vite build --mode analyze"
   },
   "dependencies": {
     "gsap": "^3.13.0",

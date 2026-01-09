@@ -1,141 +1,36 @@
-const CACHE_NAME = 'portfolio-cache-v2';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/assets/index-Djt-6e3O.js',
-  '/assets/vue-vendor-4Q8CldyY.js',
-  '/assets/gsap-vendor-DDlvirwQ.js',
-  '/assets/three-vendor-D_1aLpCO.js',
-  '/assets/css/index-jazTp3M_.css',
-  '/favicon.ico',
-  '/favicon.webp',
-  '/degrees/42.webp',
-  '/degrees/GRETA.webp',
-  '/degrees/MEFP.webp',
-  '/cv/CV_EN.pdf',
-  '/cv/CV_FR.pdf',
-  '/experiences/AP-HP.webp',
-  '/experiences/Aquarium_Informatique.webp',
-  '/experiences/ATOUTEK.webp',
-  '/experiences/chanel.webp',
-  '/experiences/Dim.webp',
-  '/experiences/Dior.webp',
-  '/experiences/EUROPEAN_TRADE.webp',
-  '/experiences/Global_Info.webp',
-  '/experiences/GRETA.webp',
-  '/experiences/ICM.webp',
-  '/experiences/independant.webp',
-  '/experiences/KEAKR.webp',
-  '/experiences/LVMH.webp',
-  '/experiences/Microlux.webp',
-  '/experiences/MSS_Fnac.webp',
-  '/experiences/MULTISERV_PLUS.webp',
-  '/experiences/Parkeon.webp',
-  '/experiences/Retronix.webp',
-  '/experiences/Sagem.webp',
-  '/experiences/solutions-30.webp',
-  '/experiences/STIE.webp',
-  '/experiences/TEKNE-TUNISIE.webp',
-  '/experiences/TRANSTU.webp',
-  '/logos/flags/ar.webp',
-  '/logos/flags/en.webp',
-  '/logos/flags/fr.webp',
-  '/logos/skills/ad.webp',
-  '/logos/skills/android-studio.webp',
-  '/logos/skills/android.webp',
-  '/logos/skills/arangodb.webp',
-  '/logos/skills/argo-cd.webp',
-  '/logos/skills/bash.webp',
-  '/logos/skills/blender.webp',
-  '/logos/skills/c.webp',
-  '/logos/skills/cisco.webp',
-  '/logos/skills/cpp.webp',
-  '/logos/skills/css3.webp',
-  '/logos/skills/dart.webp',
-  '/logos/skills/docker.webp',
-  '/logos/skills/firebase.webp',
-  '/logos/skills/flutter.webp',
-  '/logos/skills/git-hub.webp',
-  '/logos/skills/git-lab.webp',
-  '/logos/skills/git.webp',
-  '/logos/skills/html5.webp',
-  '/logos/skills/illustrator.webp',
-  '/logos/skills/intellij.webp',
-  '/logos/skills/ios.webp',
-  '/logos/skills/java.webp',
-  '/logos/skills/javascript.webp',
-  '/logos/skills/jenkins.webp',
-  '/logos/skills/linux.webp',
-  '/logos/skills/mac-os1.webp',
-  '/logos/skills/macos.webp',
-  '/logos/skills/mongodb.webp',
-  '/logos/skills/mysql.webp',
-  '/logos/skills/nodejs.webp',
-  '/logos/skills/photoshop.webp',
-  '/logos/skills/php.webp',
-  '/logos/skills/postman.webp',
-  '/logos/skills/powershell.webp',
-  '/logos/skills/python.webp',
-  '/logos/skills/qt.webp',
-  '/logos/skills/quasar.webp',
-  '/logos/skills/react.webp',
-  '/logos/skills/sharp.webp',
-  '/logos/skills/svelte.webp',
-  '/logos/skills/unreal.webp',
-  '/logos/skills/veutify.webp',
-  '/logos/skills/virtualbox.webp',
-  '/logos/skills/visual-studio.webp',
-  '/logos/skills/vite.webp',
-  '/logos/skills/vscode.webp',
-  '/logos/skills/vue.webp',
-  '/logos/skills/windows.webp',
-  '/logos/texts/ar-b-full_stack.svg',
-  '/logos/texts/ar-b-hamdi.svg',
-  '/logos/texts/ar-b-ia.svg',
-  '/logos/texts/ar-b-ml.svg',
-  '/logos/texts/ar-b-mobile.svg',
-  '/logos/texts/ar-b-web.svg',
-  '/logos/texts/ar-w-full_stack.svg',
-  '/logos/texts/ar-w-hamdi.svg',
-  '/logos/texts/ar-w-ia.svg',
-  '/logos/texts/ar-w-ml.svg',
-  '/logos/texts/ar-w-mobile.svg',
-  '/logos/texts/ar-w-web.svg',
-  '/logos/texts/en-b-full_stack.svg',
-  '/logos/texts/en-b-hamdi.svg',
-  '/logos/texts/en-b-ia.svg',
-  '/logos/texts/en-b-ml.svg',
-  '/logos/texts/en-b-mobile.svg',
-  '/logos/texts/en-b-web.svg',
-  '/logos/texts/en-w-full_stack.svg',
-  '/logos/texts/en-w-hamdi.svg',
-  '/logos/texts/en-w-ia.svg',
-  '/logos/texts/en-w-ml.svg',
-  '/logos/texts/en-w-mobile.svg',
-  '/logos/texts/en-w-web.svg',
-  '/logos/texts/fr-b-full_stack.svg',
-  '/logos/texts/fr-b-hamdi.svg',
-  '/logos/texts/fr-b-ia.svg',
-  '/logos/texts/fr-b-ml.svg',
-  '/logos/texts/fr-b-mobile.svg',
-  '/logos/texts/fr-b-web.svg',
-  '/logos/texts/fr-w-full_stack.svg',
-  '/logos/texts/fr-w-hamdi.svg',
-  '/logos/texts/fr-w-ia.svg',
-  '/logos/texts/fr-w-ml.svg',
-  '/logos/texts/fr-w-mobile.svg',
-  '/logos/texts/fr-w-web.svg',
-  '/models/avatar.glb',
-  '/qr/qr_Contact.webp',
-  '/qr/qr_Email.webp',
-  '/qr/qr_GitHub.webp',
-  '/qr/qr_LinkedIn.webp',
-];
+const CACHE_NAME = 'portfolio-cache-v3';
+
+// Fonction pour charger dynamiquement la liste des fichiers à mettre en cache
+async function getUrlsToCache() {
+  try {
+    // On construit l'URL absolue de cache-manifest.json selon l'emplacement du service worker
+    const manifestUrl = new URL('cache-manifest.json', self.location);
+    const response = await fetch(manifestUrl.href);
+    if (!response.ok) throw new Error('cache-manifest.json introuvable');
+    const files = await response.json();
+    // On ajoute la racine et index.html si besoin
+    return ['/', '/index.html', ...files];
+  } catch (e) {
+    console.error('Impossible de charger cache-manifest.json', e);
+    return ['/', '/index.html'];
+  }
+}
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    (async () => {
+      const urlsToCache = await getUrlsToCache();
+      const cache = await caches.open(CACHE_NAME);
+      await Promise.all(
+        urlsToCache.map(async url => {
+          try {
+            await cache.add(url);
+          } catch (e) {
+            console.warn('Service Worker: Ressource non cachée', url, e);
+          }
+        })
+      );
+    })()
   );
 });
 
