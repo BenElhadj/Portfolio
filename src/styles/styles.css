@@ -53,19 +53,22 @@ html, body, :not([lang="ar"]):not([dir="rtl"]) {
   --cat-stage: #f59e0b;     /* amber */
   --cat-travail: #22c55e;   /* green */
   --cat-autre: #a78bfa;     /* violet */
-  --corner-qr-size: 80px;
+    --corner-qr-size: 168px;
 
-  /* Font sizes */
-  --fs-h1: 2.6rem;
-  --fs-h2: 2.2rem;
-  --fs-h3: 1.5rem;
-  --fs-body: 1rem;
-  --fs-small: 0.85rem;
+  /* Font sizes (responsive with clamp) */
+  --fs-h1: clamp(1.2rem, 3vw + 0.8rem, 2rem);
+  --fs-h2: clamp(1.05rem, 2.2vw + 0.6rem, 1.6rem);
+  --fs-h3: clamp(0.92rem, 1.6vw + 0.5rem, 1.18rem);
+  --fs-body: clamp(0.78rem, 1.1vw + 0.35rem, 0.92rem);
+  --fs-small: clamp(0.68rem, 0.8vw + 0.25rem, 0.78rem);
+
+  
   --radius: 8px;
   --navbar-height: 36px;
   /* padding global des pages */
   --wrapper-padding-top: 28px;
   --page-padding-x: 24px;
+
   /* hauteur du bandeau de nom (égale à la taille des titres h2) */
   --name-banner-height: var(--fs-h2);
   --name-banner-offset: 0px; /* ajustement fin vertical commun bandeau/titre */
@@ -77,6 +80,24 @@ html, body, :not([lang="ar"]):not([dir="rtl"]) {
   --degree-thumb-width: 90px;
   /* QR corner size (can be adjusted globally) */
   --corner-qr-size: 168px;
+}
+
+
+
+@media (max-width: 1024px) {
+  :root {
+    --page-padding-x: 16px;
+  }
+}
+@media (max-width: 768px) {
+  :root {
+    --page-padding-x: 10px;
+  }
+}
+@media (max-width: 480px) {
+  :root {
+    --page-padding-x: 4px;
+  }
 }
 
 /* Mode clair explicite */
@@ -230,8 +251,8 @@ h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
   cursor: pointer;
   will-change: transform;
   outline: none;
-   position: relative;
-   z-index: 3000; /* le clic passe au-dessus de tout le contenu de la page */
+  position: relative;
+  z-index: 3000; /* le clic passe au-dessus de tout le contenu de la page */
   transition: transform 160ms ease, filter 120ms ease;
 }
 .links-wrapper .clickable-favicon:hover {
@@ -1383,13 +1404,13 @@ html.has-scrolled .sub-section:focus-within::after {
 .nav-left, .nav-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* left: links */
 .nav-links {
   display: flex;
-  gap: 14px;
+  gap: 8px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1434,7 +1455,7 @@ html.has-scrolled .sub-section:focus-within::after {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin: 0 1px;
+  /* margin: 0 1px; */
   transition: color 0.18s, background 0.18s;
   z-index: 1;
   outline: none;
