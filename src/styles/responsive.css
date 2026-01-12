@@ -1,8 +1,45 @@
+/* Très petits écrans <= 320px : QR code plus petit et marges adaptées */
+@media (max-width: 320px) {
+  .links-wrapper { --corner-qr-size: 85px; }
+  .links-wrapper .card.line-card.corner {
+    min-width: calc(var(--corner-qr-size) + 16px) !important;
+    min-height: calc(var(--corner-qr-size) + 16px + 6em);
+  }
+  .sub-section {
+    min-width: calc(var(--corner-qr-size) + 16px) !important;
+  }
+}
 /* La sous-section ne doit jamais être plus petite que la card corner (QR + marges) */
 .sub-section {
   min-width: calc(var(--corner-qr-size) + 32px) !important;
 }
-/* Toujours appliquer ces règles, toutes tailles d'écran */
+/* Taille du QR code responsive avec clamp() pour s'adapter à l'écran */
+:root {
+  /* Améliore la netteté du texte sur tous les navigateurs */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  --corner-qr-size: clamp(64px, 14vw, 240px);
+  --corner-qr-margin: clamp(10px, 2vw, 36px);
+}
+
+/* Synchroniser la taille du favicon avec celle du QR code */
+.links-wrapper .favicon-center img {
+  width: clamp(96px, 18vw, 260px) !important;
+  height: auto !important;
+  min-width: clamp(96px, 18vw, 260px) !important;
+  max-width: clamp(96px, 18vw, 260px) !important;
+  display: block;
+  margin: var(--corner-qr-margin) auto;
+}
+
+@media (min-width: 1025px) {
+  :root {
+    --corner-qr-size: 220px;
+    --corner-qr-margin: 32px;
+  }
+}
+}
 .links-wrapper .card.line-card.corner {
   min-width: calc(var(--corner-qr-size) + 32px) !important;
   min-height: calc(var(--corner-qr-size) + 32px + 6em);
@@ -225,19 +262,15 @@
   
 
 /* Très petits écrans: QR minimum 80px pour garantir visibilité complète */
-@media (max-width: 480px) {
-  .links-wrapper { --corner-qr-size: 100px; }
-}
-  .wrapper {
-    padding: 30px 18px;
+@media (max-width: 1024px) {
+  .links-wrapper { --corner-qr-size: clamp(140px, 20vw, 300px); --corner-qr-margin: clamp(16px, 3vw, 48px); }
+  .links-wrapper .page-layout.grid-2x2 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
   }
-  
-  .timeline {
-    padding-left: 60px;
+  .projects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
-  
-  .timeline::before {
-    left: 30px;
   }
   
   .dot {
@@ -253,14 +286,13 @@
 
 /* Mobiles */
 @media (max-width: 768px) {
-  /* Sur mobile, conserver une grille 2x2 spécifique à la page Liens */
+  .links-wrapper { --corner-qr-size: clamp(90px, 15vw, 140px); --corner-qr-margin: clamp(8px, 2vw, 18px); }
   .links-wrapper .page-layout {
     grid-template-columns: 1fr 1fr;
   }
   .links-wrapper .page-layout.grid-2x2 {
     grid-template-rows: 1fr 1fr;
   }
-  /* Optionnel: réduire légèrement le padding du wrapper pour gagner de l’espace */
   .links-wrapper .wrapper {
     padding: 20px 10px;
   }
@@ -430,4 +462,3 @@
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
   }
-}
