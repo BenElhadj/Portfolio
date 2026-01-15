@@ -111,66 +111,6 @@
 }
 
 /* ==========================================================================
-   STYLES RTL / LTR
-   Regroupe toutes les règles liées à la direction et aux variantes de police
-   ========================================================================== */
-
-/* Police Montserrat pour tout sauf arabe (LTR par défaut) */
-html, body, :not([lang="ar"]):not([dir="rtl"]) {
-  font-family: var(--font-family-montserrat);
-}
-
-/* Police système pour arabe / éléments en RTL */
-[lang="ar"], [dir="rtl"] {
-  font-family: var(--font-family-arabic);
-}
-
-/* Direction globale pour RTL */
-[dir="rtl"] body {
-  direction: rtl;
-  text-align: right;
-}
-
-/* Navbar - garder boutons en LTR pour cohérence des icônes */
-[dir="rtl"] .navbar {
-  direction: ltr;
-}
-
-/* Liste de navigation inversée */
-[dir="rtl"] .nav-links {
-  direction: rtl;
-  justify-content: center;
-}
-
-/* Bouton thème reste à gauche */
-[dir="rtl"] .theme-toggle {
-  order: 0;
-  direction: ltr;
-}
-
-/* Drapeaux restent à droite */
-[dir="rtl"] .lang-switcher {
-  order: 1;
-  direction: ltr;
-}
-
-/* Timeline inversée */
-[dir="rtl"] .timeline {
-  padding-left: 12px;
-  padding-right: 68px;
-  .navbar {
-    position: relative;
-  }
-  
-  .pages {
-    height: calc(100vh - var(--navbar-height));
-  }
-}
-
-/* Media queries déplacées vers la section RESPONSIVE DESIGN en bas du fichier.
-   Elles ont été centralisées afin d'éviter les duplications et faciliter la maintenance. */
-
-/* ==========================================================================
    RESET ET STYLES GÉNÉRAUX
    ========================================================================== */
 
@@ -182,6 +122,16 @@ html, body, #app {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Police Montserrat pour tout sauf arabe */
+html, body, :not([lang="ar"]):not([dir="rtl"]) {
+  font-family: var(--font-family-montserrat);
+}
+
+/* Police système pour arabe */
+[lang="ar"], [dir="rtl"] {
+  font-family: var(--font-family-arabic);
 }
 
 html {
@@ -1746,6 +1696,11 @@ a:hover {
   transform: translateX(var(--tg-icon-offset));
 }
 
+/* RTL pour bouton Telegram */
+.contact-form[dir="rtl"] .tg-send {
+  --tg-flip: scaleX(-1);
+  --tg-icon-offset: -8px;
+}
 
 /* ==========================================================================
    PROJETS ET IFRAMES
@@ -1851,7 +1806,73 @@ a:hover {
   cursor: pointer;
 }
 
+/* ==========================================================================
+   STYLES SPÉCIFIQUES PAGES
+   ========================================================================== */
+/* Page Diplômes */
+.diplomas-page .degree-thumb {
+  width: var(--degree-thumb-width, 120px);
+  height: auto;
+}
 
+.diplomas-page .degree-thumb img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.diplomas-page .timeline-item,
+.diplomas-page .degree-thumb,
+.diplomas-page .line-card {
+  position: relative;
+  z-index: 3000;
+}
+
+.diplomas-page .timeline {
+  padding-left: 0;
+}
+
+.diplomas-page .timeline::before {
+  display: none;
+}
+
+.diplomas-page .line-card {
+  border-left: none;
+}
+
+/* Page Compétences */
+.skills-page .skills-grid {
+  padding: 10px;
+}
+
+/* Page Liens */
+.links-wrapper .card.line-card.corner {
+  width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
+  min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
+  max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
+  min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin) + 6em);
+  box-sizing: border-box;
+}
+
+.links-wrapper .corner-qr,
+.links-wrapper .corner-qr img {
+  border-radius: var(--radius);
+}
+
+.links-wrapper .corner-qr-block {
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+/* Masquer titres sur mobile pour page Liens */
+@media (max-width: 1024px) {
+  .links-wrapper .line-card h3,
+  .links-wrapper .line-card small {
+    display: none;
+  }
+}
 
 /* ==========================================================================
    RESPONSIVE DESIGN
@@ -2191,78 +2212,143 @@ a:hover {
   }
 }
 
-/* Duplicata de media queries supprimé (centralisé dans la section RESPONSIVE DESIGN). */
+/* -------------------------------
+   ÉCRANS RETINA / HAUTE RÉSOLUTION
+   ------------------------------- */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .logo {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
 
-/* Masquer titres sur mobile pour page Liens (déplacé depuis la section pages)
-  Centralisé ici pour regrouper toutes les règles @media au même endroit. */
-@media (max-width: 1024px) {
-  .links-wrapper .line-card h3,
-  .links-wrapper .line-card small {
-   display: none;
+/* -------------------------------
+   BANDEAU NOM RESPONSIVE
+   ------------------------------- */
+@media (max-width: 640px) {
+  .name-banner {
+    height: calc((var(--name-banner-height, var(--fs-h2))) * 0.8);
+  }
+}
+
+/* -------------------------------
+   FORMULAIRE CONTACT RESPONSIVE
+   ------------------------------- */
+@media (max-width: 540px) {
+  .popup-content {
+    width: 92%;
+    padding: 12px;
+  }
+  
+  .popup-content .contact-form.card {
+    margin: 0;
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+/* QR responsive sur petits écrans */
+@media (max-width: 640px) {
+  .card.corner {
+    padding-inline-end: calc(var(--corner-qr-size) + 24px);
+    min-height: calc(var(--corner-qr-size) + 96px);
+  }
+  
+  .card.corner .corner-qr {
+    width: var(--corner-qr-size);
+    height: var(--corner-qr-size);
+    border-radius: var(--radius);
   }
 }
 
 /* ==========================================================================
-  STYLES SPÉCIFIQUES PAGES
-  ========================================================================== */
-/* Page Diplômes */
-.diplomas-page .degree-thumb {
-  width: var(--degree-thumb-width, 120px);
-  height: auto;
+   STYLES RTL (Right-To-Left)
+   ========================================================================== */
+/* Direction globale */
+[dir="rtl"] body {
+  direction: rtl;
+  text-align: right;
 }
 
-.diplomas-page .degree-thumb img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
+/* Navbar - garde boutons en LTR */
+[dir="rtl"] .navbar {
+  direction: ltr;
 }
 
-.diplomas-page .timeline-item,
-.diplomas-page .degree-thumb,
-.diplomas-page .line-card {
-  position: relative;
-  z-index: 3000;
+/* Liste de navigation inversée */
+[dir="rtl"] .nav-links {
+  direction: rtl;
+  justify-content: center;
 }
 
-.diplomas-page .timeline {
-  padding-left: 0;
+/* Bouton thème reste à gauche */
+[dir="rtl"] .theme-toggle {
+  order: 0;
+  direction: ltr;
 }
 
-.diplomas-page .timeline::before {
-  display: none;
+/* Drapeaux restent à droite */
+[dir="rtl"] .lang-switcher {
+  order: 1;
+  direction: ltr;
 }
 
-.diplomas-page .line-card {
+/* Timeline inversée */
+[dir="rtl"] .timeline {
+  padding-left: 12px;
+  padding-right: 68px;
+}
+
+[dir="rtl"] .timeline::before {
+  left: auto;
+  right: 34px;
+}
+
+[dir="rtl"] .dot {
+  left: auto;
+  right: 0;
+}
+
+/* Ligne verticale à droite pour line-card */
+[dir="rtl"] .line-card {
   border-left: none;
+  border-right: 4px solid var(--blue);
 }
 
-/* Page Compétences */
-.skills-page .skills-grid {
-  padding: 10px;
+/* Texte aligné à droite */
+[dir="rtl"] .details {
+  padding-left: 0;
+  padding-right: 18px;
 }
 
-/* Page Liens */
-.links-wrapper .card.line-card.corner {
-  width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-  min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-  max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-  min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin) + 6em);
-  box-sizing: border-box;
+[dir="rtl"] .wrapper .title {
+  text-align: right;
 }
 
-.links-wrapper .corner-qr,
-.links-wrapper .corner-qr img {
-  border-radius: var(--radius);
+/* Corrections timeline et milestone */
+[dir="rtl"] .meta,
+[dir="rtl"] .category-header,
+[dir="rtl"] .timeline-container {
+  direction: rtl;
 }
 
-.links-wrapper .corner-qr-block {
-  margin-bottom: 0;
-  margin-top: 0;
-  padding-bottom: 0;
-  padding-top: 0;
+[dir="rtl"] .milestone {
+  transform: translateX(50%);
 }
 
-/* Masquer titres sur mobile pour page Liens: déplacé vers la section RESPONSIVE DESIGN. */
+/* Bouton popup */
+[dir="rtl"] .close-btn {
+  float: left;
+}
+
+/* Iframes toujours LTR */
+[dir="rtl"] .iframe-container {
+  direction: ltr;
+}
+
+[dir="rtl"] .project-iframe {
+  transform-origin: top left;
+}
 
 /* ==========================================================================
    OVERFLOW GLOBAL

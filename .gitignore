@@ -64,3 +64,4 @@ scenario.docx
 package-lock.json
 avatar/
 public/svg/
+.fake

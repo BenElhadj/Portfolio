@@ -1,7 +1,5 @@
 import { createApp, watch } from "vue";
 import "./styles/styles.css";
-import "./styles/rtl.css";
-import "./styles/responsive.css";
 import App from "./App.vue";
 import { ObserveVisibility } from "vue-observe-visibility";
 import { i18n } from "./locales";
