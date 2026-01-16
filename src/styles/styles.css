@@ -55,7 +55,8 @@
   /* ===== DIMENSIONS ===== */
   --radius: 8px;
   --navbar-height: 36px;
-  --page-padding-x: 24px;
+  /* padding horizontal responsive: shrink jusqu'à 4px sur petits écrans, maxi 24px */
+  --page-padding-x: clamp(4px, 2vw, 24px);
   --page-padding-y: 16px;
   --wrapper-padding-top: 28px;
   --degree-thumb-width: 90px;
@@ -749,20 +750,20 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .timeline-overlay .overlay-type {
-  font-size: clamp(13px, 1.1vw, 16px);
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--text);
 }
 
 .timeline-overlay .overlay-info {
-  font-size: clamp(15px, 1.3vw, 18px);
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
   font-weight: 800;
   color: var(--text);
 }
 
 .timeline-overlay .overlay-level {
-  font-size: clamp(11px, 1vw, 14px);
+  font-size: clamp(1rem, 1vw, 1.1rem);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -788,6 +789,12 @@ html.has-scrolled .sub-section:focus-within::after {
 .overlay-item.stage { --line-color: var(--stage-color); }
 .overlay-item.travail { --line-color: var(--travail-color); }
 .overlay-item.autre { --line-color: var(--autre-color); }
+
+.section, .page-layout, .page, .wrapper {
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
 
 .overlay-type, .overlay-info, .overlay-level {
   padding-left: 12px;
@@ -1880,21 +1887,21 @@ a:hover {
 /* Variables responsive pour QR codes */
 @media (max-width: 1024px) {
   :root {
-    --corner-qr-size: clamp(100px, 10vw, 220px);
+    --corner-qr-size: clamp(120px, 10vw, 220px);
     --corner-qr-margin: clamp(14px, 1.5vw, 24px);
   }
 }
 
 @media (max-width: 768px) {
   :root {
-    --corner-qr-size: clamp(70px, 8vw, 100px);
+    --corner-qr-size: clamp(90px, 8vw, 160px);
     --corner-qr-margin: clamp(8px, 1vw, 14px);
   }
 }
 
 @media (max-width: 480px) {
   :root {
-    --corner-qr-size: clamp(56px, 6vw, 80px);
+  /* --corner-qr-size: clamp(40px, 6vw, 64px); */
     --corner-qr-margin: clamp(2px, 0.5vw, 8px);
   }
 }
@@ -2360,4 +2367,80 @@ a:hover {
 .page {
   overflow-x: hidden;
   max-width: 100%;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY & MOBILE SAFEGUARDS
+   - Forcer une taille de texte minimale (16px) et assurer que les sections
+     ne débordent pas horizontalement sur petits écrans.
+   ========================================================================== */
+@media (max-width: 480px) {
+  :root {
+    /* garantir taille minimale de police pour le corps et petits textes */
+    --fs-body: 1rem;   /* 16px */
+    --fs-small: 1rem;  /* 16px */
+    --fs-h3: 1.125rem; /* ~18px pour titres secondaires */
+  }
+
+  /* Boutons et éléments cliquables doivent rester lisibles/touch-friendly */
+  button,
+  .contact-form .actions button,
+  .card[role="button"],
+  .tg-send {
+    font-size: 1rem;
+    padding: 0.6rem 1rem;
+  }
+
+  /* Empêcher tout débordement horizontal et forcer box-sizing */
+  .section,
+  .page-layout,
+  .page,
+  .wrapper,
+  .sub-section {
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Éléments UI secondaires qui pouvaient être plus petits que 16px */
+  .timeline-overlay .overlay-type,
+  .timeline-overlay .overlay-info,
+  .timeline-overlay .overlay-level,
+  .links-wrapper .line-card small,
+  .links-wrapper .line-card h3 {
+    font-size: 1rem !important;
+  }
+}
+
+/* Élémentaire : surface d'assurance pour tablettes petites largeur */
+@media (max-width: 768px) {
+  :root {
+    --fs-body: 1rem;
+  }
+  button { font-size: 1rem; }
+}
+
+/* ================================================================
+   Override: conserver la grille 2x2 pour la page 'links' même sur
+   petits écrans. Cela force le comportement antérieur demandé.
+   On ajuste aussi les contenus enfants pour éviter débordement.
+   ================================================================ */
+@media (max-width: 768px) {
+  .links-wrapper .page-layout.grid-2x2 {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
+  }
+
+  .links-wrapper .slot-content,
+  .links-wrapper .card,
+  .links-wrapper .card.corner,
+  .links-wrapper .card.line-card.corner {
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* réduire padding/margins si nécessaire pour tenir sur de très petits écrans */
+  .links-wrapper .wrapper,
+  .links-wrapper .slot-content { padding: 6px !important; }
 }
