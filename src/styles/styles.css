@@ -68,7 +68,13 @@
   
   /* QR Codes - valeurs par défaut pour desktop */
   --corner-qr-size: 168px;
-  --corner-qr-margin: clamp(12px, 2vw, 36px);
+  --corner-qr-margin: clamp(4px, 4vw, 36px);
+  /* Marges directionnelles autour du QR (top / left / right).
+    Par défaut on répartit la marge horizontale en deux pour garder
+    le comportement visuel précédent. */
+  --corner-qr-margin-top: var(--corner-qr-margin);
+  --corner-qr-margin-left: calc(var(--corner-qr-margin) / 2);
+  --corner-qr-margin-right: calc(var(--corner-qr-margin) / 2);
   --favicon-size: clamp(100px, 15vw, 820px);
   
   /* Bouton Telegram */
@@ -80,6 +86,13 @@
   /* Grille quadrillée */
   --grid-size: 42px;
   --grid-line: color-mix(in hsl, var(--text), transparent 87%);
+
+  /* ===== ESPACEMENTS (clamp-based responsive spacing) ===== */
+  --pad-xs: clamp(4px, 1.2vw, 8px);
+  --pad-sm: clamp(6px, 1.5vw, 12px);
+  --pad-md: clamp(12px, 2.2vw, 20px);
+  --pad-lg: clamp(16px, 3vw, 32px);
+  --pad-xxs: clamp(1px, 0.6vw, 4px);
 }
 
 /* ===== MODE SOMBRE ===== */
@@ -208,7 +221,7 @@ small {
 .group-title {
   color: var(--title);
   font-size: var(--fs-h3);
-  margin-bottom: 12px;
+  margin-bottom: var(--pad-md);
 }
 
 /* ==========================================================================
@@ -293,11 +306,11 @@ small {
    COMPARTIMENTS (SUB-SECTIONS)
    ========================================================================== */
 .sub-section {
-  padding: 5px;
+  padding: var(--pad-xs);
   box-sizing: border-box;
   overflow: visible;
   border-radius: var(--radius);
-  margin: 10px;
+  margin: var(--pad-sm);
   position: relative;
   z-index: 1;
   will-change: transform;
@@ -315,7 +328,7 @@ small {
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
-  padding: 10px;
+  padding: var(--pad-sm);
   background: transparent;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -355,10 +368,10 @@ html.has-scrolled .sub-section:focus-within::after {
   box-sizing: border-box;
 }
 
-.slot-content.tl { align-items: flex-start; justify-content: flex-start; padding: 10px; }
-.slot-content.tr { align-items: flex-start; justify-content: flex-end; padding: 10px; }
-.slot-content.bl { align-items: flex-end; justify-content: flex-start; padding: 10px; }
-.slot-content.br { align-items: flex-end; justify-content: flex-end; padding: 10px; }
+.slot-content.tl { align-items: flex-start; justify-content: flex-start; padding: var(--pad-sm); }
+.slot-content.tr { align-items: flex-start; justify-content: flex-end; padding: var(--pad-sm); }
+.slot-content.bl { align-items: flex-end; justify-content: flex-start; padding: var(--pad-sm); }
+.slot-content.br { align-items: flex-end; justify-content: flex-end; padding: var(--pad-sm); }
 
 /* ==========================================================================
    CARTES
@@ -374,7 +387,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 /* Carte avec bordure gauche */
 .line-card {
-  padding: 16px 18px;
+  padding: var(--pad-md) var(--pad-md);
   border-left: 4px solid var(--blue);
   display: flex;
   flex-direction: column;
@@ -415,8 +428,8 @@ html.has-scrolled .sub-section:focus-within::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
-  padding: 5px;
+  gap: var(--pad-xxs);
+  padding: var(--pad-xs);
   width: 110px;
   height: 100%;
   box-sizing: border-box;
@@ -443,8 +456,8 @@ html.has-scrolled .sub-section:focus-within::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 14px;
+  gap: var(--pad-md);
+  padding: 0 var(--pad-md);
   background: var(--page-bg);
   border-bottom: 1px solid var(--border);
   z-index: 3000;
@@ -453,13 +466,13 @@ html.has-scrolled .sub-section:focus-within::after {
 .nav-left, .nav-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--pad-sm);
 }
 
 /* Liens de navigation */
 .nav-links {
   display: flex;
-  gap: 8px;
+  gap: var(--pad-sm);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -473,7 +486,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .nav-links li {
   cursor: pointer;
-  padding: 8px 6px;
+  padding: var(--pad-xs) var(--pad-xs);
   border-radius: var(--radius);
   color: var(--text);
   font-weight: 500;
@@ -524,14 +537,14 @@ html.has-scrolled .sub-section:focus-within::after {
 /* Actions droite */
 .nav-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--pad-sm);
   align-items: center;
 }
 
 /* Sélecteur de langue */
 .lang-switcher {
   display: flex;
-  gap: 8px;
+  gap: var(--pad-sm);
   align-items: center;
 }
 
@@ -557,7 +570,7 @@ html.has-scrolled .sub-section:focus-within::after {
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 6px;
+  padding: var(--pad-xs);
   border-radius: var(--radius);
   color: var(--text);
 }
@@ -581,7 +594,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .timeline {
   position: relative;
   padding-left: 68px;
-  padding-right: 12px;
+  padding-right: var(--pad-md);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -606,7 +619,7 @@ html.has-scrolled .sub-section:focus-within::after {
   margin-bottom: 28px;
   display: flex;
   align-items: flex-start;
-  gap: 18px;
+  gap: var(--pad-lg);
   opacity: 0;
   transform: translateY(18px) scale(0.99);
   transition: all 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
@@ -636,7 +649,7 @@ html.has-scrolled .sub-section:focus-within::after {
 /* Métadonnées */
 .meta {
   display: flex;
-  gap: 12px;
+  gap: var(--pad-md);
   align-items: baseline;
   flex-wrap: wrap;
 }
@@ -676,7 +689,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .category-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  margin-bottom: var(--pad-xxs);
   margin-bottom: 20px;
 }
 
@@ -694,7 +707,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  gap: var(--pad-lg);
   flex: 1;
   min-height: 0;
 }
@@ -710,7 +723,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .company {
   font-weight: 600;
   font-size: 1.05rem;
-  margin-bottom: 2px;
+  margin-bottom: var(--pad-xxs);
   color: var(--text);
 }
 
@@ -725,7 +738,7 @@ html.has-scrolled .sub-section:focus-within::after {
   font-size: var(--fs-small);
   color: var(--text-secondary);
   margin: 0;
-  padding-left: 18px;
+  padding-left: var(--pad-md);
   flex: 1;
 }
 
@@ -797,27 +810,27 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .overlay-type, .overlay-info, .overlay-level {
-  padding-left: 12px;
-  padding-right: 8px;
+  padding-left: var(--pad-md);
+  padding-right: var(--pad-sm);
   text-shadow: 0 0 8px rgba(0,0,0,0.18);
 }
 
 .overlay-type {
   font-weight: 700;
   font-size: 0.97rem;
-  margin-bottom: 2px;
+  margin-bottom: var(--pad-xxs);
   letter-spacing: 0.01em;
 }
 
 .overlay-info {
   font-size: 0.97rem;
-  margin-bottom: 2px;
+  margin-bottom: var(--pad-xxs);
 }
 
 .overlay-level {
   font-size: 0.85rem;
   color: #ffe;
-  margin-top: 2px;
+  margin-top: var(--pad-xxs);
 }
 
 /* Milestones */
@@ -827,7 +840,7 @@ html.has-scrolled .sub-section:focus-within::after {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--pad-sm);
   pointer-events: none;
 }
 
@@ -907,7 +920,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .logo {
   width: 80px;
   height: 80px;
-  margin: 6px auto;
+  margin: var(--pad-xs) auto;
   flex-shrink: 0;
   filter: drop-shadow(0 0 2px var(--blue));
   opacity: 0.75;
@@ -959,7 +972,7 @@ html.has-scrolled .sub-section:focus-within::after {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 3px;
+  gap: var(--pad-xxs);
 }
 
 .name {
@@ -983,7 +996,7 @@ html.has-scrolled .sub-section:focus-within::after {
   border-radius: var(--radius);
   overflow: hidden;
   height: 6px;
-  margin: 4px 0;
+  margin: var(--pad-xs) 0;
   width: 100px;
   flex-shrink: 0;
 }
@@ -1021,14 +1034,16 @@ html.has-scrolled .sub-section:focus-within::after {
 /* QR dans le coin des cartes */
 .card.corner {
   position: relative;
-  padding-inline-end: calc(var(--corner-qr-size) + 24px);
-  min-height: calc(var(--corner-qr-size) + 96px);
+  /* espace réservé pour le QR à droite (taille QR + marge droite + petit padding) */
+  padding-inline-end: calc(var(--corner-qr-size) + var(--corner-qr-margin-right) + var(--pad-sm));
+  /* hauteur minimale = taille QR + marge verticale (top/bottom) + espace pour contenu */
+  min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin-top) + 4em);
 }
 
 .card.corner .corner-qr {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: var(--corner-qr-margin-right);
+  bottom: var(--corner-qr-margin-top);
   width: var(--corner-qr-size);
   height: var(--corner-qr-size);
   border-radius: var(--radius);
@@ -1334,7 +1349,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .popup-content {
   background: var(--card-bg);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: var(--pad-md);
   position: relative;
   width: 520px;
   max-width: 90%;
@@ -1389,7 +1404,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .popup-link {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: var(--pad-sm);
   color: var(--blue);
   font-weight: 600;
   text-decoration: none;
@@ -1433,7 +1448,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .zoom-control {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--pad-xs);
 }
 
 .zoom-control input[type="range"] {
@@ -1442,7 +1457,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .zoom-value {
   font-weight: 600;
-  padding-left: 6px;
+  padding-left: var(--pad-xs);
 }
 
 .zoom-icon {
@@ -1451,7 +1466,7 @@ html.has-scrolled .sub-section:focus-within::after {
   justify-content: center;
   color: var(--text);
   opacity: 0.7;
-  margin-right: 6px;
+  margin-right: var(--pad-xs);
 }
 
 .zoom-icon svg {
@@ -1511,7 +1526,7 @@ html.has-scrolled .sub-section:focus-within::after {
   margin-top: 1.8rem;
   display: flex;
   justify-content: flex-end;
-  gap: 18px;
+  gap: var(--pad-md);
 }
 
 .contact-form .actions button {
@@ -1530,7 +1545,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .clip-btn {
   background: transparent;
   border: none !important;
-  padding: 6px;
+  padding: var(--pad-xs);
   cursor: pointer;
   color: var(--blue);
   display: inline-flex;
@@ -1573,14 +1588,14 @@ html.has-scrolled .sub-section:focus-within::after {
   margin: 1rem 0 0.6rem 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--pad-xs);
 }
 
 .contact-form .attachment-item {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: var(--pad-sm);
   padding: 0;
   border: none;
   background: transparent;
@@ -1604,7 +1619,7 @@ html.has-scrolled .sub-section:focus-within::after {
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  padding: 0 2px;
+  padding: 0 var(--pad-xs);
   margin-left: auto;
 }
 
@@ -1722,7 +1737,7 @@ a:hover {
   width: 100%;
   aspect-ratio: 16/11;
   border-radius: var(--radius);
-  margin: 10px 0;
+  margin: var(--pad-sm) 0;
   overflow: hidden;
   position: relative;
 }
@@ -1800,7 +1815,7 @@ a:hover {
   position: fixed;
   background: rgba(0, 0, 0, 0.85);
   color: #fff;
-  padding: 6px 8px;
+  padding: var(--pad-xs) var(--pad-xs);
   border-radius: var(--radius);
   font-size: 13px;
   pointer-events: none;
@@ -1849,15 +1864,15 @@ a:hover {
 
 /* Page Compétences */
 .skills-page .skills-grid {
-  padding: 10px;
+  padding: var(--pad-sm);
 }
 
 /* Page Liens */
 .links-wrapper .card.line-card.corner {
-  width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-  min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-  max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-  min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin) + 6em);
+  width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+  min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+  max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+  min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin-top) + 6em);
   box-sizing: border-box;
 }
 
@@ -1908,7 +1923,7 @@ a:hover {
 
 /* La sous-section ne doit jamais être plus petite que la card corner */
 .sub-section {
-  min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
+  min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
 }
 
 /* -------------------------------
@@ -1938,9 +1953,9 @@ a:hover {
 /* Desktop uniquement pour coins QR */
 @media (min-width: 1025px) {
   .links-wrapper .card.line-card.corner {
-    width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-    min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
-    max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin));
+    width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+    min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+    max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
     box-sizing: border-box;
   }
 }
@@ -1958,7 +1973,7 @@ a:hover {
   }
   
   .links-wrapper .wrapper {
-    padding: 20px 10px;
+    padding: var(--pad-md) var(--pad-sm);
   }
   
   .page-layout {
@@ -1982,29 +1997,27 @@ a:hover {
   
   .grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: var(--pad-md);
   }
   
   .projects-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .nav-links {
-    gap: 8px;
+    display: flex;
+    gap: var(--pad-sm);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    overflow-x: auto;
   }
-  
-  .nav-links li {
-    padding: 6px 4px;
-  }
-  
-  .wrapper {
-    padding: 20px 12px;
-  }
-  
+
   .timeline {
     padding-left: 50px;
   }
-  
+
   .timeline::before {
     left: 25px;
   }
@@ -2029,13 +2042,13 @@ a:hover {
   
   .popup-content {
     width: 90%;
-    padding: 16px;
+    padding: var(--pad-md);
   }
   
   .category-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--pad-xs);
   }
   
   .preview-link:hover .iframe-container {
@@ -2051,6 +2064,11 @@ a:hover {
     max-width: 100vw;
     overflow-x: hidden;
     padding: 0 2vw;
+    /* Réduire fortement les marges autour du QR sur petits écrans */
+    --corner-qr-margin: clamp(4px, 2.5vw, 8px);
+    --corner-qr-margin-top: clamp(2px, 1vw, 6px);
+    --corner-qr-margin-left: clamp(2px, 1vw, 4px);
+    --corner-qr-margin-right: clamp(2px, 1vw, 4px);
   }
   
   .links-wrapper .page-layout,
@@ -2064,13 +2082,16 @@ a:hover {
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 0;
+    padding: var(--pad-xs) 0;
   }
   
   .links-wrapper .card.corner {
     width: 100%;
     max-width: 100vw;
     margin: 0 auto;
+    /* réduire encore l'espacement vertical à l'intérieur de la card corner sur mobile */
+    padding-top: var(--pad-xs);
+    padding-bottom: var(--pad-xs);
   }
   
   .links-wrapper .qr-caption {
@@ -2080,7 +2101,7 @@ a:hover {
   
   .links-wrapper .qr-name {
     color: var(--text);
-    margin-bottom: 2px;
+    margin-bottom: var(--pad-xxs);
   }
   
   .links-wrapper .qr-short {
@@ -2097,14 +2118,14 @@ a:hover {
   /* Alignement cartes Links */
   .links-wrapper .card.line-card.corner {
     overflow: visible;
-    padding-bottom: 18px;
-    padding-top: 18px;
+    padding-bottom: var(--pad-md);
+    padding-top: var(--pad-md);
   }
   
   /* Style line-card sur mobile */
   .links-wrapper .line-card {
-    margin: 0 auto 12px auto;
-    padding: 16px 12px;
+    margin: 0 auto var(--pad-sm) auto;
+    padding: var(--pad-md) var(--pad-md);
     border-left: 4px solid var(--blue);
     border-radius: var(--radius);
     background: var(--card-bg);
@@ -2123,16 +2144,16 @@ a:hover {
    ------------------------------- */
 @media (max-width: 480px) {
   .section {
-    padding: 10px;
+    padding: var(--pad-sm);
   }
   
   .navbar {
-    padding: 0 10px;
-    gap: 8px;
+    padding: 0 var(--pad-sm);
+    gap: var(--pad-sm);
   }
   
   .nav-links {
-    gap: 6px;
+    gap: var(--pad-sm);
   }
   
   .lang-switcher img {
@@ -2203,7 +2224,7 @@ a:hover {
   .section {
     height: auto;
     min-height: calc(100vh - var(--navbar-height));
-    padding: 20px 0;
+    padding: var(--pad-md) 0;
   }
   
   .sub-section {
@@ -2244,21 +2265,21 @@ a:hover {
 @media (max-width: 540px) {
   .popup-content {
     width: 92%;
-    padding: 12px;
+    padding: var(--pad-sm);
   }
   
   .popup-content .contact-form.card {
     margin: 0;
     width: 100%;
-    padding: 10px;
+    padding: var(--pad-sm);
   }
 }
 
 /* QR responsive sur petits écrans */
 @media (max-width: 640px) {
   .card.corner {
-    padding-inline-end: calc(var(--corner-qr-size) + 24px);
-    min-height: calc(var(--corner-qr-size) + 96px);
+    padding-inline-end: calc(var(--corner-qr-size) + var(--corner-qr-margin-right) + var(--pad-xs));
+    min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin-top) + 3.5em);
   }
   
   .card.corner .corner-qr {
@@ -2302,7 +2323,7 @@ a:hover {
 
 /* Timeline inversée */
 [dir="rtl"] .timeline {
-  padding-left: 12px;
+  padding-left: var(--pad-md);
   padding-right: 68px;
 }
 
@@ -2325,7 +2346,7 @@ a:hover {
 /* Texte aligné à droite */
 [dir="rtl"] .details {
   padding-left: 0;
-  padding-right: 18px;
+  padding-right: var(--pad-md);
 }
 
 [dir="rtl"] .wrapper .title {
@@ -2418,14 +2439,14 @@ a:hover {
     --fs-body: 1rem;
   }
   button { font-size: 1rem; }
-}
+  .links-wrapper {
+    /* Valeurs encore plus petites pour écrans étroits */
+    --corner-qr-margin: clamp(2px, 1vw, 6px);
+    --corner-qr-margin-top: clamp(1px, 0.8vw, 4px);
+    --corner-qr-margin-left: clamp(1px, 0.8vw, 3px);
+    --corner-qr-margin-right: clamp(1px, 0.8vw, 3px);
+  }
 
-/* ================================================================
-   Override: conserver la grille 2x2 pour la page 'links' même sur
-   petits écrans. Cela force le comportement antérieur demandé.
-   On ajuste aussi les contenus enfants pour éviter débordement.
-   ================================================================ */
-@media (max-width: 768px) {
   .links-wrapper .page-layout.grid-2x2 {
     grid-template-columns: 1fr 1fr !important;
     grid-template-rows: 1fr 1fr !important;
@@ -2442,5 +2463,5 @@ a:hover {
 
   /* réduire padding/margins si nécessaire pour tenir sur de très petits écrans */
   .links-wrapper .wrapper,
-  .links-wrapper .slot-content { padding: 6px !important; }
+  .links-wrapper .slot-content { padding: var(--pad-xs) !important; }
 }
