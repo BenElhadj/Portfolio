@@ -523,7 +523,7 @@ html.has-scrolled .sub-section:focus-within::after {
   background: transparent;
   border: none;
   color: var(--text);
-  font-size: 1.05rem;
+  font-size: var(--fs-body);
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -575,7 +575,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .theme-toggle {
   background: none;
   border: none;
-  font-size: 1.2rem;
+  font-size: var(--fs-h3);
   cursor: pointer;
   padding: var(--pad-xs);
   border-radius: var(--radius);
@@ -664,17 +664,17 @@ html.has-scrolled .sub-section:focus-within::after {
 .year {
   font-weight: 700;
   color: var(--blue);
-  font-size: 0.98rem;
+  font-size: var(--fs-body);
 }
 
 .institution {
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   color: var(--text-secondary);
 }
 
 .degree {
   margin-bottom: 6px;
-  font-size: 1rem;
+  font-size: var(--fs-body);
   font-weight: 700;
   color: var(--text);
   line-height: 1.25;
@@ -721,7 +721,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 /* Détails */
 .dates {
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   font-weight: 600;
   color: var(--blue);
   margin-bottom: 4px;
@@ -729,13 +729,13 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .company {
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: var(--fs-body);
   margin-bottom: var(--pad-xxs);
   color: var(--text);
 }
 
 .role {
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   font-weight: 500;
   margin-bottom: 6px;
   color: var(--text-secondary);
@@ -799,7 +799,7 @@ html.has-scrolled .sub-section:focus-within::after {
   border-radius: var(--radius);
   box-shadow: 0 2px 12px rgba(0,0,0,0.12);
   overflow: hidden;
-  font-size: 1rem;
+  font-size: var(--fs-body);
   color: #fff;
   border-left: 12px solid var(--line-color, #53bc28);
 }
@@ -983,7 +983,7 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .name {
-  font-size: 0.9rem;
+  font-size: var(--fs-small);
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
@@ -993,7 +993,7 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .level {
-  font-size: 0.75rem;
+  font-size: var(--fs-small);
   color: var(--text-secondary);
 }
 
@@ -1389,7 +1389,7 @@ html.has-scrolled .sub-section:focus-within::after {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius);
-  font-size: 1rem;
+  font-size: var(--fs-body);
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 4px 10px var(--card-shadow);
@@ -2403,19 +2403,15 @@ a:hover {
      ne débordent pas horizontalement sur petits écrans.
    ========================================================================== */
 @media (max-width: 480px) {
-  :root {
-    /* garantir taille minimale de police pour le corps et petits textes */
-    --fs-body: 1rem;   /* 16px */
-    --fs-small: 1rem;  /* 16px */
-    --fs-h3: 1.125rem; /* ~18px pour titres secondaires */
-  }
+  /* Ne pas forcer des tailles fixes ici : laisser les variables clamp() gérer le redimensionnement
+     pour que le texte continue à rétrécir proportionnellement sur très petits écrans. */
 
   /* Boutons et éléments cliquables doivent rester lisibles/touch-friendly */
   button,
   .contact-form .actions button,
   .card[role="button"],
   .tg-send {
-    font-size: 1rem;
+    font-size: var(--fs-body);
     padding: 0.6rem 1rem;
   }
 
@@ -2436,7 +2432,7 @@ a:hover {
   .timeline-overlay .overlay-level,
   .links-wrapper .line-card small,
   .links-wrapper .line-card h3 {
-    font-size: 1rem !important;
+    font-size: var(--fs-body) !important;
   }
 }
 
