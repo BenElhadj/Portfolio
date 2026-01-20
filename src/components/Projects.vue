@@ -29,7 +29,9 @@
                 :aria-label="$t('projects.labels.visit') + ' - ' + project.name"
               >
                 <div class="iframe-container">
+                  <!-- only embed preview in iframe for safe/frontend URLs; avoid embedding backends (onrender.com) -->
                   <iframe
+                    v-if="allowEmbed(project.link)"
                     :src="project.link"
                     :title="$t('projects.labels.visit') + ' - ' + project.name"
                     loading="lazy"
@@ -37,6 +39,10 @@
                     allow="autoplay; encrypted-media"
                     referrerpolicy="no-referrer"
                   ></iframe>
+                  <div v-else class="iframe-fallback">
+                    <!-- simple fallback preview when embedding is disabled -->
+                    <div class="no-embed">{{ $t('projects.labels.visit') }}</div>
+                  </div>
                 </div>
               </a>
 
@@ -66,4 +72,19 @@ const projects = computed(() => {
   const list = tm("projects.list");
   return Array.isArray(list) ? list : [];
 });
+
+// decide whether a project link should be embedded in an iframe
+function allowEmbed(link) {
+  try {
+    const u = new URL(link);
+    // avoid embedding known backend hosts (Render backends, etc.)
+    if (u.hostname.includes('onrender.com') || u.hostname.includes('render.com')) return false;
+    // embed common static hosts (github pages) and same-origin
+    if (u.hostname.includes('github.io') || u.hostname === window.location.hostname) return true;
+    // default: allow embedding (many hosts can be embedded) — adjust if needed
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 </script>

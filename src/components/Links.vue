@@ -3,89 +3,54 @@
     <h2 class="title">{{ $t('links.title') }}</h2>
 
     <PageLayout :columns="2" :rows="2">
-      <template #slot1>
-        <div class="slot-content tl">
+      <template
+        v-for="(item, index) in slots"
+        :key="item.key"
+        v-slot:["slot"+(index+1)]
+      >
+        <div class="slot-content" :class="item.cls">
           <div class="card line-card corner">
             <div class="corner-qr-block">
-              <a :href="$t('links.items.github.url')" target="_blank" rel="noopener noreferrer" class="corner-qr">
+              <a
+                :href="getHref(item.key)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="corner-qr"
+                :title="item.key === 'contact' ? $t('links.items.contact.name') : null"
+                @click="handleClick(item.key, $event)"
+              >
                 <picture>
-                  <source :srcset="$t('links.items.github.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor($t('links.items.github.url'))" type="image/webp" />
+                  <source
+                    :srcset="( $t(`links.items.${item.key}.qr`) && $t(`links.items.${item.key}.qr`).replace(/\.[a-zA-Z]+$/, '.webp')) || qrFor(dataForKey(item.key))"
+                    type="image/webp"
+                  />
+                  <!-- special lazy image handling for GitHub -->
                   <img
+                    v-if="item.key === 'github'"
                     ref="githubQrLazy.imageRef"
-                    :src="githubQrLazy.isVisible ? ($t('links.items.github.qr') || qrFor($t('links.items.github.url'))) : githubQrLazy.placeholder"
+                    :src="githubQrLazy.isVisible ? ( $t('links.items.github.qr') || qrFor(dataForKey('github')) ) : githubQrLazy.placeholder"
                     alt="github-qr"
                     loading="lazy"
                     :class="{ 'fade-in': githubQrLazy.loaded }"
                     @load="githubQrLazy.onLoad"
                   />
+                  <img
+                    v-else
+                    :src="getImgSrc(item.key)"
+                    :alt="`${item.key}-qr`"
+                    loading="lazy"
+                  />
                 </picture>
               </a>
+
               <div class="qr-caption">
-                <div class="qr-name">{{ $t('links.items.github.name') }}</div>
-                <div class="qr-short">{{ $t('links.items.github.short') }}</div>
+                <div class="qr-name">{{ $t(`links.items.${item.key}.name`) }}</div>
+                <div class="qr-short">{{ $t(`links.items.${item.key}.short`) }}</div>
               </div>
             </div>
           </div>
         </div>
       </template>
-
-    <template #slot2>
-      <div class="slot-content tr">
-        <div class="card line-card corner">
-          <div class="corner-qr-block">
-            <a :href="$t('links.items.linkedin.url')" target="_blank" rel="noopener noreferrer" class="corner-qr">
-              <picture>
-                <source :srcset="$t('links.items.linkedin.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor($t('links.items.linkedin.url'))" type="image/webp" />
-                <img :src="$t('links.items.linkedin.qr') || qrFor($t('links.items.linkedin.url'))" alt="linkedin-qr" loading="lazy" />
-              </picture>
-            </a>
-            <div class="qr-caption">
-              <div class="qr-name">{{ $t('links.items.linkedin.name') }}</div>
-              <div class="qr-short">{{ $t('links.items.linkedin.short') }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <template #slot3>
-      <div class="slot-content bl">
-        <div class="card line-card corner">
-          <div class="corner-qr-block">
-            <a :href="'mailto:' + emailAddress" class="corner-qr">
-              <picture>
-                <source :srcset="$t('links.items.email.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor('mailto:' + emailAddress)" type="image/webp" />
-                <img :src="$t('links.items.email.qr') || qrFor('mailto:' + emailAddress)" alt="email-qr" loading="lazy" />
-              </picture>
-            </a>
-            <div class="qr-caption">
-              <div class="qr-name">{{ $t('links.items.email.name') }}</div>
-              <div class="qr-short">{{ $t('links.items.email.short') }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <template #slot4>
-      <div class="slot-content br">
-        <div class="card line-card corner">
-          <div class="corner-qr-block">
-            <a :href="'#contact'" class="corner-qr" @click.prevent="openContact" :title="$t('links.items.contact.name')">
-              <picture>
-                <source :srcset="$t('links.items.contact.qr').replace(/\.[a-zA-Z]+$/, '.webp') || qrFor(contactUrl)" type="image/webp" />
-                <img :src="$t('links.items.contact.qr') || qrFor(contactUrl)" :alt="$t('links.items.contact.name')" loading="lazy" />
-              </picture>
-            </a>
-            <div class="qr-caption">
-              <div class="qr-name">{{ $t('links.items.contact.name') }}</div>
-              <div class="qr-short">{{ $t('links.items.contact.short') }}</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </template>
     </PageLayout>
 
     <!-- Popup ContactForm rendered globally as modal -->
@@ -96,20 +61,24 @@
     </teleport>
 
     <div class="favicon-center">
-  <picture>
-    <source :srcset="faviconSrc.replace(/\.[a-zA-Z]+$/, '.webp')" type="image/webp" />
-    <img :src="faviconSrc" alt="favicon" loading="lazy"
-      role="button"
-      tabindex="0"
-      class="clickable-favicon"
-      :aria-label="$t('links.cvLabel')"
-      @click="downloadCV"
-      @keydown.enter="downloadCV"
-      @mouseenter="onCvMouseEnter"
-      @mouseleave="onCvMouseLeave"
-      @mousemove="onCvMouseMove"
-    />
-  </picture>
+      <picture>
+        <source :srcset="faviconSrc.replace(/\.[a-zA-Z]+$/, '.webp')" type="image/webp" />
+        <img
+          :src="faviconSrc"
+          alt="favicon"
+          loading="lazy"
+          role="button"
+          tabindex="0"
+          class="clickable-favicon"
+          :aria-label="$t('links.cvLabel')"
+          @click="downloadCV"
+          @keydown.enter="downloadCV"
+          @mouseenter="onCvMouseEnter"
+          @mouseleave="onCvMouseLeave"
+          @mousemove="onCvMouseMove"
+        />
+      </picture>
+
       <teleport to="body">
         <div
           v-if="showCvTooltip"
@@ -121,7 +90,7 @@
           {{ $t('links.cvLabel') }}
         </div>
       </teleport>
-  </div>
+    </div>
   </div>
 </template>
 
@@ -138,16 +107,15 @@ import { useI18n } from 'vue-i18n';
 
 const { t, locale } = useI18n();
 
-// decode placeholders in locale email address (we store as "42bhamdi[at]gmail.com" to avoid i18n parsing)
+// decode placeholders in locale email address
 const emailAddress = computed(() => {
   const raw = t('links.items.email.address');
-  // decode stored placeholder like "42bhamdi[at]gmail.com"
   return String(raw).replace(/\[at\]/g, '@').replace(/\\@/g, '@');
 });
 
 const showContact = ref(false);
 
-// CV tooltip that follows the mouse when hovering the favicon
+// CV tooltip
 const showCvTooltip = ref(false);
 const tooltipX = ref(0);
 const tooltipY = ref(0);
@@ -155,18 +123,15 @@ const tooltipY = ref(0);
 function onCvMouseEnter() {
   showCvTooltip.value = true;
 }
-
 function onCvMouseLeave() {
   showCvTooltip.value = false;
 }
-
 function onCvMouseMove(e) {
-  // simple direct follow of the cursor with a light offset so label doesn't sit exactly under the pointer
   tooltipX.value = Math.round(e.clientX + 8);
   tooltipY.value = Math.round(e.clientY + 8);
 }
 
-// decode contact url placeholder (some locales store mailto as "mailto:42bhamdi[at]gmail.com")
+// decode contact url placeholder
 const contactUrl = computed(() => {
   const raw = t('links.items.contact.url');
   return String(raw).replace(/\[at\]/g, '@').replace(/\\@/g, '@');
@@ -180,11 +145,9 @@ function openContact() {
     // ignore
   }
 }
-
 function closeContact() {
   showContact.value = false;
   try {
-    // remove hash without reloading
     const url = new URL(window.location.href);
     url.hash = '';
     history.replaceState(null, '', url.toString());
@@ -192,41 +155,28 @@ function closeContact() {
     // ignore
   }
 }
-
 function handleHashChange() {
   if (window.location.hash === '#contact') openContact();
 }
 
 onMounted(() => {
-  // open on initial load if URL contains #contact or ?contact=1
   const params = new URLSearchParams(window.location.search);
   if (window.location.hash === '#contact' || params.get('contact') === '1' || params.get('contact') === 'true') {
     showContact.value = true;
   }
   window.addEventListener('hashchange', handleHashChange);
-  // debug: print decoded email and contact url to help trace i18n parsing issues
-  // try {
-  //   // eslint-disable-next-line no-console
-  //   console.log('Links.debug emailAddress ->', emailAddress.value, 'contactUrl ->', contactUrl.value);
-  // } catch (e) {
-  //   // ignore
-  // }
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('hashchange', handleHashChange);
 });
 
-// qrFor: generate a QR image URL for any value (used as fallback when a locale
-// does not provide a static image path).
+// qrFor fallback
 function qrFor(value) {
   return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(value);
 }
 
-// Detect GitHub Pages project base from the URL's first path segment.
-// Examples:
-// - https://username.github.io/Portfolio/... -> base '/Portfolio/'
-// - https://custom.domain/ -> base '/'
+// Detect GitHub Pages base
 function getBasePath() {
   try {
     const path = window.location.pathname || '/';
@@ -237,54 +187,69 @@ function getBasePath() {
   }
 }
 
-// CV download URL depending on current locale (fr => FR, otherwise EN including ar)
-// Build an absolute path under the detected base to avoid 404 on GitHub Pages subpaths.
+// CV and favicon paths
 const cvUrl = computed(() => {
   const file = String(locale.value).startsWith('fr') ? 'cv/CV_FR.pdf' : 'cv/CV_EN.pdf';
   return getBasePath() + file;
 });
-
-// Favicon path built under the detected base to avoid build-time import of a relative file
-// and to ensure correct path on GitHub Pages subpaths.
 const faviconSrc = computed(() => getBasePath() + 'favicon.png');
 
 function downloadCV() {
   const url = cvUrl.value;
-  // Heuristic: mobile/tablet devices often ignore the download attribute,
-  // especially iOS Safari. On touch devices, prefer opening the PDF in a new tab
-  // so the OS viewer can handle saving/sharing.
   const isTouchDevice = (typeof window !== 'undefined') && (
     (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
     /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '')
   );
-
   if (isTouchDevice) {
     try {
       const w = window.open(url, '_blank');
-      // Ensure no opener reference for security
       if (w && 'opener' in w) w.opener = null;
       return;
     } catch (e) {
-      // As a last resort, navigate current tab
       window.location.href = url;
       return;
     }
   }
-
-  // Desktop: try a programmatic download
   try {
     const a = document.createElement('a');
     a.href = url;
     a.setAttribute('download', url.split('/').pop() || '');
     a.setAttribute('rel', 'noopener');
-    // Ensure it's added to DOM for Firefox
     document.body.appendChild(a);
     a.click();
     a.remove();
   } catch (e) {
-    // Fallback: open in new tab
     const w = window.open(url, '_blank');
     if (w && 'opener' in w) w.opener = null;
+  }
+}
+
+/* ---------- Nouvelle structure de slots pour PageLayout ---------- */
+const slots = [
+  { key: 'github', cls: 'tl' },
+  { key: 'linkedin', cls: 'tr' },
+  { key: 'email', cls: 'bl' },
+  { key: 'contact', cls: 'br' },
+];
+
+function getHref(key) {
+  if (key === 'email') return 'mailto:' + emailAddress.value;
+  if (key === 'contact') return '#contact';
+  return t(`links.items.${key}.url`);
+}
+function dataForKey(key) {
+  if (key === 'email') return 'mailto:' + emailAddress.value;
+  if (key === 'contact') return contactUrl.value;
+  return String(t(`links.items.${key}.url`));
+}
+function getImgSrc(key) {
+  const qr = t(`links.items.${key}.qr`);
+  return qr || qrFor(dataForKey(key));
+}
+function handleClick(key, event) {
+  if (key === 'contact') {
+    event.preventDefault();
+    openContact();
   }
 }
 </script>
