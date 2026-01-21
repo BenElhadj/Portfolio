@@ -390,6 +390,16 @@ html.has-scrolled .sub-section:focus-within::after {
   border: 1px solid var(--border);
   padding: 1rem;
   transition: background 0.3s, color 0.3s;
+
+
+
+  /* allow the card to expand when text is long; set a sensible minimum matching QR + margins */
+  height: auto;
+  min-height: calc(
+    var(--corner-qr-size)
+    + var(--corner-qr-margin-top)
+    + var(--pad-md)
+  );
 }
 
 /* Carte avec bordure gauche */
@@ -1895,39 +1905,11 @@ a:hover {
   padding-top: 0;
 }
 
-/* Masquer titres sur mobile pour page Liens */
-@media (max-width: 1024px) {
-  .links-wrapper .line-card h3,
-  .links-wrapper .line-card small {
-    display: none;
-  }
-}
 
 /* ==========================================================================
    RESPONSIVE DESIGN
    ========================================================================== */
 /* Variables responsive pour QR codes */
-@media (max-width: 1024px) {
-  :root {
-    --corner-qr-size: clamp(120px, 10vw, 220px);
-    --corner-qr-margin: clamp(14px, 1.5vw, 24px);
-  }
-}
-
-@media (max-width: 768px) {
-  :root {
-    --corner-qr-size: clamp(90px, 8vw, 160px);
-    --corner-qr-margin: clamp(8px, 1vw, 14px);
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-  /* --corner-qr-size: clamp(40px, 6vw, 64px); */
-    --corner-qr-margin: clamp(2px, 0.5vw, 8px);
-  }
-}
-
 /* La sous-section ne doit jamais être plus petite que la card corner */
 .sub-section {
   min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
@@ -1937,6 +1919,16 @@ a:hover {
    POINT DE RUPTURE: 1024px (Tablettes)
    ------------------------------- */
 @media (max-width: 1024px) {
+  :root {
+    --corner-qr-size: clamp(120px, 10vw, 220px);
+    --corner-qr-margin: clamp(14px, 1.5vw, 24px);
+  }
+
+  .links-wrapper .line-card h3,
+  .links-wrapper .line-card small {
+    display: none;
+  }
+
   .links-wrapper .page-layout.grid-2x2 {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -1971,6 +1963,44 @@ a:hover {
    POINT DE RUPTURE: 768px (Mobiles)
    ------------------------------- */
 @media (max-width: 768px) {
+  :root {
+    --corner-qr-size: clamp(90px, 8vw, 160px);
+    --corner-qr-margin: clamp(8px, 1vw, 14px);
+    --fs-body: 1rem;
+  }
+
+  button { 
+    font-size: 1rem; 
+  }
+
+  .links-wrapper {
+    /* Valeurs encore plus petites pour écrans étroits */
+    --corner-qr-margin: clamp(2px, 1vw, 6px);
+    --corner-qr-margin-top: clamp(1px, 0.8vw, 4px);
+    --corner-qr-margin-left: clamp(1px, 0.8vw, 3px);
+    --corner-qr-margin-right: clamp(1px, 0.8vw, 3px);
+  }
+
+  .links-wrapper .page-layout.grid-2x2 {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
+  }
+
+  .links-wrapper .slot-content,
+  .links-wrapper .card,
+  .links-wrapper .card.corner,
+  .links-wrapper .card.line-card.corner {
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* réduire padding/margins si nécessaire pour tenir sur de très petits écrans */
+  .links-wrapper .wrapper,
+  .links-wrapper .slot-content {
+    padding: var(--pad-xs) !important;
+  }
+
   .links-wrapper .page-layout {
     grid-template-columns: 1fr 1fr;
   }
@@ -1985,7 +2015,8 @@ a:hover {
   
   .page-layout {
     grid-template-columns: 1fr;
-    grid-auto-rows: 1fr;
+    /* allow rows to size to their content on small screens so cards can grow */
+    grid-auto-rows: auto;
     align-items: stretch;
     row-gap: var(--sub-gap);
   }
@@ -2067,6 +2098,10 @@ a:hover {
    POINT DE RUPTURE: 600px (Mobile Links)
    ------------------------------- */
 @media (max-width: 600px) {
+  .name-banner {
+    height: calc((var(--name-banner-height, var(--fs-h2))) * 0.8);
+  }
+
   .links-wrapper {
     max-width: 100vw;
     overflow-x: hidden;
@@ -2080,9 +2115,15 @@ a:hover {
   
   .links-wrapper .page-layout,
   .links-wrapper .page-layout.grid-2x2 {
+    /* conserver une grille 2x2 sur petits écrans afin que chaque carte reste
+       dans son coin (haut-gauche, haut-droite, bas-gauche, bas-droite) */
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    /* forcer chaque cellule à occuper l'espace disponible pour que les
+       alignements .slot-content.tl/tr/bl/br posent correctement les cartes */
+    grid-auto-rows: 1fr;
+    height: 100%;
   }
   
   .links-wrapper .slot-content {
@@ -2093,12 +2134,15 @@ a:hover {
   }
   
   .links-wrapper .card.corner {
-    width: 100%;
-    max-width: 100vw;
-    margin: 0 auto;
+    /* Ne pas forcer la card à 100% de largeur sur mobile: garder sa largeur
+       relative au QR afin qu'elle reste collée au coin via .slot-content */
+    width: auto;
+    max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+    margin: 0;
     /* réduire encore l'espacement vertical à l'intérieur de la card corner sur mobile */
     padding-top: var(--pad-xs);
     padding-bottom: var(--pad-xs);
+    box-sizing: border-box;
   }
   
   .links-wrapper .qr-caption {
@@ -2150,6 +2194,11 @@ a:hover {
    POINT DE RUPTURE: 480px (Très petits écrans)
    ------------------------------- */
 @media (max-width: 480px) {
+  :root {
+  /* --corner-qr-size: clamp(40px, 6vw, 64px); */
+    --corner-qr-margin: clamp(2px, 0.5vw, 8px);
+  }
+
   .section {
     padding: var(--pad-sm);
   }
@@ -2208,6 +2257,33 @@ a:hover {
   .sub-section {
     min-width: calc(var(--corner-qr-size) + 16px);
   }
+  button,
+  .contact-form .actions button,
+  .card[role="button"],
+  .tg-send {
+    font-size: var(--fs-body);
+    padding: 0.6rem 1rem;
+  }
+
+  /* Empêcher tout débordement horizontal et forcer box-sizing */
+  .section,
+  .page-layout,
+  .page,
+  .wrapper,
+  .sub-section {
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Éléments UI secondaires qui pouvaient être plus petits que 16px */
+  .timeline-overlay .overlay-type,
+  .timeline-overlay .overlay-info,
+  .timeline-overlay .overlay-level,
+  .links-wrapper .line-card small,
+  .links-wrapper .line-card h3 {
+    font-size: var(--fs-body) !important;
+  }
 }
 
 /* -------------------------------
@@ -2254,15 +2330,6 @@ a:hover {
   .logo {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
-  }
-}
-
-/* -------------------------------
-   BANDEAU NOM RESPONSIVE
-   ------------------------------- */
-@media (max-width: 640px) {
-  .name-banner {
-    height: calc((var(--name-banner-height, var(--fs-h2))) * 0.8);
   }
 }
 
@@ -2395,76 +2462,4 @@ a:hover {
 .page {
   overflow-x: hidden;
   max-width: 100%;
-}
-
-/* ==========================================================================
-   ACCESSIBILITY & MOBILE SAFEGUARDS
-   - Forcer une taille de texte minimale (16px) et assurer que les sections
-     ne débordent pas horizontalement sur petits écrans.
-   ========================================================================== */
-@media (max-width: 480px) {
-  /* Ne pas forcer des tailles fixes ici : laisser les variables clamp() gérer le redimensionnement
-     pour que le texte continue à rétrécir proportionnellement sur très petits écrans. */
-
-  /* Boutons et éléments cliquables doivent rester lisibles/touch-friendly */
-  button,
-  .contact-form .actions button,
-  .card[role="button"],
-  .tg-send {
-    font-size: var(--fs-body);
-    padding: 0.6rem 1rem;
-  }
-
-  /* Empêcher tout débordement horizontal et forcer box-sizing */
-  .section,
-  .page-layout,
-  .page,
-  .wrapper,
-  .sub-section {
-    box-sizing: border-box;
-    max-width: 100vw;
-    overflow-x: hidden;
-  }
-
-  /* Éléments UI secondaires qui pouvaient être plus petits que 16px */
-  .timeline-overlay .overlay-type,
-  .timeline-overlay .overlay-info,
-  .timeline-overlay .overlay-level,
-  .links-wrapper .line-card small,
-  .links-wrapper .line-card h3 {
-    font-size: var(--fs-body) !important;
-  }
-}
-
-/* Élémentaire : surface d'assurance pour tablettes petites largeur */
-@media (max-width: 768px) {
-  :root {
-    --fs-body: 1rem;
-  }
-  button { font-size: 1rem; }
-  .links-wrapper {
-    /* Valeurs encore plus petites pour écrans étroits */
-    --corner-qr-margin: clamp(2px, 1vw, 6px);
-    --corner-qr-margin-top: clamp(1px, 0.8vw, 4px);
-    --corner-qr-margin-left: clamp(1px, 0.8vw, 3px);
-    --corner-qr-margin-right: clamp(1px, 0.8vw, 3px);
-  }
-
-  .links-wrapper .page-layout.grid-2x2 {
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: 1fr 1fr !important;
-  }
-
-  .links-wrapper .slot-content,
-  .links-wrapper .card,
-  .links-wrapper .card.corner,
-  .links-wrapper .card.line-card.corner {
-    min-width: 0 !important;
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-
-  /* réduire padding/margins si nécessaire pour tenir sur de très petits écrans */
-  .links-wrapper .wrapper,
-  .links-wrapper .slot-content { padding: var(--pad-xs) !important; }
 }
