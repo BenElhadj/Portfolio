@@ -390,16 +390,6 @@ html.has-scrolled .sub-section:focus-within::after {
   border: 1px solid var(--border);
   padding: 1rem;
   transition: background 0.3s, color 0.3s;
-
-
-
-  /* allow the card to expand when text is long; set a sensible minimum matching QR + margins */
-  height: auto;
-  min-height: calc(
-    var(--corner-qr-size)
-    + var(--corner-qr-margin-top)
-    + var(--pad-md)
-  );
 }
 
 /* Carte avec bordure gauche */
@@ -2091,6 +2081,13 @@ a:hover {
   
   .preview-link:hover .iframe-container {
     border: 1px solid var(--border);
+  }
+
+  .card {
+    min-height: calc(
+     (var(--corner-qr-size) * 2.3)
+    + var(--pad-md)
+  ) !important;
   }
 }
 
