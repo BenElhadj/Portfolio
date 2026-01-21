@@ -1923,6 +1923,10 @@ a:hover {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
   }
+  .soft-skills-page .page-layout.grid-2x2 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
   
   .projects-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1976,6 +1980,12 @@ a:hover {
     grid-template-rows: 1fr 1fr !important;
   }
 
+  /* Make Soft_Skills page layout behave like Links page on small screens */
+  .soft-skills-page .page-layout.grid-2x2 {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
+  }
+
   .links-wrapper .slot-content,
   .links-wrapper .card,
   .links-wrapper .card.corner,
@@ -1996,6 +2006,14 @@ a:hover {
   }
   
   .links-wrapper .page-layout.grid-2x2 {
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .soft-skills-page .page-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .soft-skills-page .page-layout.grid-2x2 {
     grid-template-rows: 1fr 1fr;
   }
   
