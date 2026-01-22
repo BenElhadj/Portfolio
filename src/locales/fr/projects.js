@@ -27,7 +27,7 @@ export default {
       name: "Learn2Slither",
       year: "2025",
       description:
-        "Jeu éducatif interactif inspiré du célèbre Snake, conçu pour apprendre les bases du développement tout en s’amusant.",
+        "Jeu éducatif interactif inspiré du célèbre Snake, conçu pour apprendre les bases du développement tout en s'amusant.",
       stack: "Svelte, Vite, GitHub Pages",
       link: "https://benelhadj.github.io/Learn2Slither/",
     },
@@ -41,7 +41,7 @@ export default {
     {
       name: "Matcha (Backend)",
       year: "2025",
-      description: "API backend du projet Matcha, gérant l’authentification, la base de données, la logique métier et la communication avec le front-end.",
+      description: "API backend du projet Matcha, gérant l'authentification, la base de données, la logique métier et la communication avec le front-end.",
       stack: "Node.js, Express, PostgreSQL, Docker, Render",
       link: "https://matcha-backend-t6dr.onrender.com/"
     },
