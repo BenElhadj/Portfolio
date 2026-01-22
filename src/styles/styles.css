@@ -2367,7 +2367,7 @@ a:hover {
 /* QR responsive sur petits écrans */
 @media (max-width: 640px) {
   .card.corner {
-    padding-inline-end: calc(var(--corner-qr-size) + var(--corner-qr-margin-right) + var(--pad-xs));
+    padding-inline-end: calc(var(--corner-qr-size) + var(--corner-qr-margin-right) + var(--corner-qr-margin-left) + var(--pad-xs));
     min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin-top) + 3.5em);
   }
   
@@ -2477,4 +2477,145 @@ a:hover {
 .page {
   overflow-x: hidden;
   max-width: 100%;
+}
+
+/* Soft_Skills — card should size exactly to its text content (no clamp, no reserved QR space) */
+.soft-skills-page .card {
+  /* let the card size to its content */
+  height: auto !important;
+  min-height: 0 !important;
+  box-sizing: border-box;
+  padding: var(--pad-sm) var(--pad-sm);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  overflow: visible !important;
+  display: block;
+}
+
+/* On small screens, don't clamp — allow the card to shrink/grow with its text */
+@media (max-width: 768px) {
+  .soft-skills-page .card {
+    max-height: none !important;
+    overflow: visible !important;
+    /* remove any previous clamping behaviours */
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: unset;
+    display: block;
+  }
+
+  /* ensure the title and short description stack nicely inside the card */
+  .soft-skills-page .card .name,
+  .soft-skills-page .card .short {
+    display: block;
+    margin: 0 0 0.25rem 0;
+  }
+}
+
+/* Prevent QR / corner-specific spacing from applying to soft-skills cards */
+.soft-skills-page .card.corner {
+  /* remove large reserved inline space used by Links QR cards */
+  padding-inline-end: var(--pad-sm);
+  background-position: center;
+}
+
+/* Soft_Skills — fixed-size cards sized to exactly 2 text lines (name + short) */
+/* Adjust --soft-card-width or the numeric values below if you want a different size */
+.soft-skills-page .card {
+  /* fixed width for consistent layout */
+  --soft-card-width: 14rem;
+  width: var(--soft-card-width) !important;
+  max-width: 100%;
+
+  /* height = 2 lines * line-height + vertical padding */
+  line-height: 1.25 !important; /* ensure consistent line-height */
+  height: calc((1.25em * 2) + (var(--pad-sm) * 2)) !important;
+
+  /* clamp visual overflow to exactly 2 lines */
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  white-space: normal !important;
+
+  box-sizing: border-box !important;
+  padding: var(--pad-sm) !important;
+}
+
+/* smaller cards on very small screens */
+@media (max-width: 480px) {
+  .soft-skills-page .card {
+    --soft-card-width: 11rem;
+    width: var(--soft-card-width) !important;
+    height: calc((1.25em * 2) + (var(--pad-sm) * 2)) !important;
+  }
+}
+
+/* Ensure corner/QR spacing doesn't reintroduce extra width */
+.soft-skills-page .card.corner {
+  padding-inline-end: var(--pad-sm) !important;
+}
+
+/* Soft_Skills — make cards larger and more airy while keeping responsive clamp */
+.soft-skills-page .card {
+  /* responsive fixed width: min 11rem, preferred scales with viewport, max 18rem (increased) */
+  --soft-card-min: 14rem;
+  --soft-card-max: 17rem;
+  width: clamp(var(--soft-card-min), 20vw + 1rem, var(--soft-card-max)) !important;
+  max-width: 100% !important;
+
+  /* increase line-height and height to fit 2 more airy lines */
+  line-height: 1.5 !important; /* increased for legibility */
+  height: calc((2em * 2) + (var(--pad-sm) * 2)) !important; /* 2 lines + vertical padding */
+
+  /* clamp overflow to exactly 2 lines where supported */
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  white-space: normal !important;
+
+  box-sizing: border-box !important;
+  padding: var(--pad-xs) var(--pad-sm) calc(var(--pad-sm) + 0.5rem) var(--pad-sm) !important; /* extra bottom padding */
+  vertical-align: top !important;
+}
+
+/* larger but still responsive on very small screens */
+@media (max-width: 480px) {
+  .soft-skills-page .card {
+    --soft-card-min: 9.5rem;
+    --soft-card-max: 16rem;
+    width: clamp(var(--soft-card-min), 14vw + 1rem, var(--soft-card-max)) !important;
+    height: calc((1.3em * 2) + (var(--pad-sm) * 2)) !important;
+  }
+}
+
+/* Ensure corner/QR spacing doesn't reintroduce extra width */
+.soft-skills-page .card.corner {
+  padding-inline-end: var(--pad-sm) !important;
+}
+
+/* Ensure spacing between soft-skills cards matches spacing between sub-sections */
+.soft-skills-page .grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sub-gap) !important; /* use same gap as sub-sections */
+  align-items: flex-start;
+}
+
+/* Reset individual skill-item margins so gap controls spacing */
+.soft-skills-page .skill-item {
+  margin: 0 !important;
+  width: auto !important;
+  box-sizing: border-box;
+}
+
+/* Ensure card fills its item and keeps the fixed responsive width */
+.soft-skills-page .skill-item .card {
+  width: clamp(var(--soft-card-min, 11rem), 10vw + 2rem, var(--soft-card-max, 18rem)) !important;
+  box-sizing: border-box !important;
 }
