@@ -1986,6 +1986,23 @@ a:hover {
     grid-template-rows: 1fr 1fr !important;
   }
 
+  .soft-skills-page .card {
+    max-height: none !important;
+    overflow: visible !important;
+    /* remove any previous clamping behaviours */
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: unset;
+    display: block;
+  }
+
+  /* ensure the title and short description stack nicely inside the card */
+  .soft-skills-page .card .name,
+  .soft-skills-page .card .short {
+    display: block;
+    margin: 0 0 0.25rem 0;
+  }
+
   .links-wrapper .slot-content,
   .links-wrapper .card,
   .links-wrapper .card.corner,
@@ -2362,6 +2379,13 @@ a:hover {
     width: 100%;
     padding: var(--pad-sm);
   }
+  .soft-skills-page .page-layout.grid-2x2,
+  .soft-skills-page .page-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(4, auto) !important;
+    grid-auto-rows: auto !important;
+    row-gap: var(--sub-gap) !important;
+  }
 }
 
 /* QR responsive sur petits écrans */
@@ -2493,35 +2517,13 @@ a:hover {
   display: block;
 }
 
-/* On small screens, don't clamp — allow the card to shrink/grow with its text */
-@media (max-width: 768px) {
-  .soft-skills-page .card {
-    max-height: none !important;
-    overflow: visible !important;
-    /* remove any previous clamping behaviours */
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
-    -webkit-box-orient: unset;
-    display: block;
-  }
-
-  /* ensure the title and short description stack nicely inside the card */
-  .soft-skills-page .card .name,
-  .soft-skills-page .card .short {
-    display: block;
-    margin: 0 0 0.25rem 0;
-  }
-}
-
 /* Prevent QR / corner-specific spacing from applying to soft-skills cards */
 .soft-skills-page .card.corner {
-  /* remove large reserved inline space used by Links QR cards */
   padding-inline-end: var(--pad-sm);
   background-position: center;
 }
 
 /* Soft_Skills — fixed-size cards sized to exactly 2 text lines (name + short) */
-/* Adjust --soft-card-width or the numeric values below if you want a different size */
 .soft-skills-page .card {
   /* fixed width for consistent layout */
   --soft-card-width: 14rem;
@@ -2536,21 +2538,13 @@ a:hover {
   display: -webkit-box !important;
   -webkit-box-orient: vertical !important;
   -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
   overflow: hidden !important;
   text-overflow: ellipsis;
   white-space: normal !important;
 
   box-sizing: border-box !important;
   padding: var(--pad-sm) !important;
-}
-
-/* smaller cards on very small screens */
-@media (max-width: 480px) {
-  .soft-skills-page .card {
-    --soft-card-width: 11rem;
-    width: var(--soft-card-width) !important;
-    height: calc((1.25em * 2) + (var(--pad-sm) * 2)) !important;
-  }
 }
 
 /* Ensure corner/QR spacing doesn't reintroduce extra width */
@@ -2582,16 +2576,6 @@ a:hover {
   box-sizing: border-box !important;
   padding: var(--pad-xs) var(--pad-sm) calc(var(--pad-sm) + 0.5rem) var(--pad-sm) !important; /* extra bottom padding */
   vertical-align: top !important;
-}
-
-/* larger but still responsive on very small screens */
-@media (max-width: 480px) {
-  .soft-skills-page .card {
-    --soft-card-min: 9.5rem;
-    --soft-card-max: 16rem;
-    width: clamp(var(--soft-card-min), 14vw + 1rem, var(--soft-card-max)) !important;
-    height: calc((1.3em * 2) + (var(--pad-sm) * 2)) !important;
-  }
 }
 
 /* Ensure corner/QR spacing doesn't reintroduce extra width */
