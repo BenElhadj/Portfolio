@@ -2118,11 +2118,8 @@ a:hover {
     border: 1px solid var(--border);
   }
 
-  .card {
-    min-height: calc(
-     (var(--corner-qr-size) * 2.3)
-    + var(--pad-md)
-  ) !important;
+  .links-wrapper .card {
+    min-height: calc((var(--corner-qr-size) * 2.3) + var(--pad-md)) !important;
   }
 }
 
