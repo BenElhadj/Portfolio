@@ -997,6 +997,23 @@ html.has-scrolled .sub-section:focus-within::after {
   color: var(--text-secondary);
 }
 
+/* Responsive: réduire les logos, le nom et le level spécifiquement sur la page Hard_Skills
+   Utilise clamp() pour s'adapter fluidemnt sans impacter les autres pages */
+.skills-page .small-card .logo {
+  /* mini 48px, idéal autour de 8vw, max 80px (valeur actuelle) */
+  width: clamp(45px, 8vw, 80px);
+  height: clamp(45px, 8vw, 80px);
+}
+
+.skills-page .small-card .name {
+  /* texte légèrement plus petit sur mobile, max proche de la taille actuelle */
+  font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+}
+
+.skills-page .small-card .level {
+  font-size: clamp(0.25rem, 1.5vw, 0.85rem);
+}
+
 /* Barre de progression */
 .bar {
   background: var(--bar-bg);
