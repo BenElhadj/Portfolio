@@ -2000,7 +2000,7 @@ a:hover {
   .soft-skills-page .card .name,
   .soft-skills-page .card .short {
     display: block;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.3rem 0;
   }
 
   .links-wrapper .slot-content,
@@ -2556,7 +2556,7 @@ a:hover {
 .soft-skills-page .card {
   /* responsive fixed width: min 11rem, preferred scales with viewport, max 18rem (increased) */
   --soft-card-min: 14rem;
-  --soft-card-max: 17rem;
+  --soft-card-max: 20rem; /* increased max width */
   width: clamp(var(--soft-card-min), 20vw + 1rem, var(--soft-card-max)) !important;
   max-width: 100% !important;
 
@@ -2596,10 +2596,4 @@ a:hover {
   margin: 0 !important;
   width: auto !important;
   box-sizing: border-box;
-}
-
-/* Ensure card fills its item and keeps the fixed responsive width */
-.soft-skills-page .skill-item .card {
-  width: clamp(var(--soft-card-min, 11rem), 10vw + 2rem, var(--soft-card-max, 18rem)) !important;
-  box-sizing: border-box !important;
 }
