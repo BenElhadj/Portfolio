@@ -436,14 +436,17 @@ html.has-scrolled .sub-section:focus-within::after {
   flex-direction: column;
   align-items: center;
   gap: var(--pad-xxs);
-  padding: var(--pad-xs);
-  width: 110px;
-  height: 100%;
+  /* la carte s'adapte uniquement via des clamp : padding et max-width */
+  padding: clamp(4px, 1.6vw, 12px);
+  width: 100%;
+  /* limite la taille générale de la card tout en restant responsive */
+  max-width: clamp(90px, 12vw, 140px);
+  height: auto;
   box-sizing: border-box;
   overflow: hidden;
   cursor: pointer;
   transform: translateY(0);
-  transition: all 0.2s ease-out;
+  transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
 .small-card.visible {
@@ -818,7 +821,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .overlay-type, .overlay-info, .overlay-level {
   padding-left: var(--pad-md);
-  padding-right: var(--pad-sm);
+  padding-right: var(--pad-md);
   text-shadow: 0 0 8px rgba(0,0,0,0.18);
 }
 
@@ -982,6 +985,14 @@ html.has-scrolled .sub-section:focus-within::after {
   gap: var(--pad-xxs);
 }
 
+/* Ensure .info spans the full card width on skills page so bar percentages
+   are calculated relative to the card and not to a narrower container. */
+.skills-page .small-card .info {
+  width: 100% !important;
+  box-sizing: border-box;
+  align-items: center;
+}
+
 .name {
   font-size: var(--fs-small);
   font-weight: 600;
@@ -1011,24 +1022,28 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .skills-page .small-card .level {
-  font-size: clamp(0.25rem, 1.5vw, 0.85rem);
+  /* plus lisible et proportionnel à la taille écran */
+  font-size: clamp(0.65rem, 1.2vw, 0.85rem);
 }
 
-/* Barre de progression */
-.bar {
+/* Barre de progression (scopée à la page skills pour éviter les overrides) */
+.skills-page .small-card .bar {
   background: var(--bar-bg);
   border-radius: var(--radius);
   overflow: hidden;
-  height: 6px;
-  margin: var(--pad-xs) 0;
-  width: 100px;
+  /* épaisseur fixe (toujours 6px) */
+  height: 7px !important;
+  /* espacement vertical adapté */
+  margin: clamp(6px, 1.2vw, 12px) 0;
+  /* largeur proportionnelle à la card : min 48px, idéal 60% du conteneur, max 140px */
+  width: clamp(48px, 60%, 140px);
   flex-shrink: 0;
 }
 
-.fill {
+.skills-page .small-card .fill {
   height: 100%;
   background: var(--bar-fill);
-  border-radius: 6px;
+  border-radius: inherit;
 }
 
 /* Filtres SVG */
@@ -1888,7 +1903,42 @@ a:hover {
 
 /* Page Compétences */
 .skills-page .skills-grid {
-  padding: var(--pad-sm);
+  display: grid;
+  /* une seule règle responsive pour la taille des cards (min, idéal, max) */
+  grid-template-columns: repeat(auto-fill, minmax(clamp(90px, 12vw, 180px), 1fr));
+  /* gap uniforme horizontal + vertical, responsive */
+  gap: clamp(8px, 2vw, 24px);
+  /* padding géré par le gap pour garantir marges égales */
+  /* padding: 0;
+  margin: 0; */
+}
+
+/* Forcer les règles de la page skills (évite les overrides depuis d'autres media queries)
+   Nous utilisons !important pour garantir une seule règle responsive homogène */
+.skills-page .small-card {
+  width: 100% !important;
+  max-width: clamp(90px, 12vw, 140px) !important;
+  padding: clamp(4px, 1.6vw, 12px) !important;
+}
+
+.skills-page .small-card .logo {
+  width: clamp(45px, 8vw, 80px) !important;
+  height: clamp(45px, 8vw, 80px) !important;
+}
+
+.skills-page .small-card .name {
+  font-size: clamp(0.75rem, 1.5vw, 0.95rem) !important;
+}
+
+.skills-page .small-card .bar {
+  /* Width scales with the card: min 56px, ideal 72% of card, max 160px */
+  width: clamp(50px, 80%, 200px) !important;
+  height: 7px !important;
+  display: block;
+}
+
+.skills-page .small-card .fill {
+  transition: width 360ms cubic-bezier(.2,.9,.2,1);
 }
 
 /* Page Liens */
@@ -2116,8 +2166,8 @@ a:hover {
     height: 80px;
   }
   
-  .bar {
-    width: 80px;
+  .skills-page .small-card .bar {
+    width: clamp(48px, 50%, 160px);
   }
   
   .popup-content {
@@ -2610,4 +2660,25 @@ a:hover {
   margin: 0 !important;
   width: auto !important;
   box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   Layout: For Hard Skills page we want a consistent 2x2 layout on >=540px
+   and a 1x4 single-column layout on smaller screens. Use a single responsive
+   breakpoint (540px) and !important to avoid being overridden by other rules.
+   -------------------------------------------------------------------------- */
+@media (min-width: 540px) {
+  .skills-page .page-layout.grid-2x2 {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
+    height: 100%;
+  }
+}
+
+@media (max-width: 539.98px) {
+  .skills-page .page-layout.grid-2x2 {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(4, auto) !important;
+    height: auto;
+  }
 }
