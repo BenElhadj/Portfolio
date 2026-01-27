@@ -34,7 +34,7 @@
                     @keydown.space.prevent="openLogo(d)"
                     :title="'Voir logo ' + d.institution"
                   >
-                    <picture v-if="d.image && i === 0 && catIndex === 0">
+                    <picture>
                       <source :srcset="getAssetPath('/degrees/' + d.image.replace(/\.[a-zA-Z]+$/, '.webp'))" type="image/webp" />
                       <img
                         ref="firstLogoLazy.imageRef"
@@ -44,10 +44,6 @@
                         :class="{ 'fade-in': firstLogoLazy.loaded }"
                         @load="firstLogoLazy.onLoad"
                       />
-                    </picture>
-                    <picture v-else-if="d.image">
-                      <source :srcset="getAssetPath('/degrees/' + d.image.replace(/\.[a-zA-Z]+$/, '.webp'))" type="image/webp" />
-                      <img :src="getAssetPath('/degrees/' + d.image)" :alt="d.degree" loading="lazy" />
                     </picture>
                   </div>
 
