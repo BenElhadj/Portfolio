@@ -2449,6 +2449,12 @@ a:hover {
     grid-template-rows: repeat(4, auto) !important;
     grid-auto-rows: auto !important;
     row-gap: var(--sub-gap) !important;
+    height: auto;
+  }
+  .skills-page .page-layout.grid-2x2 {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(4, auto) !important;
+    height: auto;
   }
 }
 
@@ -2667,18 +2673,11 @@ a:hover {
    and a 1x4 single-column layout on smaller screens. Use a single responsive
    breakpoint (540px) and !important to avoid being overridden by other rules.
    -------------------------------------------------------------------------- */
-@media (min-width: 540px) {
+/* @media (min-width: 540px) {
   .skills-page .page-layout.grid-2x2 {
     grid-template-columns: 1fr 1fr !important;
     grid-template-rows: 1fr 1fr !important;
     height: 100%;
   }
-}
+} */
 
-@media (max-width: 539.98px) {
-  .skills-page .page-layout.grid-2x2 {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: repeat(4, auto) !important;
-    height: auto;
-  }
-}

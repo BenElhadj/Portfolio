@@ -1,11 +1,3 @@
-/* Fade-in effect for lazy loaded images */
-.fade-in {
-  opacity: 1;
-  transition: opacity 0.6s;
-}
-img[loading="lazy"] {
-  opacity: 0;
-}
 <template>
   <div class="wrapper diplomas-page">
     <h2 class="title">{{ $t("diplomas.title") }}</h2>
