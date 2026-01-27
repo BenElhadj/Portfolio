@@ -3,25 +3,49 @@ const CACHE_NAME = 'portfolio-cache-v3';
 // Fonction pour charger dynamiquement la liste des fichiers à mettre en cache
 async function getUrlsToCache() {
   try {
-    // On construit l'URL absolue de cache-manifest.json selon l'emplacement du service worker
-    const manifestUrl = new URL('cache-manifest.json', self.location);
+    // Base URL correspondant au répertoire contenant le service-worker (ex: https://.../Portfolio/)
+    const baseUrl = new URL('.', self.location).href;
+    // On construit l'URL du cache-manifest.json à partir de ce baseUrl
+    const manifestUrl = new URL('cache-manifest.json', baseUrl);
     const response = await fetch(manifestUrl.href);
     if (!response.ok) throw new Error('cache-manifest.json introuvable');
     const files = await response.json();
-    // On ajoute la racine et index.html si besoin
-    return ['/', '/index.html', ...files];
+    // Normaliser les chemins du manifeste en URL absolues en respectant le baseUrl
+    const normalized = (Array.isArray(files) ? files : []).map((f) => {
+      if (typeof f !== 'string') return f;
+      // laisser les data: ou URLs externes telles quelles
+      if (/^data:|^https?:\/\//i.test(f)) return f;
+      // si le manifeste contient des chemins absolus commençant par '/...'
+      // on les résout en les préfixant par le baseUrl (sous-chemin du site)
+      if (f.startsWith('/')) {
+        return new URL(f.replace(/^\//, ''), baseUrl).href;
+      }
+      // sinon, résoudre relatif au baseUrl
+      return new URL(f, baseUrl).href;
+    });
+
+    // On ajoute la racine du baseUrl et index.html
+    const rootUrl = baseUrl;
+    const indexUrl = new URL('index.html', baseUrl).href;
+    return [rootUrl, indexUrl, ...normalized];
   } catch (e) {
     console.error('Impossible de charger cache-manifest.json', e);
-    return ['/', '/index.html'];
+    // fallback: utiliser la racine du service-worker comme scope
+    const baseUrl = new URL('.', self.location).href;
+    return [baseUrl, new URL('index.html', baseUrl).href];
   }
 }
 
 
 // Désactive le service worker en dev (localhost)
 self.addEventListener('install', event => {
-  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
-    console.warn('Service Worker désactivé en développement.');
-    // On stoppe l'installation, rien n'est fait
+  // Activer le Service Worker uniquement sur des origines sécurisées (https)
+  // ou en développement local (localhost / 127.0.0.1).
+  const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+  const isSecure = self.location.protocol === 'https:';
+  if (!isSecure && !isLocalhost) {
+    console.warn('Service Worker désactivé : actif seulement sur une origine sécurisée (https) ou localhost.');
+    // On stoppe l'installation pour éviter des fetchs invalides (ex: file://)
     self.skipWaiting();
     return;
   }
