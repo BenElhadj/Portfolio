@@ -52,6 +52,9 @@ app.mount("#app");
     pages = Array.from(document.querySelectorAll(".pages .page"));
     if (!pages.length) pages = Array.from(document.querySelectorAll(".page"));
     sections = Array.from(document.querySelectorAll(".sub-section"));
+    try {
+      if (location.hostname === 'localhost') console.log('[scroll-debug] refreshNodes', { pages: pages.length, sections: sections.length });
+    } catch (e) {}
   }
 
   function applyParallax() {
@@ -101,6 +104,24 @@ app.mount("#app");
       if (scrollFlags.get(target)) return; // éviter doublons
       const onScroll = () => {
         const parent = target.closest('.sub-section') || sectionEl;
+        // Diagnostic: log des informations utiles pour tracer le comportement
+        try {
+          if (location.hostname === 'localhost') {
+            const now = new Date().toISOString();
+            const computedTarget = window.getComputedStyle(target);
+            const computedParent = window.getComputedStyle(parent);
+            console.log('[scroll-debug]', now, {
+              target: target.className || target.tagName,
+              parent: parent.className,
+              scrollTop: target.scrollTop,
+              scrollHeight: target.scrollHeight,
+              clientHeight: target.clientHeight,
+              canScroll: target.scrollHeight > target.clientHeight,
+              targetOverflow: computedTarget.overflowY,
+              parentOverflow: computedParent.overflowY,
+            });
+          }
+        } catch (e) {}
         parent.classList.add('is-scrolling');
         // retirer après une courte pause
         clearTimeout(onScroll._t);
@@ -109,6 +130,9 @@ app.mount("#app");
         }, 220);
       };
       target.addEventListener('scroll', onScroll, { passive: true });
+      try {
+        if (location.hostname === 'localhost') console.log('[scroll-debug] listener attached', { target: target.className || target.tagName });
+      } catch (e) {}
       scrollFlags.set(target, true);
     });
   }
@@ -141,5 +165,6 @@ app.mount("#app");
     else window.addEventListener('scroll', onAnyScroll, { passive: true });
     // écouteurs de scroll interne pour compartiments
     attachInnerScrollListeners();
+    try { if (location.hostname === 'localhost') console.log('[scroll-debug] attachInnerScrollListeners called'); } catch (e) {}
   }, 0);
 })();
