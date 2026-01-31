@@ -90,7 +90,7 @@ app.mount("#app");
         hasScrolled = true;
         htmlEl.classList.add('has-scrolled');
       }
-    } catch (e) {}
+    } catch (e) { /* ignore errors during scroll detection/worker registration */ }
   }
 
   // Supprimer le glow pendant le scroll interne d'un compartiment

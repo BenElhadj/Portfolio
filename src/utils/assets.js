@@ -9,3 +9,11 @@ export const getAssetPath = (path) => {
   const prefix = String(base).replace(/\/*$/, '/') ;
   return `${prefix}${clean}`;
 };
+
+// Return an asset path preferring a given extension (e.g. 'webp').
+// Behavior:
+// - If `path` is an absolute URL (http(s)://) it is returned unchanged.
+// - If `path` already has an extension, it will be replaced by the preferred one.
+// - If `path` has no extension, the preferred one will be appended.
+// The returned path is passed through `getAssetPath` so it is normalized with BASE_URL.
+// NOTE: getPreferredAssetPath removed — project uses explicit .webp assets in locales and components.

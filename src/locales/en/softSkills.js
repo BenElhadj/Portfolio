@@ -17,11 +17,6 @@ export default {
       short: "Builds authentic relationships.",
       info: "Shows genuine interest in others, listens actively and adapts communication to people."
     },
-    empathicCommunication: {
-      name: "Concise communication",
-      short: "Gets to the point, expresses clearly.",
-      info: "Prefers clear, concise messages while sharing feelings to keep interactions transparent."
-    },
     adaptability: {
       name: "Adaptability",
       short: "Handles surprises, flexible.",
@@ -98,11 +93,6 @@ export default {
       name: "Calm under pressure",
       short: "Remains composed and effective under pressure.",
       info: "I keep a cool head in stressful situations. Unexpected events, tight deadlines or emergencies don't throw me off: I focus on solutions rather than the problem."
-    },
-    teamSpirit: {
-      name: "Team spirit",
-      short: "Naturally works in a team.",
-      info: "I involve others, ask for their views and value their contributions. I believe the best solutions come from collective intelligence."
     },
     agileFlexible: {
       name: "Agile & flexible",

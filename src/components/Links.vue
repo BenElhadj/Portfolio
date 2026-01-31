@@ -21,14 +21,14 @@
               >
                 <picture>
                   <source
-                    :srcset="( $t(`links.items.${item.key}.qr`) && $t(`links.items.${item.key}.qr`).replace(/\.[a-zA-Z]+$/, '.webp')) || qrFor(dataForKey(item.key))"
+                    :srcset="( (t(`links.items.${item.key}.qr`) && getAssetPath(t(`links.items.${item.key}.qr`))) || qrFor(dataForKey(item.key)) )"
                     type="image/webp"
                   />
                   <!-- special lazy image handling for GitHub -->
                   <img
                     v-if="item.key === 'github'"
                     ref="githubQrLazy.imageRef"
-                    :src="githubQrLazy.isVisible ? ( $t('links.items.github.qr') || qrFor(dataForKey('github')) ) : githubQrLazy.placeholder"
+                    :src="githubQrLazy.isVisible ? ( (t('links.items.github.qr') && getAssetPath(t('links.items.github.qr'))) || qrFor(dataForKey('github')) ) : githubQrLazy.placeholder"
                     alt="github-qr"
                     loading="lazy"
                     :class="{ 'fade-in': githubQrLazy.loaded }"
@@ -101,8 +101,9 @@ import Popup from './Popup.vue';
 
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLazyImage } from '../composables/useLazyImage.js';
-// Lazy loading avancé pour le QR GitHub
-const githubQrLazy = useLazyImage('/public/qr/qr_GitHub.png');
+import { getAssetPath } from '../utils/assets.js';
+// Lazy loading avancé pour le QR GitHub (webp)
+const githubQrLazy = useLazyImage('/public/qr/qr_GitHub.webp');
 import { useI18n } from 'vue-i18n';
 
 const { t, locale } = useI18n();
@@ -192,7 +193,7 @@ const cvUrl = computed(() => {
   const file = String(locale.value).startsWith('fr') ? 'cv/CV_FR.pdf' : 'cv/CV_EN.pdf';
   return getBasePath() + file;
 });
-const faviconSrc = computed(() => getBasePath() + 'favicon.png');
+const faviconSrc = computed(() => getBasePath() + 'favicon.webp');
 
 function downloadCV() {
   const url = cvUrl.value;
@@ -244,7 +245,8 @@ function dataForKey(key) {
 }
 function getImgSrc(key) {
   const qr = t(`links.items.${key}.qr`);
-  return qr || qrFor(dataForKey(key));
+  if (qr) return getAssetPath(qr);
+  return qrFor(dataForKey(key));
 }
 function handleClick(key, event) {
   if (key === 'contact') {

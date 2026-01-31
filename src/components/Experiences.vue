@@ -32,7 +32,7 @@
               >
                 <div class="degree-thumb">
                   <picture>
-                    <source :srcset="getAssetPath(`/experiences/${exp.logo.replace(/\.[a-zA-Z]+$/, '.webp')}`)" type="image/webp" />
+                    <source :srcset="getAssetPath(`/experiences/${exp.logo}`)" type="image/webp" />
                     <img :src="getAssetPath(`/experiences/${exp.logo}`)" :alt="exp.company" loading="lazy" />
                   </picture>
                 </div>

@@ -45,79 +45,87 @@ function getModeCode() {
   return isDark ? 'w' : 'b'
 }
 
-const buildUrl = (key) => `${normalizedBase}logos/texts/${langCode.value}-${getModeCode()}-${key}.svg`
+const buildBase = (key) => `${normalizedBase}logos/texts/${langCode.value}-${getModeCode()}-${key}`
 
 let currentRenderToken = 0
 
-async function animateSvgText(url, expectedToken) {
-  const token = expectedToken ?? ++currentRenderToken
+async function fetchSvgText(url) {
   try {
     const res = await fetch(url)
+    if (!res.ok) return null
     const txt = await res.text()
-    if (!svgHolder.value) return
+    if (txt && txt.includes('<svg')) return txt
+    return null
+  } catch (e) {
+    return null
+  }
+}
 
-    // Injecte l'SVG dans le holder
-    if (token !== currentRenderToken) return
-    svgHolder.value.innerHTML = txt
-    const svg = svgHolder.value.querySelector('svg')
-    if (!svg) return
+// Charge strictement le SVG et l'anime. Si absent, on logge un avertissement.
+async function animateSvgOnly(key, expectedToken) {
+  const token = expectedToken ?? ++currentRenderToken
+  const base = buildBase(key)
 
-    // Assure un dimensionnement et centrage cohérents avec la bannière
-    svg.setAttribute('width', '100%')
-    svg.setAttribute('height', '100%')
-    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
-    svg.style.display = 'block'
+  if (!svgHolder.value) return
+  svgHolder.value.innerHTML = ''
 
-    // Couleur pilotée par variable CSS globale (héritée via styles.css)
-    // La couleur effective est définie par `.name-banner svg { color: var(--text); }` dans le CSS global
+  const svgUrl = `${base}.svg`
+  const svgText = await fetchSvgText(svgUrl)
+  if (token !== currentRenderToken) return
+  if (!svgText) {
+    console.warn('NameBanner: SVG manquant pour', key, svgUrl)
+    // Ne pas fallback sur une image — le composant exige un SVG pour l'animation
+    return
+  }
 
-    // ==== Colorise directement les formes avec currentColor (var(--text)) ====
-    const drawableSelectors = 'path, line, polyline, polygon, rect, circle, ellipse, text'
-    const elems = Array.from(svg.querySelectorAll(drawableSelectors))
-    elems.forEach(el => {
-      el.setAttribute('stroke', 'currentColor')
-      el.setAttribute('fill', 'currentColor')
-      if (!el.getAttribute('stroke-width')) el.setAttribute('stroke-width', '2')
-      el.style.opacity = '1'
-    })
+  svgHolder.value.innerHTML = svgText
+  const svg = svgHolder.value.querySelector('svg')
+  if (!svg) return
+  svg.setAttribute('width', '100%')
+  svg.setAttribute('height', '100%')
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+  svg.style.display = 'block'
 
-    // ==== Animation d'écriture: n'anime que les paths ====
-    const paths = Array.from(svg.querySelectorAll('path'))
-    const durationPerPath = 600 // ms
-    for (const p of paths) {
-      if (stopLoop || token !== currentRenderToken) return
-      let len = 0
-      try {
-        len = p.getTotalLength()
-      } catch (e) {
-        // Si getTotalLength n'est pas dispo, on ne tente pas l'écriture
-        p.style.opacity = '1'
-        continue
-      }
-      p.style.transition = 'none'
-      p.style.strokeDasharray = `${len}`
-      p.style.strokeDashoffset = `${len}`
-      void p.getBoundingClientRect()
-      p.style.transition = `stroke-dashoffset ${durationPerPath}ms ease`
-      p.style.strokeDashoffset = '0'
-      await new Promise(r => setTimeout(r, durationPerPath + 60))
-      if (token !== currentRenderToken) return
+  const drawableSelectors = 'path, line, polyline, polygon, rect, circle, ellipse, text'
+  const elems = Array.from(svg.querySelectorAll(drawableSelectors))
+  elems.forEach(el => {
+    el.setAttribute('stroke', 'currentColor')
+    el.setAttribute('fill', 'currentColor')
+    if (!el.getAttribute('stroke-width')) el.setAttribute('stroke-width', '2')
+    el.style.opacity = '1'
+  })
+
+  const paths = Array.from(svg.querySelectorAll('path'))
+  const durationPerPath = 600 // ms
+  for (const p of paths) {
+    if (stopLoop || token !== currentRenderToken) return
+    let len = 0
+    try {
+      len = p.getTotalLength()
+    } catch (e) {
+      p.style.opacity = '1'
+      continue
     }
-
-    // Pause d'affichage de 5 secondes
-    await new Promise(r => setTimeout(r, 5000))
+    p.style.transition = 'none'
+    p.style.strokeDasharray = `${len}`
+    p.style.strokeDashoffset = `${len}`
+    void p.getBoundingClientRect()
+    p.style.transition = `stroke-dashoffset ${durationPerPath}ms ease`
+    p.style.strokeDashoffset = '0'
+    await new Promise(r => setTimeout(r, durationPerPath + 60))
     if (token !== currentRenderToken) return
+  }
 
-    // Efface en fondu
-    if (svgHolder.value && token === currentRenderToken) {
-      svgHolder.value.classList.add('fade-out')
-      await new Promise(r => setTimeout(r, 600))
-      svgHolder.value.classList.remove('fade-out')
-      svgHolder.value.innerHTML = ''
-    }
-  } catch (err) {
-    // En cas d'échec de chargement, ignorer et continuer
-    console.warn('NameBanner: échec chargement SVG', url, err)
+  // Pause d'affichage
+  await new Promise(r => setTimeout(r, 5000))
+  if (token !== currentRenderToken) return
+
+  // Efface en fondu
+  if (svgHolder.value && token === currentRenderToken) {
+    svgHolder.value.classList.add('fade-out')
+    await new Promise(r => setTimeout(r, 600))
+    svgHolder.value.classList.remove('fade-out')
+    svgHolder.value.innerHTML = ''
   }
 }
 
@@ -125,26 +133,24 @@ async function runLoop() {
   stopLoop = false
   while (!stopLoop) {
     const key = sequence[currentIndex.value]
-    await animateSvgText(buildUrl(key))
+    await animateSvgOnly(key)
     currentIndex.value = (currentIndex.value + 1) % sequence.length
   }
 }
 
 onMounted(() => {
   themeChangedHandler = async () => {
-    // Invalide les rendus en cours et recharge immédiatement le texte courant
     currentRenderToken++
     if (svgHolder.value) svgHolder.value.innerHTML = ''
-    const key = sequence[currentIndex.value]
-    await animateSvgText(buildUrl(key), currentRenderToken)
+  const key = sequence[currentIndex.value]
+  await animateSvgOnly(key, currentRenderToken)
   }
   window.addEventListener('theme-changed', themeChangedHandler)
   languageChangedHandler = async (e) => {
-    // Rester sur la même key, mais recharger dans la nouvelle langue
     currentRenderToken++
     if (svgHolder.value) svgHolder.value.innerHTML = ''
-    const key = sequence[currentIndex.value]
-    await animateSvgText(buildUrl(key), currentRenderToken)
+  const key = sequence[currentIndex.value]
+  await animateSvgOnly(key, currentRenderToken)
   }
   window.addEventListener('language-changed', languageChangedHandler)
   // Démarre la boucle
@@ -153,7 +159,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopLoop = true
-  // Nettoie l'écouteur
   if (themeChangedHandler) {
     window.removeEventListener('theme-changed', themeChangedHandler)
     themeChangedHandler = null
@@ -165,6 +170,5 @@ onUnmounted(() => {
 })
 
 // Si la langue change, on repart du début de la séquence
-// Le rechargement instantané est géré par l'évènement 'language-changed'
 watch(() => locale.value, () => {})
 </script>
