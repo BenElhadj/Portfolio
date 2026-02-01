@@ -55,8 +55,8 @@
   /* ===== DIMENSIONS ===== */
   --radius: 8px;
   --navbar-height: 36px;
-  /* padding horizontal responsive: shrink jusqu'à 4px sur petits écrans, maxi 24px */
-  --page-padding-x: clamp(4px, 2vw, 24px);
+  /* padding horizontal responsive: shrink jusqu'à 4px sur petits écrans, maxi 12px (réduit) */
+  --page-padding-x: clamp(4px, 1.2vw, 12px);
   --page-padding-y: clamp(4px, 2vw, 24px);
   --wrapper-padding-top: 28px;
   --degree-thumb-width: 90px;
@@ -237,9 +237,10 @@ small {
   position: relative;
   background-color: var(--page-bg);
   color: var(--text);
-  padding-inline: var(--fs-body);
+  /* utiliser le padding horizontal centralisé et réduit */
+  padding-inline: var(--page-padding-x);
   /* reserve space vertically as well so top/bottom glows are visible */
-  padding-block: var(--fs-body);
+  padding-block: var(--page-padding-y);
   box-sizing: border-box;
 }
 
