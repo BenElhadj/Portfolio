@@ -1,22 +1,30 @@
 <template>
   <div class="navbar">
 
-    <!-- Toggle Dark/Light -->
-    <button class="theme-toggle" @click="toggleTheme">
-      <span v-if="theme === 'light'">🌙</span>
-      <span v-else>☀️</span>
-    </button>
+    <div class="nav-left">
+      <!-- Toggle Dark/Light -->
+      <button class="theme-toggle" @click="toggleTheme">
+        <span v-if="theme === 'light'">🌙</span>
+        <span v-else>☀️</span>
+      </button>
+      <!-- Burger (mobile) -->
+      <button class="burger" @click="isNavOpen = !isNavOpen" :aria-expanded="isNavOpen ? 'true' : 'false'" aria-label="Menu">
+        <span class="burger-box">
+          <span class="burger-inner" :class="{ open: isNavOpen }"></span>
+        </span>
+      </button>
+    </div>
     <!-- Navigation Pages avec flèches -->
     <div class="nav-arrows-container">
       <button v-if="showArrows" class="nav-arrow left" @click="scrollNav(-1);handleArrowClick($event)" :disabled="isAtStart" aria-label="Pages précédentes">&#60;</button>
-      <ul class="nav-links" role="menubar" ref="navLinksRef">
+  <ul :class="['nav-links', { open: isNavOpen }]" role="menubar" ref="navLinksRef">
         <li
           v-for="(key, i) in navKeys"
           :key="key"
           role="menuitem"
           tabindex="0"
           :class="{ active: currentIndex === i }"
-          @click="goToIndex(i)"
+          @click="(e) => { goToIndex(i); isNavOpen = false }"
           @keydown.enter="goToIndex(i)"
           :aria-current="currentIndex === i ? 'true' : 'false'"
         >
@@ -121,6 +129,8 @@ const fallback = {
 /* état */
 const currentIndex = ref(0);
 const theme = ref("dark");
+// Mobile nav open state (pour le burger)
+const isNavOpen = ref(false);
 
 /* Dom refs / observer */
 let pagesContainer = null;
