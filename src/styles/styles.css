@@ -55,26 +55,26 @@
   /* ===== DIMENSIONS ===== */
   --radius: 8px;
   --navbar-height: 36px;
-  /* padding horizontal responsive: shrink jusqu'à 4px sur petits écrans, maxi 12px (réduit) */
-  --page-padding-x: clamp(4px, 1.2vw, 12px);
-  --page-padding-y: clamp(4px, 2vw, 24px);
-  --wrapper-padding-top: 28px;
-  --degree-thumb-width: 90px;
+  /* padding horizontal moins progressif : min 6px, faible scaling, max 10px */
+  --page-padding-x: clamp(7px, 1vw, 24px);
+  --page-padding-y: clamp(4px, 1vw, 24px);
+  --wrapper-padding-top: 16px;
+  --degree-thumb-width: clamp(1.9rem, 5vw, 2.7rem);
   
   /* Bandeau nom */
   --name-banner-height: clamp(1.9rem, 5vw, 2.7rem);
   --name-banner-color: #000000;
   
   /* QR Codes - valeurs par défaut pour desktop */
-  --corner-qr-size: 168px;
-  --corner-qr-margin: clamp(4px, 4vw, 36px);
+  --corner-qr-size: 167px;
+  --corner-qr-margin: clamp(2px, 2vw, 36px);
   /* Marges directionnelles autour du QR (top / left / right).
     Par défaut on répartit la marge horizontale en deux pour garder
     le comportement visuel précédent. */
   --corner-qr-margin-top: var(--corner-qr-margin);
   --corner-qr-margin-left: calc(var(--corner-qr-margin) / 2);
   --corner-qr-margin-right: calc(var(--corner-qr-margin) / 2);
-  --favicon-size: clamp(100px, 15vw, 820px);
+  --favicon-size: clamp(95px, 15vw, 820px);
   
   /* Bouton Telegram */
   --tg-size: 80px;
@@ -274,7 +274,7 @@ small {
 
 .page {
   height: 100vh;
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
