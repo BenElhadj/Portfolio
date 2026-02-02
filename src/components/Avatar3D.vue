@@ -72,9 +72,9 @@ const GAIT_PRESETS = {
     hipRollAmp: 0.015,
     hipBobAmp: 0.025,
     pelvisPitchAmp: 0.02,
-  legSwingAmp: 0.52,
+    legSwingAmp: 0.52,
     kneeBendAmp: 0.7,
-  armSwingAmp: 0.6,
+    armSwingAmp: 0.6,
     armZSwingAmp: 0.003,
     elbowBase: 0.28,
     elbowBendAmp: 0.35,
@@ -83,20 +83,20 @@ const GAIT_PRESETS = {
     footLiftAmp: 0.18,
     footPlantarAmp: 0.14,
     shoulderRollAmp: 0.012,
-  maxArmSwing: 0.8,
-  maxArmForwardSwing: 0.8,
-  maxArmBackwardSwing: 0.35,
+    maxArmSwing: 0.8,
+    maxArmForwardSwing: 0.8,
+    maxArmBackwardSwing: 0.35,
     maxElbowBend: 0.9,
     maxKneeBend: 1.1,
     legAdductionRoll: 0.08,
     armAdductionRoll: 0.10,
-  basePelvisPitch: -0.07,
-  baseShoulderPitch: 0.07,
-  baseSpinePitch: 0.20,
-  handSwingGain: 1.3,
-  forearmSwingGain: 0.5,
+    basePelvisPitch: -0.07,
+    baseShoulderPitch: 0.07,
+    baseSpinePitch: 0.20,
+    handSwingGain: 1.3,
+    forearmSwingGain: 0.5,
     forearmElbowGain: 0.85,
-  kneeLiftAmp: 0.22,
+    kneeLiftAmp: 0.22,
     cycleFreqBase: 3.0,   // rad/s de base (augmenté)
     cycleFreqGain: 7.0    // gain selon la vitesse (augmenté)
   },
@@ -105,9 +105,9 @@ const GAIT_PRESETS = {
     hipRollAmp: 0.02,
     hipBobAmp: 0.03,
     pelvisPitchAmp: 0.03,
-  legSwingAmp: 0.63,
+    legSwingAmp: 0.63,
     kneeBendAmp: 0.9,
-  armSwingAmp: 0.8,
+    armSwingAmp: 0.8,
     armZSwingAmp: 0.005,
     elbowBase: 0.25,
     elbowBendAmp: 0.45,
@@ -116,20 +116,20 @@ const GAIT_PRESETS = {
     footLiftAmp: 0.22,
     footPlantarAmp: 0.18,
     shoulderRollAmp: 0.015,
-  maxArmSwing: 1.0,
-  maxArmForwardSwing: 1.0,
-  maxArmBackwardSwing: 0.45,
+    maxArmSwing: 1.0,
+    maxArmForwardSwing: 1.0,
+    maxArmBackwardSwing: 0.45,
     maxElbowBend: 1.0,
     maxKneeBend: 1.2,
     legAdductionRoll: 0.06,
     armAdductionRoll: 0.08,
-  basePelvisPitch: -0.08,
-  baseShoulderPitch: 0.08,
-  baseSpinePitch: 0.28,
-  handSwingGain: 1.35,
-  forearmSwingGain: 0.5,
+    basePelvisPitch: -0.08,
+    baseShoulderPitch: 0.08,
+    baseSpinePitch: 0.28,
+    handSwingGain: 1.35,
+    forearmSwingGain: 0.5,
     forearmElbowGain: 0.80,
-  kneeLiftAmp: 0.26,
+    kneeLiftAmp: 0.26,
     cycleFreqBase: 3.5,
     cycleFreqGain: 8.0
   },
@@ -138,9 +138,9 @@ const GAIT_PRESETS = {
     hipRollAmp: 0.025,
     hipBobAmp: 0.04,
     pelvisPitchAmp: 0.04,
-  legSwingAmp: 0.78,
+    legSwingAmp: 0.78,
     kneeBendAmp: 1.05,
-  armSwingAmp: 0.95,
+    armSwingAmp: 0.95,
     armZSwingAmp: 0.007,
     elbowBase: 0.22,
     elbowBendAmp: 0.55,
@@ -149,20 +149,20 @@ const GAIT_PRESETS = {
     footLiftAmp: 0.26,
     footPlantarAmp: 0.22,
     shoulderRollAmp: 0.018,
-  maxArmSwing: 1.15,
-  maxArmForwardSwing: 1.15,
-  maxArmBackwardSwing: 0.55,
+    maxArmSwing: 1.15,
+    maxArmForwardSwing: 1.15,
+    maxArmBackwardSwing: 0.55,
     maxElbowBend: 1.1,
     maxKneeBend: 1.3,
     legAdductionRoll: 0.05,
     armAdductionRoll: 0.07,
-  basePelvisPitch: -0.09,
-  baseShoulderPitch: 0.09,
-  baseSpinePitch: 0.36,
-  handSwingGain: 1.45,
-  forearmSwingGain: 0.5,
+    basePelvisPitch: -0.09,
+    baseShoulderPitch: 0.09,
+    baseSpinePitch: 0.36,
+    handSwingGain: 1.45,
+    forearmSwingGain: 0.5,
     forearmElbowGain: 0.75,
-  kneeLiftAmp: 0.30,
+    kneeLiftAmp: 0.30,
     cycleFreqBase: 4.0,
     cycleFreqGain: 10.0
   }
@@ -243,9 +243,15 @@ onMounted(() => {
     alpha: true,
     antialias: true
   });
-  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  // limiter le pixel ratio pour alléger la charge GPU sur écrans très haute-dpi
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  // compat: three.js renamed outputEncoding -> outputColorSpace in newer versions
+  if ("outputColorSpace" in renderer) {
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+  } else if ("outputEncoding" in renderer) {
+    renderer.outputEncoding = THREE.sRGBEncoding;
+  }
 
   // lights
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1);
@@ -312,28 +318,28 @@ onMounted(() => {
       return { axis: best.axis, sign: best.sign };
     };
 
-  const LeftArm = bones["LeftArm"];
-  const RightArm = bones["RightArm"];
-  const LeftForeArm = bones["LeftForeArm"];
-  const RightForeArm = bones["RightForeArm"];
-  const LeftHand = bones["LeftHand"];
-  const RightHand = bones["RightHand"];
+  const leftArmBone = bones["LeftArm"];
+  const rightArmBone = bones["RightArm"];
+  const leftForeArmBone = bones["LeftForeArm"];
+  const rightForeArmBone = bones["RightForeArm"];
+  const leftHandBone = bones["LeftHand"];
+  const rightHandBone = bones["RightHand"];
 
-    if (LeftArm && LeftForeArm) {
-      const c = calibratePitchAxisAndSign(LeftArm, LeftForeArm);
-      LeftArm.userData.pitchAxis = c.axis; LeftArm.userData.pitchSign = c.sign;
+    if (leftArmBone && leftForeArmBone) {
+      const c = calibratePitchAxisAndSign(leftArmBone, leftForeArmBone);
+      leftArmBone.userData.pitchAxis = c.axis; leftArmBone.userData.pitchSign = c.sign;
     }
-    if (RightArm && RightForeArm) {
-      const c = calibratePitchAxisAndSign(RightArm, RightForeArm);
-      RightArm.userData.pitchAxis = c.axis; RightArm.userData.pitchSign = c.sign;
+    if (rightArmBone && rightForeArmBone) {
+      const c = calibratePitchAxisAndSign(rightArmBone, rightForeArmBone);
+      rightArmBone.userData.pitchAxis = c.axis; rightArmBone.userData.pitchSign = c.sign;
     }
-    if (LeftForeArm && LeftHand) {
-      const c = calibratePitchAxisAndSign(LeftForeArm, LeftHand);
-      LeftForeArm.userData.pitchAxis = c.axis; LeftForeArm.userData.pitchSign = c.sign;
+    if (leftForeArmBone && leftHandBone) {
+      const c = calibratePitchAxisAndSign(leftForeArmBone, leftHandBone);
+      leftForeArmBone.userData.pitchAxis = c.axis; leftForeArmBone.userData.pitchSign = c.sign;
     }
-    if (RightForeArm && RightHand) {
-      const c = calibratePitchAxisAndSign(RightForeArm, RightHand);
-      RightForeArm.userData.pitchAxis = c.axis; RightForeArm.userData.pitchSign = c.sign;
+    if (rightForeArmBone && rightHandBone) {
+      const c = calibratePitchAxisAndSign(rightForeArmBone, rightHandBone);
+      rightForeArmBone.userData.pitchAxis = c.axis; rightForeArmBone.userData.pitchSign = c.sign;
     }
   // Pas de calibration spécifique pour les mains: elles héritent de l'axe du coude si nécessaire
 
@@ -344,14 +350,6 @@ onMounted(() => {
     if (gltf.animations?.length) {
       mixer = new THREE.AnimationMixer(avatar);
     }
-
-    // Tenter de charger un clip de marche externe et le retarget sur l'avatar
-    const animLoader = new GLTFLoader();
-    // Liste des modèles réellement présents (évite d'appeler loader sur un fichier manquant)
-    // Si vous ajoutez walk.glb sous public/models, ajoutez "walk.glb" à ce tableau.
-    const AVAILABLE_MODELS = [
-      "avatar-bleu.glb",
-    ];
 
     clock = new THREE.Clock();
     lastTime = performance.now();
@@ -377,44 +375,53 @@ const X_AXIS = new THREE.Vector3(1, 0, 0);
 const Y_AXIS = new THREE.Vector3(0, 1, 0);
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
+// temporaries reused every frame to reduce GC churn
+const _TMP_V1 = new THREE.Vector3();
+const _TMP_V2 = new THREE.Vector3();
+const _TMP_V3 = new THREE.Vector3();
+const _TMP_Q = new THREE.Quaternion();
+const _TMP_Q2 = new THREE.Quaternion();
+const _TMP_P = new THREE.Plane();
+
 function applyBoneOffset(bone, ox = 0, oy = 0, oz = 0, slerpAlpha = 0.3) {
   if (!bone || !bone.userData?.bindQuaternion) return;
-  const targetQ = bone.userData.bindQuaternion.clone();
-  if (ox) targetQ.multiply(new THREE.Quaternion().setFromAxisAngle(X_AXIS, ox));
-  if (oy) targetQ.multiply(new THREE.Quaternion().setFromAxisAngle(Y_AXIS, oy));
-  if (oz) targetQ.multiply(new THREE.Quaternion().setFromAxisAngle(Z_AXIS, oz));
-  bone.quaternion.slerp(targetQ, slerpAlpha);
+  // build target quaternion in temporaries to avoid per-frame allocations
+  _TMP_Q.copy(bone.userData.bindQuaternion);
+  if (ox) _TMP_Q.multiply(_TMP_Q2.setFromAxisAngle(X_AXIS, ox));
+  if (oy) _TMP_Q.multiply(_TMP_Q2.setFromAxisAngle(Y_AXIS, oy));
+  if (oz) _TMP_Q.multiply(_TMP_Q2.setFromAxisAngle(Z_AXIS, oz));
+  bone.quaternion.slerp(_TMP_Q, slerpAlpha);
 }
 
 function applyBoneOffsetAxis(bone, axis /* 'X'|'Y'|'Z' */, angle = 0, slerpAlpha = 0.3) {
   if (!bone || !bone.userData?.bindQuaternion || !angle) return;
-  const targetQ = bone.userData.bindQuaternion.clone();
+  _TMP_Q.copy(bone.userData.bindQuaternion);
   const ax = axis === 'Y' ? Y_AXIS : axis === 'Z' ? Z_AXIS : X_AXIS;
-  targetQ.multiply(new THREE.Quaternion().setFromAxisAngle(ax, angle));
-  bone.quaternion.slerp(targetQ, slerpAlpha);
+  _TMP_Q.multiply(_TMP_Q2.setFromAxisAngle(ax, angle));
+  bone.quaternion.slerp(_TMP_Q, slerpAlpha);
 }
 
 // === Animation de marche procédurale CORRIGÉE ===
 function updateWalkAnimation(dt, speed, direction) {
-  // cadence dépendante de la vitesse, avec base > 0 pour lisser
-  const phaseRate = (GAIT.cycleFreqBase + GAIT.cycleFreqGain * speed) * speed;
-  walkTime += dt * phaseRate;
-  
-  // Bones pour l'animation de marche
-  const Hips = bones["Hips"];
-  const Spine = bones["Spine"];
-  const LeftShoulder = bones["LeftShoulder"]; // peut ne pas exister selon le rig
-  const RightShoulder = bones["RightShoulder"];
-  const LeftUpLeg = bones["LeftUpLeg"];
-  const RightUpLeg = bones["RightUpLeg"];
-  const LeftLeg = bones["LeftLeg"];
-  const RightLeg = bones["RightLeg"];
-  const LeftArm = bones["LeftArm"];
-  const RightArm = bones["RightArm"];
-  const LeftForeArm = bones["LeftForeArm"];
-  const RightForeArm = bones["RightForeArm"];
+   // cadence dépendante de la vitesse, avec base > 0 pour lisser
+   const phaseRate = (GAIT.cycleFreqBase + GAIT.cycleFreqGain * speed) * speed;
+   walkTime += dt * phaseRate;
+   
+   // Bones pour l'animation de marche
+  const hipsBone = bones["Hips"];
+  const spineBone = bones["Spine"];
+  const leftShoulderBone = bones["LeftShoulder"]; // peut ne pas exister selon le rig
+  const rightShoulderBone = bones["RightShoulder"];
+  const leftUpLegBone = bones["LeftUpLeg"];
+  const rightUpLegBone = bones["RightUpLeg"];
+  const leftLegBone = bones["LeftLeg"];
+  const rightLegBone = bones["RightLeg"];
+  const leftArmBone = bones["LeftArm"];
+  const rightArmBone = bones["RightArm"];
+  const leftForeArmBone = bones["LeftForeArm"];
+  const rightForeArmBone = bones["RightForeArm"];
 
-  if (!Hips) return;
+  if (!hipsBone) return;
 
   // === Phases ===
   const speedPow = Math.pow(speed, 0.7); // plus naturel que linéaire
@@ -427,11 +434,11 @@ function updateWalkAnimation(dt, speed, direction) {
   const pelvisPitch = GAIT.basePelvisPitch + Math.cos(walkTime) * GAIT.pelvisPitchAmp * speedPow; // légère bascule + tilt arrière
   
   // Appliquer le balancement des hanches (offsets sur la pose bind)
-  applyBoneOffset(Hips, pelvisPitch, hipYaw, hipRoll, 0.2);
+  applyBoneOffset(hipsBone, pelvisPitch, hipYaw, hipRoll, 0.2);
 
   // bob vertical symétrique (0..1) via (1-cos(2t))/2
   const hipBobY = ((1 - Math.cos(walkTime * 2)) * 0.5) * GAIT.hipBobAmp * speedPow;
-  Hips.position.y = hipBobY;
+  hipsBone.position.y = hipBobY;
 
   // === Jambes - mouvement de marche naturel ===
   // CORRECTION : Utiliser des rotations X uniquement pour un mouvement naturel
@@ -448,14 +455,14 @@ function updateWalkAnimation(dt, speed, direction) {
   leftKneeBend = clamp(leftKneeBend, 0, GAIT.maxKneeBend);
   rightKneeBend = clamp(rightKneeBend, 0, GAIT.maxKneeBend);
 
-  applyBoneOffset(LeftUpLeg, leftLegSwing, 0, 0, 0.25);
-  applyBoneOffset(RightUpLeg, rightLegSwing, 0, 0, 0.25);
-  applyBoneOffset(LeftLeg, -leftKneeBend, 0, 0, 0.25);
-  applyBoneOffset(RightLeg, -rightKneeBend, 0, 0, 0.25);
+  applyBoneOffset(leftUpLegBone, leftLegSwing, 0, 0, 0.25);
+  applyBoneOffset(rightUpLegBone, rightLegSwing, 0, 0, 0.25);
+  applyBoneOffset(leftLegBone, -leftKneeBend, 0, 0, 0.25);
+  applyBoneOffset(rightLegBone, -rightKneeBend, 0, 0, 0.25);
 
   // Rapprocher les pieds vers le centre (légère adduction au niveau de la hanche)
-  if (LeftUpLeg) applyBoneOffset(LeftUpLeg, 0, 0, -GAIT.legAdductionRoll, 0.2);
-  if (RightUpLeg) applyBoneOffset(RightUpLeg, 0, 0, GAIT.legAdductionRoll, 0.2);
+  if (leftUpLegBone) applyBoneOffset(leftUpLegBone, 0, 0, -GAIT.legAdductionRoll, 0.2);
+  if (rightUpLegBone) applyBoneOffset(rightUpLegBone, 0, 0, GAIT.legAdductionRoll, 0.2);
 
   // === Bras - coordination contralatérale: bras gauche suit le pied droit, bras droit suit le pied gauche
   // Si le pied droit avance (sin(rPhase) > 0), le bras gauche avance (même sens). Idem à l'inverse.
@@ -465,13 +472,13 @@ function updateWalkAnimation(dt, speed, direction) {
   let leftArmSwing = Math.sin(leftArmPhase) * GAIT.armSwingAmp * speedPow;
   let rightArmSwing = Math.sin(rightArmPhase) * GAIT.armSwingAmp * speedPow;
   // Appliquer le signe par côté pour obtenir un angle où >0 = vers l'avant
-  let rightApplied = (RightArm ? (RightArm.userData.pitchSign ?? 1) : 1) * rightArmSwing;
+  let rightApplied = (rightArmBone ? (rightArmBone.userData.pitchSign ?? 1) : 1) * rightArmSwing;
   // Asymétrie: limiter plus fortement le mouvement vers l'arrière pour éviter la sensation de "démembrement"
   const maxFwd = GAIT.maxArmForwardSwing ?? GAIT.maxArmSwing;
   const maxBack = GAIT.maxArmBackwardSwing ?? GAIT.maxArmSwing;
   rightApplied = clamp(rightApplied, -maxBack, maxFwd);
   // Côté gauche indépendant: utiliser sa propre calibration signe/axe
-  let leftApplied = (LeftArm ? (LeftArm.userData.pitchSign ?? 1) : 1) * leftArmSwing;
+  let leftApplied = (leftArmBone ? (leftArmBone.userData.pitchSign ?? 1) : 1) * leftArmSwing;
   leftApplied = clamp(leftApplied, -maxBack, maxFwd);
   
   // Flexion des coudes: extension quand le bras passe devant, flexion quand il passe derrière
@@ -480,44 +487,44 @@ function updateWalkAnimation(dt, speed, direction) {
   leftElbowBend = clamp(leftElbowBend, 0, GAIT.maxElbowBend);
   rightElbowBend = clamp(rightElbowBend, 0, GAIT.maxElbowBend);
 
-  const lAxis = LeftArm?.userData?.pitchAxis || 'X';
-  const rAxis = RightArm?.userData?.pitchAxis || 'X';
-  const lSign = LeftArm?.userData?.pitchSign ?? 1;
-  const rSign = RightArm?.userData?.pitchSign ?? 1;
-  const lElbAxis = LeftForeArm?.userData?.pitchAxis || lAxis;
-  const rElbAxis = RightForeArm?.userData?.pitchAxis || rAxis;
-  const lElbSign = LeftForeArm?.userData?.pitchSign ?? lSign;
-  const rElbSign = RightForeArm?.userData?.pitchSign ?? rSign;
+  const lAxis = leftArmBone?.userData?.pitchAxis || 'X';
+  const rAxis = rightArmBone?.userData?.pitchAxis || 'X';
+  const lSign = leftArmBone?.userData?.pitchSign ?? 1;
+  const rSign = rightArmBone?.userData?.pitchSign ?? 1;
+  const lElbAxis = leftForeArmBone?.userData?.pitchAxis || lAxis;
+  const rElbAxis = rightForeArmBone?.userData?.pitchAxis || rAxis;
+  const lElbSign = leftForeArmBone?.userData?.pitchSign ?? lSign;
+  const rElbSign = rightForeArmBone?.userData?.pitchSign ?? rSign;
   const lHandAxis = (bones["LeftHand"]?.userData?.pitchAxis) || lElbAxis;
   const rHandAxis = (bones["RightHand"]?.userData?.pitchAxis) || rElbAxis;
 
   // Swing bras essentiellement avant/arrière le long de l'axe latéral détecté
-  applyBoneOffsetAxis(LeftArm, lAxis, leftApplied, 0.25);
-  applyBoneOffsetAxis(RightArm, rAxis, rightApplied, 0.25);
+  applyBoneOffsetAxis(leftArmBone, lAxis, leftApplied, 0.25);
+  applyBoneOffsetAxis(rightArmBone, rAxis, rightApplied, 0.25);
 
   // Très légère composante latérale (presque nulle) pour la vie
   const tinyZL = Math.sin(lPhase + Math.PI) * GAIT.armZSwingAmp * speedPow;
   const tinyZR = Math.sin(rPhase + Math.PI) * GAIT.armZSwingAmp * speedPow;
-  if (Math.abs(tinyZL) > 1e-4) applyBoneOffset(LeftArm, 0, 0, tinyZL, 0.25);
-  if (Math.abs(tinyZR) > 1e-4) applyBoneOffset(RightArm, 0, 0, tinyZR, 0.25);
+  if (Math.abs(tinyZL) > 1e-4) applyBoneOffset(leftArmBone, 0, 0, tinyZL, 0.25);
+  if (Math.abs(tinyZR) > 1e-4) applyBoneOffset(rightArmBone, 0, 0, tinyZR, 0.25);
 
   // Avant-bras: petite composante de swing + flexion de coude
-  if (LeftForeArm) {
+  if (leftForeArmBone) {
     // calculer l'angle dans l'espace calibré du coude (tenir compte du pitchSign)
     let leftForeArmAngle = (leftApplied * GAIT.forearmSwingGain) - (lElbSign * leftElbowBend);
     // éviter l'hyper-extension : clamp strict
     leftForeArmAngle = clamp(leftForeArmAngle, -GAIT.maxElbowBend, GAIT.maxElbowBend);
-    applyBoneOffsetAxis(LeftForeArm, lElbAxis, leftForeArmAngle, 0.25);
+    applyBoneOffsetAxis(leftForeArmBone, lElbAxis, leftForeArmAngle, 0.25);
   }
-  if (RightForeArm) {
+  if (rightForeArmBone) {
     let rightForeArmAngle = (rightApplied * GAIT.forearmSwingGain) - (rElbSign * rightElbowBend);
     rightForeArmAngle = clamp(rightForeArmAngle, -GAIT.maxElbowBend, GAIT.maxElbowBend);
-    applyBoneOffsetAxis(RightForeArm, rElbAxis, rightForeArmAngle, 0.25);
+    applyBoneOffsetAxis(rightForeArmBone, rElbAxis, rightForeArmAngle, 0.25);
   }
 
   // ---- Mains : appliquer une rotation symétrique et une adduction pour les rapprocher du torse
-  const LeftHand = bones["LeftHand"];
-  const RightHand = bones["RightHand"];
+  const leftHandBone = bones["LeftHand"];
+  const rightHandBone = bones["RightHand"];
 
   // main yaw/pitch basés sur l'angle appliqué au bras (leftApplied/rightApplied)
   // on inverse légèrement le yaw pour que la paume tende vers le bas/avant
@@ -527,57 +534,57 @@ function updateWalkAnimation(dt, speed, direction) {
   const handPitchR = clamp(rightApplied * HAND_PITCH_GAIN, -MAX_HAND_PITCH, MAX_HAND_PITCH);
 
   // Appliquer rotations lissées sur les mains (axes calibrés hérités si présents)
-  if (LeftHand) {
+  if (leftHandBone) {
     // pitch
-    applyBoneOffsetAxis(LeftHand, lHandAxis, handPitchL, 0.25);
+    applyBoneOffsetAxis(leftHandBone, lHandAxis, handPitchL, 0.25);
     // yaw (Y axis)
-    applyBoneOffsetAxis(LeftHand, 'Y', handYawL, 0.25);
+    applyBoneOffsetAxis(leftHandBone, 'Y', handYawL, 0.25);
     // rapprocher du torse (adduction supplémentaire)
-    applyBoneOffset(LeftHand, 0, 0, -(GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA), 0.22);
+    applyBoneOffset(leftHandBone, 0, 0, -(GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA), 0.22);
   }
-  if (RightHand) {
-    applyBoneOffsetAxis(RightHand, rHandAxis, handPitchR, 0.25);
-    applyBoneOffsetAxis(RightHand, 'Y', handYawR, 0.25);
-    applyBoneOffset(RightHand, 0, 0, (GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA), 0.22);
+  if (rightHandBone) {
+    applyBoneOffsetAxis(rightHandBone, rHandAxis, handPitchR, 0.25);
+    applyBoneOffsetAxis(rightHandBone, 'Y', handYawR, 0.25);
+    applyBoneOffset(rightHandBone, 0, 0, (GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA), 0.22);
   }
 
   // Rapprocher les bras du torse (légère adduction/roulis) en complément
-  if (LeftArm) applyBoneOffset(LeftArm, 0, 0, -(GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA * 0.6), 0.22);
-  if (RightArm) applyBoneOffset(RightArm, 0, 0, (GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA * 0.6), 0.22);
+  if (leftArmBone) applyBoneOffset(leftArmBone, 0, 0, -(GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA * 0.6), 0.22);
+  if (rightArmBone) applyBoneOffset(rightArmBone, 0, 0, (GAIT.armAdductionRoll + HAND_ADDUCTION_EXTRA * 0.6), 0.22);
 
   // === Rotation du torse ===
-  if (Spine) {
+  if (spineBone) {
     const spineYaw = -hipYaw * GAIT.spineCounterYaw + direction * 0.08 * speedPow;
     const spineRoll = Math.sin(walkTime * 0.5) * GAIT.spineRollAmp * speedPow;
     const spinePitch = GAIT.baseSpinePitch || 0;
-    applyBoneOffset(Spine, spinePitch, spineYaw, spineRoll, 0.2);
-  }
-  // Épaules: contre-roulis subtil opposé au bassin
-  if (LeftShoulder) {
-    applyBoneOffset(LeftShoulder, 0, 0, -hipRoll * (GAIT.shoulderRollAmp / Math.max(GAIT.hipRollAmp, 1e-6)), 0.25);
+    applyBoneOffset(spineBone, spinePitch, spineYaw, spineRoll, 0.2);
+   }
+   // Épaules: contre-roulis subtil opposé au bassin
+  if (leftShoulderBone) {
+    applyBoneOffset(leftShoulderBone, 0, 0, -hipRoll * (GAIT.shoulderRollAmp / Math.max(GAIT.hipRollAmp, 1e-6)), 0.25);
     // Avancer légèrement les épaules (lean avant subtil)
-    applyBoneOffset(LeftShoulder, GAIT.baseShoulderPitch, 0, 0, 0.25);
+    applyBoneOffset(leftShoulderBone, GAIT.baseShoulderPitch, 0, 0, 0.25);
   }
-  if (RightShoulder) {
-    applyBoneOffset(RightShoulder, 0, 0, -hipRoll * (GAIT.shoulderRollAmp / Math.max(GAIT.hipRollAmp, 1e-6)), 0.25);
-    applyBoneOffset(RightShoulder, GAIT.baseShoulderPitch, 0, 0, 0.25);
+  if (rightShoulderBone) {
+    applyBoneOffset(rightShoulderBone, 0, 0, -hipRoll * (GAIT.shoulderRollAmp / Math.max(GAIT.hipRollAmp, 1e-6)), 0.25);
+    applyBoneOffset(rightShoulderBone, GAIT.baseShoulderPitch, 0, 0, 0.25);
   }
 
   // === Pieds - légère dorsiflexion en phase de swing ===
-  const LeftFoot = bones["LeftFoot"];
-  const RightFoot = bones["RightFoot"];
-  if (LeftFoot) {
-    const dorsiflex = Math.max(0, Math.sin(lPhase)) * GAIT.footLiftAmp * speedPow;
-    const plantar = Math.max(0, -Math.sin(lPhase)) * GAIT.footPlantarAmp * speedPow;
-    const footPitch = dorsiflex - plantar; // lever devant, pousser derrière
-    applyBoneOffset(LeftFoot, footPitch, 0, 0, 0.25);
-  }
-  if (RightFoot) {
-    const dorsiflex = Math.max(0, Math.sin(rPhase)) * GAIT.footLiftAmp * speedPow;
-    const plantar = Math.max(0, -Math.sin(rPhase)) * GAIT.footPlantarAmp * speedPow;
-    const footPitch = dorsiflex - plantar;
-    applyBoneOffset(RightFoot, footPitch, 0, 0, 0.25);
-  }
+  const leftFootBone = bones["LeftFoot"];
+  const rightFootBone = bones["RightFoot"];
+  if (leftFootBone) {
+     const dorsiflex = Math.max(0, Math.sin(lPhase)) * GAIT.footLiftAmp * speedPow;
+     const plantar = Math.max(0, -Math.sin(lPhase)) * GAIT.footPlantarAmp * speedPow;
+     const footPitch = dorsiflex - plantar; // lever devant, pousser derrière
+    applyBoneOffset(leftFootBone, footPitch, 0, 0, 0.25);
+   }
+  if (rightFootBone) {
+     const dorsiflex = Math.max(0, Math.sin(rPhase)) * GAIT.footLiftAmp * speedPow;
+     const plantar = Math.max(0, -Math.sin(rPhase)) * GAIT.footPlantarAmp * speedPow;
+     const footPitch = dorsiflex - plantar;
+    applyBoneOffset(rightFootBone, footPitch, 0, 0, 0.25);
+   }
 }
 
 // === Reset de l'animation de marche - CORRIGÉ ===
@@ -598,15 +605,15 @@ function resetWalkAnimation() {
   });
   
   // Réinitialiser la position des hanches
-  const Hips = bones["Hips"];
-  if (Hips) {
-    Hips.position.y = lerp(Hips.position.y, 0, 0.1);
+  const hipsBone = bones["Hips"];
+  if (hipsBone) {
+    hipsBone.position.y = lerp(hipsBone.position.y, 0, 0.1);
   }
 
   // Conserver l'inclinaison en avant du torse même à l'arrêt
-  const Spine = bones["Spine"];
-  if (Spine) {
-    applyBoneOffset(Spine, (GAIT.baseSpinePitch || 0), 0, 0, 0.2);
+  const spineBone = bones["Spine"];
+  if (spineBone) {
+    applyBoneOffset(spineBone, (GAIT.baseSpinePitch || 0), 0, 0, 0.2);
   }
 }
 
@@ -652,13 +659,10 @@ function animate() {
 
   // === Orientation du corps vers le pointeur (plus naturel) ===
   raycaster.setFromCamera(mouseNDC, camera);
-  const aPos = new THREE.Vector3();
-  avatar.getWorldPosition(aPos);
-  const camDir = new THREE.Vector3();
-  camera.getWorldDirection(camDir);
-  const screenPlane = new THREE.Plane().setFromNormalAndCoplanarPoint(camDir, aPos);
-  const hit = new THREE.Vector3();
-  // compute mouse velocity (used to slightly bias responsiveness)
+  // réutiliser des vecteurs temporaires pour éviter des allocations par frame
+  avatar.getWorldPosition(_TMP_V1); // aPos
+  camera.getWorldDirection(_TMP_V2); // camDir
+   // compute mouse velocity (used to slightly bias responsiveness)
   const invDt = dt > 0 ? 1 / dt : 0;
   mouseVelocity.x = (mouseNDC.x - prevMouseNDC.x) * invDt;
   mouseVelocity.y = (mouseNDC.y - prevMouseNDC.y) * invDt;
@@ -697,22 +701,24 @@ function animate() {
   }
 
   // Bones pour le suivi de la tête
-  const Neck = bones["Neck"];
-  const Head = bones["Head"] || bones["Wolf3D_Head"];
-  const EyeL = bones["EyeLeft"] || bones["LeftEye"];
-  const EyeR = bones["EyeRight"] || bones["RightEye"];
+  const neckBone = bones["Neck"];
+  const headBone = bones["Head"] || bones["Wolf3D_Head"];
+  const eyeLeftBone = bones["EyeLeft"] || bones["LeftEye"];
+  const eyeRightBone = bones["EyeRight"] || bones["RightEye"];
 
-  if (Head) {
+  if (headBone) {
     // Position monde de la tête
-    let headPos = new THREE.Vector3();
-    Head.getWorldPosition(headPos);
-
-    // Vecteur tête → point visé sur le plan "écran"
-    let lookPoint = new THREE.Vector3();
-    if (!raycaster.ray.intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(camDir, headPos), lookPoint)) {
+    headBone.getWorldPosition(_TMP_V1);
+    const headPos = _TMP_V1;
+    
+    // Vecteur tête → point visé sur le plan "écran" (réutilise _TMP_V3)
+    const lookPoint = _TMP_V3;
+    _TMP_P.setFromNormalAndCoplanarPoint(_TMP_V2, headPos);
+    if (!raycaster.ray.intersectPlane(_TMP_P, lookPoint)) {
       lookPoint.copy(raycaster.ray.direction).multiplyScalar(5).add(raycaster.ray.origin);
     }
-    let dir = new THREE.Vector3().subVectors(lookPoint, headPos).normalize();
+    _TMP_V2.subVectors(lookPoint, headPos).normalize();
+    const dir = _TMP_V2;
 
     // Angles yaw/pitch (inverser le pitch pour que bas écran = tête vers le bas)
     let yaw = Math.atan2(dir.x, dir.z);
@@ -726,13 +732,13 @@ function animate() {
     // ---- Appliquer aux yeux ----
     const maxEyeYaw = 0.32;
     const maxEyePitch = 0.32;
-    if (EyeL) {
-      EyeL.rotation.y = lerp(EyeL.rotation.y, clamp(yaw, -maxEyeYaw, maxEyeYaw), EYE_RESPONSIVENESS);
-      EyeL.rotation.x = lerp(EyeL.rotation.x, clamp(pitch, -maxEyePitch, maxEyePitch), EYE_RESPONSIVENESS);
+    if (eyeLeftBone) {
+      eyeLeftBone.rotation.y = lerp(eyeLeftBone.rotation.y, clamp(yaw, -maxEyeYaw, maxEyeYaw), EYE_RESPONSIVENESS);
+      eyeLeftBone.rotation.x = lerp(eyeLeftBone.rotation.x, clamp(pitch, -maxEyePitch, maxEyePitch), EYE_RESPONSIVENESS);
     }
-    if (EyeR) {
-      EyeR.rotation.y = lerp(EyeR.rotation.y, clamp(yaw, -maxEyeYaw, maxEyeYaw), EYE_RESPONSIVENESS);
-      EyeR.rotation.x = lerp(EyeR.rotation.x, clamp(pitch, -maxEyePitch, maxEyePitch), EYE_RESPONSIVENESS);
+    if (eyeRightBone) {
+      eyeRightBone.rotation.y = lerp(eyeRightBone.rotation.y, clamp(yaw, -maxEyeYaw, maxEyeYaw), EYE_RESPONSIVENESS);
+      eyeRightBone.rotation.x = lerp(eyeRightBone.rotation.x, clamp(pitch, -maxEyePitch, maxEyePitch), EYE_RESPONSIVENESS);
     }
 
   // ---- Appliquer à la tête + cou (lissage + anticipation) ----
@@ -741,7 +747,7 @@ function animate() {
   const maxHeadYaw = Math.min(MAX_HEAD_YAW, 0.9 * headReduction);
   const maxHeadPitch = Math.min(MAX_HEAD_PITCH, 0.9 * headReduction);
 
-  if (Neck || Head) {
+  if (neckBone || headBone) {
     // desired angles clamped
     const desiredYaw = clamp(yaw, -maxHeadYaw, maxHeadYaw);
     const desiredPitch = clamp(pitch, -maxHeadPitch, maxHeadPitch);
@@ -760,11 +766,11 @@ function animate() {
     const neckYaw = smoothedYaw * 0.45;
     const neckPitch = smoothedPitch * 0.6;
 
-    if (Neck) applyBoneOffsetAxis(Neck, 'Y', neckYaw, respFactor);
-    if (Neck) applyBoneOffsetAxis(Neck, 'X', neckPitch, respFactor);
+    if (neckBone) applyBoneOffsetAxis(neckBone, 'Y', neckYaw, respFactor);
+    if (neckBone) applyBoneOffsetAxis(neckBone, 'X', neckPitch, respFactor);
 
-    if (Head) applyBoneOffsetAxis(Head, 'Y', smoothedYaw, respFactor);
-    if (Head) applyBoneOffsetAxis(Head, 'X', smoothedPitch, respFactor);
+    if (headBone) applyBoneOffsetAxis(headBone, 'Y', smoothedYaw, respFactor);
+    if (headBone) applyBoneOffsetAxis(headBone, 'X', smoothedPitch, respFactor);
 
     // store for next frame
     prevHeadYaw = smoothedYaw;
