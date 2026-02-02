@@ -6,7 +6,6 @@
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import { getAssetPath } from "../utils/assets.js";
 
 const canvas = ref(null);
@@ -257,7 +256,7 @@ onMounted(() => {
 
   // loader
   const loader = new GLTFLoader();
-  loader.load(getAssetPath("/models/avatar.glb"), (gltf) => {
+  loader.load(getAssetPath("/models/avatar-bleu.glb"), (gltf) => {
     avatar = gltf.scene;
   // remember base yaw so we rotate relative to initial facing (avoid turning back to camera)
   baseAvatarYaw = avatar.rotation.y || 0;
@@ -351,47 +350,8 @@ onMounted(() => {
     // Liste des modèles réellement présents (évite d'appeler loader sur un fichier manquant)
     // Si vous ajoutez walk.glb sous public/models, ajoutez "walk.glb" à ce tableau.
     const AVAILABLE_MODELS = [
-      "avatar.glb",
+      "avatar-bleu.glb",
     ];
-
-    // const walkModelName = "walk.glb";
-    // if (AVAILABLE_MODELS.includes(walkModelName)) {
-    //   animLoader.load(
-    //     getAssetPath(`/models/${walkModelName}`),
-    //     (wgltf) => {
-    //       try {
-    //         if (!mixer) mixer = new THREE.AnimationMixer(avatar);
-    //         // choisir un clip "Walk" si dispo, sinon le premier
-    //         const clip = (wgltf.animations || []).find(c => /walk/i.test(c.name)) || wgltf.animations?.[0];
-    //         if (clip) {
-    //           let retargeted = null;
-    //           try {
-    //             retargeted = SkeletonUtils.retargetClip(wgltf.scene, avatar, clip);
-    //           } catch (e) {
-    //             // si retarget indisponible, tenter de jouer le clip tel quel (si mêmes noms d'os)
-    //             retargeted = clip;
-    //           }
-    //           walkClip = retargeted;
-    //           walkAction = mixer.clipAction(walkClip);
-    //           walkAction.setLoop(THREE.LoopRepeat, Infinity);
-    //           walkAction.enabled = true;
-    //           walkAction.clampWhenFinished = false;
-    //           walkAction.play();
-    //           // démarrer à poids nul; on pilotera weight/timeScale dans animate()
-    //           walkAction.weight = 0;
-    //         }
-    //       } catch (e) {
-    //         // silencieux: on restera en procédural
-    //       }
-    //     },
-    //     undefined,
-    //     () => {
-    //       // pas de walk.glb -> rester en procédural
-    //     }
-    //   );
-    // } else {
-    //   // walk.glb absent : on reste en animation procédurale sans tenter le chargement
-    // }
 
     clock = new THREE.Clock();
     lastTime = performance.now();

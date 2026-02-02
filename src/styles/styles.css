@@ -5,9 +5,9 @@
 
 :root {
   /* ===== TYPOGRAPHIE ===== */
-  --font-family-base: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --font-family-montserrat: 'Montserrat', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --font-family-arabic: system-ui, "BArabics", "Amiri", "Cairo", Arial, sans-serif;
+  --font-family-base: system-ui, avenir, helvetica, arial, sans-serif;
+  --font-family-montserrat: 'Montserrat', system-ui, avenir, helvetica, arial, sans-serif;
+  --font-family-arabic: system-ui, "BArabics", "Amiri", "Cairo", arial, sans-serif;
   --line-height: 1.5;
   --font-weight: 400;
   
@@ -20,17 +20,17 @@
   --fs-small: clamp(0.8rem, 1vw, 1.2rem);
   
   /* ===== COULEURS - MODE CLAIR (DÉFAUT) ===== */
-  --page-bg: #ffffff;
-  --text: #111111;
-  --text-secondary: #444444;
+  --page-bg: #fff;
+  --text: #111;
+  --text-secondary: #444;
   --title: #0b6fb8;
   --blue: #0b6fb8;
   --border: #e6e6e6;
   --green-glow: #34D399;
   
   /* Cartes */
-  --card-bg: #ffffff;
-  --card-shadow: rgba(0, 0, 0, 0.06);
+  --card-bg: #fff;
+  --card-shadow: rgb(0 0 0 / 6%);
   
   /* Barres de progression */
   --bar-bg: #e5e7eb;
@@ -55,22 +55,21 @@
   /* ===== DIMENSIONS ===== */
   --radius: 8px;
   --navbar-height: 36px;
+
   /* padding horizontal moins progressif : min 6px, faible scaling, max 10px */
   --page-padding-x: clamp(7px, 1vw, 24px);
   --page-padding-y: clamp(4px, 1vw, 24px);
   --wrapper-padding-top: 16px;
-  --degree-thumb-width: clamp(1.9rem, 5vw, 2.7rem);
-  
+  --degree-thumb: clamp(2.7rem, 5vw, 4.7rem);
+  --thumb-h: clamp(55px, 10vw, var(--degree-thumb, 250px));
+
   /* Bandeau nom */
   --name-banner-height: clamp(1.9rem, 5vw, 2.7rem);
-  --name-banner-color: #000000;
+  --name-banner-color: #000;
   
   /* QR Codes - valeurs par défaut pour desktop */
   --corner-qr-size: 167px;
   --corner-qr-margin: clamp(2px, 2vw, 36px);
-  /* Marges directionnelles autour du QR (top / left / right).
-    Par défaut on répartit la marge horizontale en deux pour garder
-    le comportement visuel précédent. */
   --corner-qr-margin-top: var(--corner-qr-margin);
   --corner-qr-margin-left: calc(var(--corner-qr-margin) / 2);
   --corner-qr-margin-right: calc(var(--corner-qr-margin) / 2);
@@ -84,6 +83,9 @@
   
   /* Grille quadrillée */
   --grid-size: 42px;
+
+  /* fallback pour navigateurs anciens */
+  /* --grid-line: rgb(17 17 17 / 7%); */
   --grid-line: color-mix(in hsl, var(--text), transparent 87%);
 
   /* ===== ESPACEMENTS (clamp-based responsive spacing) ===== */
@@ -92,6 +94,7 @@
   --pad-md: clamp(12px, 2.2vw, 20px);
   --pad-lg: clamp(16px, 3vw, 32px);
   --pad-xxs: clamp(1px, 0.6vw, 4px);
+
   /* Espacement unifié entre les sous-sections (horizontal & vertical) */
   --sub-gap: clamp(8px, 2vw, 24px);
 }
@@ -105,23 +108,20 @@
   --blue: #60a5fa;
   --border: #2b2b2b;
   --green-glow: #34D399;
-  
   --card-bg: #1e1e1f;
-  --card-shadow: rgba(0, 0, 0, 0.6);
-  
+  --card-shadow: rgb(0 0 0 / 60%);
   --bar-bg: #2a2a2a;
   --bar-fill: linear-gradient(90deg, #3b82f6, #60a5fa);
-  
   --scrollbar-track: #1e1e1e;
   --scrollbar-thumb: #3b82f6;
-  
   --cat-formation: #38bdf8;
   --cat-stage: #fbbf24;
   --cat-travail: #4ade80;
   --cat-autre: #c4b5fd;
-  
-  --name-banner-color: #ffffff;
-  
+  --name-banner-color: #fff;
+
+  /* fallback pour navigateurs anciens */
+  --grid-line: rgb(255 255 255 / 7%);
   --grid-line: color-mix(in hsl, var(--text), transparent 87%);
 }
 
@@ -134,13 +134,13 @@ html, body, #app {
   height: 100%;
   width: 100%;
   color: var(--text);
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Police Montserrat pour tout sauf arabe */
-html, body, :not([lang="ar"]):not([dir="rtl"]) {
+html, body, :not([lang="ar"], [dir="rtl"]) {
   font-family: var(--font-family-montserrat);
 }
 
@@ -179,33 +179,23 @@ html::before {
     linear-gradient(var(--grid-line) 1px, transparent 1px var(--grid-size)) 0 0 / var(--grid-size) var(--grid-size);
   
   /* Masque diagonal */
-  -webkit-mask-image: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 1) 45%,
-    rgba(0, 0, 0, 0.6) 55%,
-    rgba(0, 0, 0, 0.2) 65%,
-    rgba(0, 0, 0, 0) 75%
-  );
   mask-image: linear-gradient(
     135deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 1) 45%,
-    rgba(0, 0, 0, 0.6) 55%,
-    rgba(0, 0, 0, 0.2) 65%,
-    rgba(0, 0, 0, 0) 75%
+    rgb(0 0 0 / 100%) 0%,
+    rgb(0 0 0 / 100%) 45%,
+    rgb(0 0 0 / 60%) 55%,
+    rgb(0 0 0 / 20%) 65%,
+    rgb(0 0 0 / 0%) 75%
   );
 }
 
 /* ==========================================================================
    TYPOGRAPHIE
    ========================================================================== */
-h1, .h1, h2, .h2, h3, .h3 {
+ h2, .h2, h3, .h3 {
   margin: 0;
   color: var(--title);
 }
-
-h1, .h1 { font-size: var(--fs-h1); }
 h2, .h2 { font-size: var(--fs-h2); }
 h3, .h3 { font-size: var(--fs-h3); color: var(--text); }
 
@@ -277,7 +267,6 @@ small {
   /* box-sizing: border-box; */
   scroll-snap-align: start;
   display: flex;
-  flex-direction: column;
   gap: var(--sub-gap);
   flex-direction: column;
   align-items: stretch;
@@ -348,6 +337,7 @@ small {
 /* Glow externe au survol */
 html.has-scrolled .sub-section:hover,
 html.has-scrolled .sub-section:focus-within {
+  /* fallback pour navigateurs plus anciens */
   filter: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
   box-shadow: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
   z-index: 2998;
@@ -363,6 +353,7 @@ html.has-scrolled .sub-section:focus-within {
   transition: opacity 160ms ease;
   border-radius: inherit;
   z-index: 2999;
+  box-shadow: 0 0 12px 4px rgb(11 111 184 / 6%);
   box-shadow: 0 0 18px 6px color-mix(in hsl, var(--blue), transparent 82%);
 }
 
@@ -479,7 +470,7 @@ html.has-scrolled .sub-section:focus-within::after {
   z-index: 3000;
 }
 
-.nav-left, .nav-right {
+.nav-left {
   display: flex;
   align-items: center;
   gap: var(--pad-sm);
@@ -487,8 +478,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 /* Ne pas laisser des marges/paddings internes des boutons augmenter la hauteur */
 .nav-left > button,
-.nav-left .burger,
-.nav-right > button {
+.nav-left .burger {
   margin: 0;
   padding: 0;
   line-height: 1;
@@ -556,14 +546,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .nav-arrow:active {
   color: var(--blue);
-  background: rgba(11,111,184,0.08);
-}
-
-/* Actions droite */
-.nav-actions {
-  display: flex;
-  gap: var(--pad-sm);
-  align-items: center;
+  background: rgb(11 111 184 / 8%);
 }
 
 /* Sélecteur de langue */
@@ -621,12 +604,14 @@ html.has-scrolled .sub-section:focus-within::after {
   border-radius: var(--radius);
   color: var(--text);
 }
+
 .burger-box {
   display: inline-block;
   width: 22px;
   height: 16px;
   position: relative;
 }
+
 .burger-inner,
 .burger-inner::before,
 .burger-inner::after {
@@ -676,7 +661,7 @@ html.has-scrolled .sub-section:focus-within::after {
   top: 8px;
   bottom: 8px;
   width: 4px;
-  background: linear-gradient(180deg, var(--blue), rgba(96, 165, 250, 0.55));
+  background: linear-gradient(180deg, var(--blue), rgb(96 165 250 / 55%));
   border-radius: var(--radius);
 }
 
@@ -820,13 +805,13 @@ html.has-scrolled .sub-section:focus-within::after {
   flex-direction: column;
   justify-content: flex-start;
   gap: 2.2vh;
-  padding: 10vh 6vw 4vh 6vw;
+  padding: 10vh 6vw 4vh;
   opacity: 0.74;
 }
 
 .timeline-overlay .overlay-item {
   line-height: 1.1;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  text-shadow: 0 2px 6px rgb(0 0 0 / 25%);
 }
 
 .timeline-overlay .overlay-type {
@@ -855,9 +840,9 @@ html.has-scrolled .sub-section:focus-within::after {
   align-items: center;
   min-height: 45px;
   max-width: 620px;
-  background: rgba(30,30,30,0.85);
+  background: rgb(30 30 30 / 85%);
   border-radius: var(--radius);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 12%);
   overflow: hidden;
   font-size: var(--fs-body);
   color: #fff;
@@ -879,7 +864,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .overlay-type, .overlay-info, .overlay-level {
   padding-left: var(--pad-md);
   padding-right: var(--pad-md);
-  text-shadow: 0 0 8px rgba(0,0,0,0.18);
+  text-shadow: 0 0 8px rgb(0 0 0 / 18%);
 }
 
 .overlay-type {
@@ -921,25 +906,13 @@ html.has-scrolled .sub-section:focus-within::after {
 .milestone .label {
   font-size: var(--fs-small);
   color: var(--text);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 35%);
 }
-
-/* Couleurs par catégorie */
-.milestone.cat-formation .dot { border-color: var(--cat-formation); }
-.milestone.cat-formation .label { color: var(--cat-formation); }
-
-.milestone.cat-stage .dot { border-color: var(--cat-stage); }
-.milestone.cat-stage .label { color: var(--cat-stage); }
-
-.milestone.cat-travail .dot { border-color: var(--cat-travail); }
-.milestone.cat-travail .label { color: var(--cat-travail); }
-
-.milestone.cat-autre .dot { border-color: var(--cat-autre); }
-.milestone.cat-autre .label { color: var(--cat-autre); }
 
 /* ==========================================================================
    COMPÉTENCES ET LOGOS
    ========================================================================== */
+
 /* Logos de diplômes */
 .degree-thumb {
   border-radius: var(--radius);
@@ -952,17 +925,24 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .degree-thumb img {
   display: block;
-  width: clamp(45px, 10vw, var(--degree-thumb-width, 120px)) !important;
+  /* hauteur principale (contrainte) via variable responsive */
+  /* Empêcher l'image de dépasser la hauteur ou une largeur max = 2 * hauteur */
+  max-height: var(--thumb-h);
+  max-width: calc(2 * var(--thumb-h));
+  /* Laisser le navigateur conserver le ratio : width/height automatiques
+     L'image s'arrête de grandir dès qu'une des limites est atteinte */
+  width: auto;
+  height: auto;
   object-fit: contain;
   object-position: center;
-  filter: drop-shadow(0 0 1px rgba(11,111,184,0.6));
+  filter: drop-shadow(0 0 1px rgb(11 111 184 / 60%));
 }
 
 /* Hover sur logos */
 .company-logo-link:hover .degree-thumb img,
 .degree-thumb:hover img {
   transform: translateZ(0) scale(1.04);
-  filter: drop-shadow(0 0 1px rgba(11,111,184,0.65)) brightness(1.01) contrast(1.01);
+  filter: drop-shadow(0 0 1px rgb(11 111 184 / 65%)) brightness(1.01) contrast(1.01);
 }
 
 .company-logo-link:active .degree-thumb img,
@@ -1001,7 +981,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .logo :deep(svg) {
   width: 100%;
   height: 100%;
-  filter: url(#glow);
+  filter: url("#glow");
   opacity: 1;
 }
 
@@ -1010,7 +990,7 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .small-card:hover .logo :deep(svg) {
-  filter: url(#glow-green);
+  filter: url("#glow-green");
   transform: scale(1.05);
 }
 
@@ -1025,7 +1005,7 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .small-card:not(.is-clicked):hover .logo :deep(svg) {
-  filter: url(#glow-green);
+  filter: url("#glow-green");
 }
 
 /* Info sous logos */
@@ -1100,24 +1080,14 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 /* Filtres SVG */
-.filters {
-  position: absolute;
-  width: 0;
-  height: 0;
-}
 
-#glow, #glow-hover {
+#glow {
   --glow-color: var(--blue);
 }
 
 #glow {
   --blur-radius: 4px;
   --opacity: 0.5;
-}
-
-#glow-hover {
-  --blur-radius: 8px;
-  --opacity: 0.8;
 }
 
 /* ==========================================================================
@@ -1158,7 +1128,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .card.corner .corner-qr:hover,
 .card.corner .corner-qr:focus {
   transform: scale(1.08);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 12%);
 }
 
 .card.corner .corner-qr:active {
@@ -1166,7 +1136,7 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .card.corner .corner-qr:focus {
-  outline: 2px solid rgba(11,111,184,0.12);
+  outline: 2px solid rgb(11 111 184 / 12%);
 }
 
 /* Bloc QR (regroupe QR + légende) */
@@ -1235,6 +1205,8 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .links-wrapper .clickable-favicon:hover {
   transform: translateZ(0) scale(1.05);
+  /* fallback */
+  filter: brightness(1.02) drop-shadow(0 0 8px rgb(11 111 184 / 8%));
   filter: brightness(1.02) drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
 }
 
@@ -1243,6 +1215,7 @@ html.has-scrolled .sub-section:focus-within::after {
 }
 
 .links-wrapper .clickable-favicon:focus-visible {
+  filter: drop-shadow(0 0 8px rgb(11 111 184 / 8%));
   filter: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
 }
 
@@ -1303,7 +1276,7 @@ html.has-scrolled .sub-section:focus-within::after {
 /* Carte normale */
 .ys-card-normal {
   background: transparent;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.38);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 38%);
   z-index: 2;
   position: relative;
   overflow: hidden;
@@ -1323,7 +1296,7 @@ html.has-scrolled .sub-section:focus-within::after {
   font-size: 32px;
   font-weight: 900;
   color: var(--text);
-  text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  text-shadow: 0 2px 8px rgb(0 0 0 / 25%);
 }
 
 .ys-year-text {
@@ -1355,6 +1328,8 @@ html.has-scrolled .sub-section:focus-within::after {
   left: 0;
   width: 100%;
   height: 100%;
+  /* fallback pour navigateurs sans color-mix */
+  color: rgb(17 17 17 / 60%);
   color: color-mix(in hsl, var(--text), transparent 40%);
   font-family: 'Courier New', monospace;
   overflow: hidden;
@@ -1390,7 +1365,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .ys-scan-effect {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(0,255,255,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgb(0 255 255 / 40%), transparent);
   animation: ys-scan 0.6s ease-out;
   pointer-events: none;
   z-index: 5;
@@ -1431,7 +1406,7 @@ html.has-scrolled .sub-section:focus-within::after {
 .popup-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgb(0 0 0 / 60%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1581,7 +1556,7 @@ html.has-scrolled .sub-section:focus-within::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0);
+  background: rgb(0 0 0 / 0%);
   pointer-events: none;
   font-weight: 700;
   color: var(--text);
@@ -1677,7 +1652,7 @@ html.has-scrolled .sub-section:focus-within::after {
 
 /* Liste pièces jointes */
 .contact-form .attachments-list {
-  margin: 1rem 0 0.6rem 0;
+  margin: 1rem 0 0.6rem;
   display: flex;
   flex-direction: column;
   gap: var(--pad-xs);
@@ -1905,7 +1880,7 @@ a:hover {
 
 .cv-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgb(0 0 0 / 85%);
   color: #fff;
   padding: var(--pad-xs) var(--pad-xs);
   border-radius: var(--radius);
@@ -1925,13 +1900,13 @@ a:hover {
    ========================================================================== */
 /* Page Diplômes */
 .diplomas-page .degree-thumb {
-  width: clamp(45px, 10vw, var(--degree-thumb-width, 120px)) !important;
-  height: auto;
+  min-width: clamp(55px, 10vw, 55px) !important;
+  width: clamp(55px, 10vw, var(--degree-thumb, 250px)) !important;
+  height: auto !important;
 }
 
 .diplomas-page .degree-thumb img {
-  width: 100%;
-  height: auto;
+  width: 100% !important;
   object-fit: contain;
 }
 
@@ -1961,9 +1936,6 @@ a:hover {
   grid-template-columns: repeat(auto-fill, minmax(clamp(90px, 12vw, 180px), 1fr));
   /* gap uniforme horizontal + vertical, responsive */
   gap: clamp(8px, 2vw, 24px);
-  /* padding géré par le gap pour garantir marges égales */
-  /* padding: 0;
-  margin: 0; */
 }
 
 /* Forcer les règles de la page skills (évite les overrides depuis d'autres media queries)
@@ -2015,7 +1987,6 @@ a:hover {
   padding-top: 0;
 }
 
-
 /* ==========================================================================
    RESPONSIVE DESIGN
    ========================================================================== */
@@ -2026,9 +1997,29 @@ a:hover {
 }
 
 /* -------------------------------
+   ÉCRANS RETINA / HAUTE RÉSOLUTION
+   ------------------------------- */
+@media (min-device-pixel-ratio: 2), (resolution >= 192dpi) {
+  .logo {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Desktop uniquement pour coins QR */
+@media (width >= 1025px) {
+  .links-wrapper .card.line-card.corner {
+    width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+    min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+    max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
+    box-sizing: border-box;
+  }
+}
+
+/* -------------------------------
    POINT DE RUPTURE: 1024px (Tablettes)
    ------------------------------- */
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
   :root {
     --corner-qr-size: clamp(120px, 10vw, 220px);
     --corner-qr-margin: clamp(14px, 1.5vw, 24px);
@@ -2043,6 +2034,7 @@ a:hover {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
   }
+
   .soft-skills-page .page-layout.grid-2x2 {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -2063,20 +2055,10 @@ a:hover {
   }
 }
 
-/* Desktop uniquement pour coins QR */
-@media (min-width: 1025px) {
-  .links-wrapper .card.line-card.corner {
-    width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
-    min-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
-    max-width: calc(var(--corner-qr-size) + var(--corner-qr-margin-left) + var(--corner-qr-margin-right));
-    box-sizing: border-box;
-  }
-}
-
 /* -------------------------------
    POINT DE RUPTURE: 768px (Mobiles)
    ------------------------------- */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   :root {
     --corner-qr-size: clamp(90px, 8vw, 160px);
     --corner-qr-margin: clamp(8px, 1vw, 14px);
@@ -2123,7 +2105,7 @@ a:hover {
   .soft-skills-page .card .name,
   .soft-skills-page .card .short {
     display: block;
-    margin: 0 0 0.3rem 0;
+    margin: 0 0 0.3rem;
   }
 
   .links-wrapper .slot-content,
@@ -2190,16 +2172,7 @@ a:hover {
     grid-template-columns: 1fr;
   }
 
-  .nav-links {
-    display: flex;
-    gap: var(--pad-sm);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    align-items: center;
-    overflow-x: auto;
-  }
-
+  /* .nav-links base styles are declared earlier; avoid duplicate declarations here */
   .timeline {
     padding-left: 50px;
   }
@@ -2214,9 +2187,7 @@ a:hover {
   }
 
   /* Rapprocher le burger du theme-toggle et éviter tout changement de hauteur */
-  .nav-left { gap: var(--pad-md); }
-
-  /* .burger { display: flex; } */
+  .nav-left { gap: var(--pad-xxs); }
 
   /* Garder la taille du navbar inchangée */
   .theme-toggle, .burger {
@@ -2234,6 +2205,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     gap: 0;
+
     /* padding: var(--pad-sm); */
     max-height: 0;
     overflow: hidden;
@@ -2247,20 +2219,9 @@ a:hover {
     overflow: auto;
   }
 
-  .nav-links li {
-    /* padding: calc(var(--pad-xs) + 6px) 0; */
-    /* border-bottom: 1px solid rgba(0,0,0,0.04); */
-    /* white-space: normal; */
-  }
+  /* mobile overrides for .nav-links li moved/removed to avoid empty rulesets */
 
-  .nav-links li:hover {
-    /* transform: none; */
-  }
-
-  /* .lang-switcher {
-    gap: calc(var(--pad-sm) / 2);
-  } */
-  
+  /* lang-switcher spacing handled globally; removed commented override */
   .dot {
     width: 50px;
     height: 50px;
@@ -2299,10 +2260,24 @@ a:hover {
   }
 }
 
+/* QR responsive sur petits écrans */
+@media (width <= 640px) {
+  .card.corner {
+    padding-inline-end: calc(var(--corner-qr-size) + var(--corner-qr-margin-right) + var(--corner-qr-margin-left) + var(--pad-xs));
+    min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin-top) + 3.5em);
+  }
+  
+  .card.corner .corner-qr {
+    width: var(--corner-qr-size);
+    height: var(--corner-qr-size);
+    border-radius: var(--radius);
+  }
+}
+
 /* -------------------------------
    POINT DE RUPTURE: 600px (Mobile Links)
    ------------------------------- */
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .links-wrapper {
     max-width: 100vw;
     overflow-x: hidden;
@@ -2373,28 +2348,67 @@ a:hover {
     padding-bottom: var(--pad-md);
     padding-top: var(--pad-md);
   }
+
+}
+
+/* -------------------------------
+   FORMULAIRE CONTACT RESPONSIVE
+   ------------------------------- */
+@media (width <= 540px) {
+  .popup-content {
+    width: 92%;
+    padding: var(--pad-sm);
+  }
   
-  /* Style line-card sur mobile */
-  .links-wrapper .line-card {
-    margin: 0 auto var(--pad-sm) auto;
-    padding: var(--pad-md) var(--pad-md);
-    border-left: 4px solid var(--blue);
-    border-radius: var(--radius);
-    background: var(--card-bg);
-    box-shadow: 0 6px 16px var(--card-shadow);
+  .popup-content .contact-form.card {
+    margin: 0;
     width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    padding: var(--pad-sm);
+  }
+
+  .soft-skills-page .page-layout.grid-2x2,
+  .soft-skills-page .page-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(4, auto) !important;
+    grid-auto-rows: auto !important;
+    row-gap: var(--sub-gap) !important;
+    height: auto;
+  }
+
+  .skills-page .page-layout.grid-2x2 {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(4, auto) !important;
+    height: auto;
+  }
+}
+
+/* -------------------------------
+   ORIENTATION PAYSAGE
+   ------------------------------- */
+@media (height <= 500px) and (orientation: landscape) {
+  .section {
+    height: auto;
+    min-height: calc(100vh - var(--navbar-height));
+    padding: var(--pad-md) 0;
+  }
+  
+  .sub-section {
+    max-height: 80vh;
+  }
+  
+  .navbar {
+    position: relative;
+  }
+  
+  .pages {
+    height: calc(100vh - var(--navbar-height));
   }
 }
 
 /* -------------------------------
    POINT DE RUPTURE: 480px (Très petits écrans)
    ------------------------------- */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   :root {
   /* --corner-qr-size: clamp(40px, 6vw, 64px); */
     --corner-qr-margin: clamp(2px, 0.5vw, 8px);
@@ -2458,6 +2472,7 @@ a:hover {
   .sub-section {
     min-width: calc(var(--corner-qr-size) + 16px);
   }
+
   button,
   .contact-form .actions button,
   .card[role="button"],
@@ -2490,7 +2505,7 @@ a:hover {
 /* -------------------------------
    POINT DE RUPTURE: 320px (Très très petits écrans)
    ------------------------------- */
-@media (max-width: 320px) {
+@media (width <= 320px) {
   .links-wrapper .card.line-card.corner {
     min-width: calc(var(--corner-qr-size) + 16px);
     min-height: calc(var(--corner-qr-size) + 16px + 6em);
@@ -2498,82 +2513,6 @@ a:hover {
   
   .sub-section {
     min-width: calc(var(--corner-qr-size) + 16px);
-  }
-}
-
-/* -------------------------------
-   ORIENTATION PAYSAGE
-   ------------------------------- */
-@media (max-height: 500px) and (orientation: landscape) {
-  .section {
-    height: auto;
-    min-height: calc(100vh - var(--navbar-height));
-    padding: var(--pad-md) 0;
-  }
-  
-  .sub-section {
-    max-height: 80vh;
-  }
-  
-  .navbar {
-    position: relative;
-  }
-  
-  .pages {
-    height: calc(100vh - var(--navbar-height));
-  }
-}
-
-/* -------------------------------
-   ÉCRANS RETINA / HAUTE RÉSOLUTION
-   ------------------------------- */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .logo {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-  }
-}
-
-/* -------------------------------
-   FORMULAIRE CONTACT RESPONSIVE
-   ------------------------------- */
-@media (max-width: 540px) {
-  .popup-content {
-    width: 92%;
-    padding: var(--pad-sm);
-  }
-  
-  .popup-content .contact-form.card {
-    margin: 0;
-    width: 100%;
-    padding: var(--pad-sm);
-  }
-  .soft-skills-page .page-layout.grid-2x2,
-  .soft-skills-page .page-layout {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: repeat(4, auto) !important;
-    grid-auto-rows: auto !important;
-    row-gap: var(--sub-gap) !important;
-    height: auto;
-  }
-  .skills-page .page-layout.grid-2x2 {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: repeat(4, auto) !important;
-    height: auto;
-  }
-}
-
-/* QR responsive sur petits écrans */
-@media (max-width: 640px) {
-  .card.corner {
-    padding-inline-end: calc(var(--corner-qr-size) + var(--corner-qr-margin-right) + var(--corner-qr-margin-left) + var(--pad-xs));
-    min-height: calc(var(--corner-qr-size) + var(--corner-qr-margin-top) + 3.5em);
-  }
-  
-  .card.corner .corner-qr {
-    width: var(--corner-qr-size);
-    height: var(--corner-qr-size);
-    border-radius: var(--radius);
   }
 }
 
@@ -2701,14 +2640,11 @@ a:hover {
 /* Soft_Skills — fixed-size cards sized to exactly 2 text lines (name + short) */
 .soft-skills-page .card {
   /* fixed width for consistent layout */
-  --soft-card-width: 14rem;
-  width: var(--soft-card-width) !important;
+  width: 14rem !important;
   max-width: 100%;
-
   /* height = 2 lines * line-height + vertical padding */
   line-height: 1.25 !important; /* ensure consistent line-height */
   height: calc((1.25em * 2) + (var(--pad-sm) * 2)) !important;
-
   /* clamp visual overflow to exactly 2 lines */
   display: -webkit-box !important;
   -webkit-box-orient: vertical !important;
@@ -2717,7 +2653,6 @@ a:hover {
   overflow: hidden !important;
   text-overflow: ellipsis;
   white-space: normal !important;
-
   box-sizing: border-box !important;
   padding: var(--pad-sm) !important;
 }
@@ -2747,7 +2682,6 @@ a:hover {
   overflow: hidden !important;
   text-overflow: ellipsis;
   white-space: normal !important;
-
   box-sizing: border-box !important;
   padding: var(--pad-xs) var(--pad-sm) calc(var(--pad-sm) + 0.5rem) var(--pad-sm) !important; /* extra bottom padding */
   vertical-align: top !important;
