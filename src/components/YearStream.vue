@@ -584,6 +584,3 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
-/* Styles déplacés dans src/styles/styles.css pour respecter la source unique des styles */
-</style>
