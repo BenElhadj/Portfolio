@@ -79,7 +79,7 @@ export default {
         bac_pro_maintenance_informatique: "Bac Pro Maintenance Informatique",
         bac_pro_fabrication_electronique: "Bac Pro Fabrication Électronique",
         bts_production_electronique_bac_2: "BTS Production Électronique (Bac +2)",
-        bts_en_systemes_numeriques_option_informatique_et_reseaux: "BTS en SYSTÈMES NUMÉRIQUES Option: INFORMATIQUE et RÉSEAUX",
+        bts_systemes_numeriques_option_informatique_et_reseaux: "BTS SYSTÈMES NUMÉRIQUES Option: INFORMATIQUE et RÉSEAUX",
         expert_en_architecture_informatique_data: "Expert en Architecture Informatique / Data"
     }
 };

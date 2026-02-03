@@ -1,34 +1,42 @@
 <template>
   <div class="timeline-viewport" ref="viewport">
-    <!-- Avatar: marche pilotée par la timeline (vitesse/direction depuis la souris) -->
-    <Avatar3D :useMouseForWalk="false" :walkSpeed="avatarWalkSpeed" :walkDirection="state.facing" />
+    
+    <!-- Overlay d'infos actives: du Début à la Fin -->
+    <div class="timeline-overlay" aria-hidden="true">
+
+  <div v-for="entry in activeInfoList" :key="entry.key" class="card line-card overlay-item">
+        <div v-if="logoPathForEntry(entry)" class="overlay-logo">
+          <picture>
+            <source :srcset="logoPathForEntry(entry)" type="image/webp" />
+            <img :src="logoPathForEntry(entry)" :alt="entry.info" loading="lazy" />
+          </picture>
+        </div>
+        <!-- Toujours afficher le type (ex: Stage, Technicien...) même si un logo est présent -->
+        <div class="overlay-type">{{ t(`timeline.types.${sanitizeKey(entry.type)}`) ?? entry.type }}</div>
+        <!-- Afficher l'info (nom de l'entité) uniquement quand il n'y a pas de logo (fallback texte) -->
+        <div v-if="!logoPathForEntry(entry)" class="overlay-info">{{ t(`timeline.infos.${sanitizeKey(entry.info)}`) ?? entry.info }}</div>
+        <!-- Pour les formations, afficher le niveau si fourni -->
+        <div v-if="entry.Niveau" class="overlay-level">{{ t(`timeline.levels.${sanitizeKey(entry.Niveau)}`) ?? entry.Niveau }}</div>
+      </div>
+    </div>
 
     <!-- Piste: largeur dynamique selon nombre d'événements -->
     <div class="timeline-track" ref="track" :style="{ width: trackWidth + 'px' }">
       <div
         v-for="(m, i) in eventMarkers"
         :key="i"
-        :class="['milestone', 'cat-' + m.category]"
+        class="milestone"
         :style="{ left: m.x + 'px' }"
       >
         <div class="dot"></div>
-        <!-- Label removed: YearStream now provides aligned labels -->
       </div>
     </div>
+
+    <!-- Avatar: marche pilotée par la timeline (vitesse/direction depuis la souris) -->
+    <Avatar3D :useMouseForWalk="false" :walkSpeed="avatarWalkSpeed" :walkDirection="state.facing" />
 
     <!-- Flux d'années avec scanner + étoiles -->
     <YearStream />
-
-    <!-- Overlay d'infos actives: du Début à la Fin -->
-    <div class="timeline-overlay" aria-hidden="true">
-
-  <div v-for="entry in activeInfoList" :key="entry.key" :class="['overlay-item', getCategory(entry.type)]">
-  <div class="overlay-type">{{ t(`timeline.types.${sanitizeKey(entry.type)}`) ?? entry.type }}</div>
-  <div class="overlay-info">{{ t(`timeline.infos.${sanitizeKey(entry.info)}`) ?? entry.info }}</div>
-  <div v-if="entry.Niveau" class="overlay-level">{{ t(`timeline.levels.${sanitizeKey(entry.Niveau)}`) ?? entry.Niveau }}</div>
-      </div>
-    </div>
-
   </div>
 </template>
 
@@ -39,6 +47,7 @@ import gsap from "gsap";
 import Avatar3D from "./Avatar3D.vue";
 import { timelineEvents } from "../timelineEvents.js";
 import YearStream from "./YearStream.vue";
+import { getAssetPath } from "../utils/assets.js";
 
 const viewport = ref(null);
 const track = ref(null);
@@ -56,19 +65,14 @@ const state = reactive({
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // Espacement et marqueurs (légèrement rapproché)
-const eventSpacing = 380 // px
-function getCategory(typeStr = "") {
-  const t = String(typeStr).toLowerCase();
-  if (t.includes("formation")) return "formation";
-  if (t.includes("stage")) return "stage";
-  // mots clés liés au travail
-  if (
-    t.includes("développeur") || t.includes("technicien") || t.includes("gestionnaire") ||
-    t.includes("commercial") || t.includes("associé") || t.includes("propriétaire") ||
-    t.includes("web3") || t.includes("ia") || t.includes("machine learning") || t.includes("travail")
-  ) return "travail";
-  if (t.includes("nouveau départ") || t.includes("immigration")) return "autre";
-  return "autre";
+const eventSpacing = 380; // px
+
+// Minimal helper: détermine si le type est une formation.
+// Nous gardons uniquement la logique nécessaire pour choisir le dossier
+// d'assets (degrees vs experiences). La logique d'affichage par couleur
+// a été retirée pour simplifier le composant.
+function isFormation(typeStr = "") {
+  return String(typeStr).toLowerCase().includes('formation');
 }
 
 const { t } = (() => { try { return useI18n(); } catch { return { t: (k) => k }; } })();
@@ -85,12 +89,48 @@ function sanitizeKey(str = "") {
   return s || "_";
 }
 
+// Normalize a label to a simple key (remove diacritics, lowercase)
+function normalizeForLookup(s = "") {
+  return String(s)
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/\(.+\)/g, '') // remove parenthesis content
+    .replace(/[^\w\s+\-]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+// Attempt to resolve a logo path for an overlay entry.
+// Prefer an explicit `entry.logo` provided in timelineEvents; else derive a probable path
+function logoPathForEntry(entry) {
+  if (!entry) return null;
+  // 1) explicit logo field — accept formats like 'experiences/Name.webp' or 'degrees/Name.webp' or just 'Name.webp'
+  if (entry.logo) {
+    const logo = String(entry.logo || '').trim();
+    if (!logo) return null;
+    // if it's an absolute http(s) URL, return as-is
+    if (/^https?:\/\//i.test(logo)) return logo;
+    // allow both 'experiences/...' and '/experiences/...'
+    if (/^\/?(experiences|degrees)\//i.test(logo)) {
+      return getAssetPath('/' + String(logo).replace(/^\/+/, ''));
+    }
+    // If only filename provided, decide prefix by category
+    const prefix = isFormation(entry.type) ? 'degrees' : 'experiences';
+    return getAssetPath(`/${prefix}/${logo}`);
+  }
+
+  // 2) no explicit logo: try to derive from entry.info
+  if (!entry.info) return null;
+  const norm = normalizeForLookup(entry.info).replace(/\s+/g, '_');
+  const prefix = isFormation(entry.type) ? 'degrees' : 'experiences';
+  return getAssetPath(`/${prefix}/${norm}.webp`);
+}
+
 const eventMarkers = computed(() => {
   // Toujours LTR: ne pas inverser l'ordre pour l'arabe
   return timelineEvents.map((ev, i) => ({
     x: 80 + i * eventSpacing,
-    label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim(),
-    category: getCategory(ev.type)
+    label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim()
   }));
 });
 
@@ -102,12 +142,12 @@ const makeKey = (ev) => `${ev.type}|${ev.info}`;
 function applyForward(ev) {
   const key = makeKey(ev);
   if (ev.action === "Début") {
-    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
   } else if (ev.action === "Fin") {
     activeInfoMap.value.delete(key);
   } else if (ev.action === "En cours") {
     if (!activeInfoMap.value.has(key)) {
-      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
     }
   }
 }
@@ -119,10 +159,10 @@ function applyBackward(ev) {
     activeInfoMap.value.delete(key);
   } else if (ev.action === "Fin") {
     // en remontant avant la fin: l'info redevient active
-    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
   } else if (ev.action === "En cours") {
     if (!activeInfoMap.value.has(key)) {
-      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null });
+      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
     }
   }
 }

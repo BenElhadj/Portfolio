@@ -28,7 +28,6 @@ let renderer, scene, camera, avatar;
 let bones = {};
 let mixer = null;
 let walkAction = null;
-let walkClip = null;
 let clock;
 let rafId;
 let lastTime = 0;

@@ -79,7 +79,7 @@ export default {
         bac_pro_maintenance_informatique: "Vocational Baccalaureate in Computer Maintenance",
         bac_pro_fabrication_electronique: "Vocational Baccalaureate in Electronic Manufacturing",
         bts_production_electronique_bac_2: "Advanced Technician's Certificate in Electronic Production (2-year degree)",
-        bts_en_systemes_numeriques_option_informatique_et_reseaux: "Advanced Technician's Certificate in Digital Systems, Option: Computer Science and Networks",
+        bts_systemes_numeriques_option_informatique_et_reseaux: "Advanced Technician's Certificate in Digital Systems, Option: Computer Science and Networks",
         expert_en_architecture_informatique_data: "Expert in IT Architecture / Data"
     }
 };

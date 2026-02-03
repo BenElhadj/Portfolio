@@ -79,7 +79,7 @@ export default {
         bac_pro_maintenance_informatique: "بكالوريا مهني في صيانة الحاسوب",
         bac_pro_fabrication_electronique: "بكالوريا مهني في التصنيع الإلكتروني",
         bts_production_electronique_bac_2: "شهادة تقني سامٍ في الإنتاج الإلكتروني (سنتان بعد البكالوريا)",
-        bts_en_systemes_numeriques_option_informatique_et_reseaux: "شهادة تقني سامٍ في الأنظمة الرقمية، تخصص: المعلوماتية والشبكات",
+        bts_systemes_numeriques_option_informatique_et_reseaux: "شهادة تقني سامٍ في الأنظمة الرقمية، تخصص: المعلوماتية والشبكات",
         expert_en_architecture_informatique_data: "خبير في هندسة نظم المعلومات / البيانات"
     }
 };
