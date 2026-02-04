@@ -40,7 +40,6 @@
 
               <!-- Nom de société cliquable -->
               <div class="company">
-                <!-- Company name linking to website when available -->
                 <!-- Company name linking to provided link/website when available -->
                 <a
                   v-if="companyUrl(exp) && companyUrl(exp) !== '#'"
