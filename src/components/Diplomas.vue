@@ -1,7 +1,6 @@
 <template>
   <div class="wrapper diplomas-page">
     <h2 class="title">{{ $t("diplomas.title") }}</h2>
-    <!-- <div class="timeline" aria-label="Timeline des diplômes"> -->
       <PageLayout :columns="1" :rows="diplomas.length">
         <template
           v-for="(cat, catIndex) in diplomas"
@@ -127,7 +126,6 @@
         </div>
       </div>
     </Popup>
-  <!-- </div> -->
 </template>
 
 <script setup>
