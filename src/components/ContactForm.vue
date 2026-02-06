@@ -258,4 +258,3 @@ function removeAttachment(index) {
   attachments.value.splice(index, 1);
 }
 </script>
-
