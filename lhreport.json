@@ -20201,6 +20201,23 @@
             "entity": "localhost"
           },
           {
+            "url": "http://localhost:5173/Portfolio/logos/skills/NET-core.webp",
+            "sessionTargetType": "page",
+            "protocol": "http/1.1",
+            "rendererStartTime": 2755.700000000000,
+            "networkRequestTime": 4800.000000000000,
+            "networkEndTime": 4820.000000000000,
+            "finished": true,
+            "transferSize": 10240,
+            "resourceSize": 10000,
+            "statusCode": 200,
+            "mimeType": "image/webp",
+            "resourceType": "Image",
+            "priority": "Low",
+            "experimentalFromMainFrame": true,
+            "entity": "localhost"
+          },
+          {
             "url": "http://localhost:5173/Portfolio/logos/skills/java.webp",
             "sessionTargetType": "page",
             "protocol": "http/1.1",

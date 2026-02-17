@@ -62,5 +62,6 @@ export default {
     vite: { name: "Vite", level: "Maîtrise", info: "Utilisé comme bundler dans plusieurs projets Vue.js." },
     flutter: { name: "Flutter", level: "Intermédiaire", info: "Utilisé pour le développement d'applications mobiles cross-platform." },
     firebase: { name: "Firebase", level: "Intermédiaire", info: "Utilisé pour des projets avec authentification et base de données en temps réel." },
+    net: { name: ".NET Core", level: "Avancé", info: "Utilisé lors de mon alternance chez Keakr." },
     },
 };

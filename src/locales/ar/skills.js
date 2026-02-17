@@ -62,5 +62,6 @@ export default {
       vite: { name: "Vite", level: "إتقان", info: "يستخدم كأداة تجميع في عدة مشاريع Vue.js." },
       flutter: { name: "Flutter", level: "متوسط", info: "يستخدم لتطوير تطبيقات الهواتف المحمولة عبر الأنظمة." },
       firebase: { name: "Firebase", level: "متوسط", info: "يستخدم لمشاريع مع المصادقة وقاعدة بيانات في الوقت الحقيقي." },
+      net: { name: ".NET Core", level: "متقدم", info: "استخدمته خلال تدريبي في شركة Keakr." },
     },
 };
