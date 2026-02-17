@@ -23,7 +23,7 @@ export default {
     php: { name: "PHP", level: "Maîtrise", info: "Utilisé pour un site e-commerce." },
     node: { name: "Node.js", level: "Avancé", info: "Employé dans des projets Full-Stack et API REST." },
     python: { name: "Python", level: "Avancé", info: "Utilisé pour IA et data science." },
-    java: { name: "Java", level: "Intermédiaire", info: "Expérience académique et projets Android." },
+    java: { name: "Java", level: "Avancé", info: "Expérience académique et projets Android." },
     arangodb: { name: "ArangoDB", level: "Maîtrise", info: "Base NoSQL pour projets complexes." },
     mysql: { name: "MySQL", level: "Avancé", info: "Utilisé dans plusieurs projets web et école." },
     mongodb: { name: "MongoDB", level: "Avancé", info: "Employé dans plusieurs projets Full-Stack." },
@@ -51,8 +51,6 @@ export default {
     windows: { name: "Windows", level: "Maîtrise", info: "OS principal pour maintenance IT." },
     linux: { name: "Linux", level: "Avancé", info: "Utilisé pour serveurs et dev." },
     virtualbox: { name: "VirtualBox", level: "Avancé", info: "Tests systèmes et environnements virtuels." },
-    
-    
     github: { name: "GitHub", level: "Maîtrise", info: "Utilisé quotidiennement (GitHub, GitLab)." },
     gitlab: { name: "GitLab", level: "Maîtrise", info: "Utilisé quotidiennement (GitHub, GitLab)." },
     argocd: { name: "ArgoCD", level: "Maîtrise", info: "Utilisé quelques fois pour la gestion des déploiements." },

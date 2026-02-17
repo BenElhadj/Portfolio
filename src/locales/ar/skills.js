@@ -23,7 +23,7 @@ export default {
       php: { name: "PHP", level: "إتقان", info: "مستخدم لموقع تجارة إلكترونية." },
       node: { name: "Node.js", level: "متقدم", info: "مستخدم في مشاريع Full-Stack وواجهات API REST." },
       python: { name: "Python", level: "متقدم", info: "مستخدم للذكاء الاصطناعي وعلوم البيانات." },
-      java: { name: "Java", level: "متوسط", info: "خبرة أكاديمية ومشاريع Android." },
+      java: { name: "Java", level: "متقدم", info: "خبرة أكاديمية ومشاريع Android." },
       arangodb: { name: "ArangoDB", level: "إتقان", info: "قاعدة بيانات NoSQL لمشاريع معقدة." },
       mysql: { name: "MySQL", level: "متقدم", info: "مستخدم في عدة مشاريع ويب ومدرسية." },
       mongodb: { name: "MongoDB", level: "متقدم", info: "مستخدم في عدة مشاريع Full-Stack." },
