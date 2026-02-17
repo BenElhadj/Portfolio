@@ -29038,8 +29038,8 @@
                 "width": 70,
                 "height": 70
               },
-              "snippet": "<img src=\"http://localhost:5173/Portfolio/logos/skills/react.webp\" alt=\"React Native\" class=\"logo\" loading=\"lazy\">",
-              "nodeLabel": "React Native"
+              "snippet": "<img src=\"http://localhost:5173/Portfolio/logos/skills/react.webp\" alt=\"React\" class=\"logo\" loading=\"lazy\">",
+              "nodeLabel": "React"
             },
             "subItems": {
               "type": "subitems",
@@ -34402,8 +34402,8 @@
                 "width": 70,
                 "height": 70
               },
-              "snippet": "<img src=\"http://localhost:5173/Portfolio/logos/skills/react.webp\" alt=\"React Native\" class=\"logo\" loading=\"lazy\">",
-              "nodeLabel": "React Native"
+              "snippet": "<img src=\"http://localhost:5173/Portfolio/logos/skills/react.webp\" alt=\"React\" class=\"logo\" loading=\"lazy\">",
+              "nodeLabel": "React"
             },
             "url": "http://localhost:5173/Portfolio/logos/skills/react.webp",
             "totalBytes": 49928,

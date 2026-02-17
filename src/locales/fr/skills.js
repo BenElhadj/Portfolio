@@ -19,7 +19,7 @@ export default {
     svelte: { name: "Svelte", level: "Intermédiaire", info: "Utilisé dans des projets expérimentaux." },
     css: { name: "CSS3", level: "Maîtrise", info: "Responsive design et animations." },
     javascript: { name: "JavaScript", level: "Maîtrise", info: "Langage central de mon parcours." },
-    reactnative: { name: "React Native", level: "Avancé", info: "Développement mobile pour apps médicales et musicales." },
+    react: { name: "React", level: "Avancé", info: "Développement mobile pour apps médicales et musicales." },
     php: { name: "PHP", level: "Maîtrise", info: "Utilisé pour un site e-commerce." },
     node: { name: "Node.js", level: "Avancé", info: "Employé dans des projets Full-Stack et API REST." },
     python: { name: "Python", level: "Avancé", info: "Utilisé pour IA et data science." },

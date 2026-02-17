@@ -19,7 +19,7 @@ export default {
       svelte: { name: "Svelte", level: "متوسط", info: "مستخدم في مشاريع تجريبية." },
       css: { name: "CSS3", level: "إتقان", info: "تصميم متجاوب وتأثيرات بصرية." },
       javascript: { name: "JavaScript", level: "إتقان", info: "اللغة الأساسية في مسيرتي." },
-      reactnative: { name: "React Native", level: "متقدم", info: "تطوير تطبيقات موبايل طبية وموسيقية." },
+      react: { name: "React", level: "متقدم", info: "تطوير تطبيقات موبايل طبية وموسيقية." },
       php: { name: "PHP", level: "إتقان", info: "مستخدم لموقع تجارة إلكترونية." },
       node: { name: "Node.js", level: "متقدم", info: "مستخدم في مشاريع Full-Stack وواجهات API REST." },
       python: { name: "Python", level: "متقدم", info: "مستخدم للذكاء الاصطناعي وعلوم البيانات." },

@@ -97,7 +97,7 @@ const skillGroups = [
       { key: "svelte", logo: "svelte.webp", years: 1 },
       { key: "css", logo: "css3.webp", years: 5 },
       { key: "javascript", logo: "javascript.webp", years: 6 },
-      { key: "reactnative", logo: "react.webp", years: 3 },
+      { key: "react", logo: "react.webp", years: 3 },
       { key: "flutter", logo: "flutter.webp", years: 1 },
     ]
   },
