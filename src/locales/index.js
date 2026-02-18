@@ -4,7 +4,7 @@ import en from "./en/en";
 import ar from "./ar/ar";
 
 // récupérer la langue sauvegardée ou fallback sur "fr"
-const savedLocale = localStorage.getItem("lang") || "fr";
+const savedLocale = typeof window !== 'undefined' ? localStorage.getItem("lang") || "fr" : "fr";
 
 export const i18n = createI18n({
   legacy: false,

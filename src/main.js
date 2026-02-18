@@ -23,15 +23,12 @@ watch(
       html.classList.remove("rtl");
       html.setAttribute("dir", "ltr");
     }
-
-    // on sauvegarde le choix
-    localStorage.setItem("lang", newLocale);
   },
   { immediate: true } // applique dès le chargement initial
 );
 
 // ✅ langue par défaut = français
-if (!localStorage.getItem("lang")) {
+if (typeof window !== 'undefined' && !localStorage.getItem("lang")) {
   i18n.global.locale.value = "fr";
 }
 

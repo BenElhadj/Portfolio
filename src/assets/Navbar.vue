@@ -175,11 +175,12 @@ function goToIndex(i) {
 /* Langue */
 function changeLang(lang) {
   if (locale) locale.value = lang;
+  
+  // Save language preference
   localStorage.setItem("lang", lang);
-
+  
+  // Apply RTL/LTR layout changes
   const html = document.documentElement;
-  html.setAttribute("lang", lang);
-
   if (lang === "ar") {
     html.classList.add("rtl");
     html.setAttribute("dir", "rtl");
@@ -187,6 +188,7 @@ function changeLang(lang) {
     html.classList.remove("rtl");
     html.setAttribute("dir", "ltr");
   }
+  
   try {
     window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang } }))
   } catch {}
