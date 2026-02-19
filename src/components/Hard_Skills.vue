@@ -60,9 +60,12 @@
 
 <script setup>
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import PageLayout from "../assets/PageLayout.vue";
 import Popup from "./Popup.vue";
 import { getAssetPath } from "../utils/assets.js";
+
+const { t } = useI18n();
 
 /* Animation visibilité */
 const visibleSkills = ref([]);
@@ -91,7 +94,7 @@ const skillGroups = [
       skills: [
       { key: "vue", logo: "vue.webp", years: 3 },
       { key: "quasar", logo: "quasar.webp", years: 1 },
-      { key: "vuetify", logo: "veutify.webp", years: 1 },
+      { key: "vuetify", logo: "vuetify.webp", years: 1 },
       { key: "vite", logo: "vite.webp", years: 2 },
       { key: "html", logo: "html5.webp", years: 5 },
       { key: "react", logo: "react.webp", years: 3 },
@@ -139,8 +142,8 @@ const skillGroups = [
       { key: "androidstudio", logo: "android-studio.webp", years: 2 },
       { key: "c", logo: "c.webp", years: 2 },
       { key: "cpp", logo: "cpp.webp", years: 2 },
-      { key: "vscode", logo: "visual-studio.webp", years: 6 },
-      { key: "visualstudio", logo: "vscode.webp", years: 6 },
+      { key: "vscode", logo: "vscode.webp", years: 6 },
+      { key: "visualstudio", logo: "visual-studio.webp", years: 6 },
       { key: "intellij", logo: "intellij.webp", years: 2 },
       { key: "photoshop", logo: "photoshop.webp", years: 3 },
       { key: "illustrator", logo: "illustrator.webp", years: 2 },
