@@ -75,7 +75,7 @@ function isFormation(typeStr = "") {
   return String(typeStr).toLowerCase().includes('formation');
 }
 
-const { t } = (() => { try { return useI18n(); } catch { return { t: (k) => k }; } })();
+const { t } = useI18n();
 
 // Sanitize a label into a stable i18n key: remove accents, non-alphanumerics to '_', collapse and trim
 function sanitizeKey(str = "") {
