@@ -111,7 +111,7 @@ const { t, locale } = useI18n();
 // decode placeholders in locale email address
 const emailAddress = computed(() => {
   const raw = t('links.items.email.address');
-  return String(raw).replace(/\[at\]/g, '@').replace(/\\@/g, '@');
+  return String(raw).replace(/\[at\]/g, '@').replace(/@/g, '@');
 });
 
 const showContact = ref(false);
@@ -135,7 +135,7 @@ function onCvMouseMove(e) {
 // decode contact url placeholder
 const contactUrl = computed(() => {
   const raw = t('links.items.contact.url');
-  return String(raw).replace(/\[at\]/g, '@').replace(/\\@/g, '@');
+  return String(raw).replace(/\[at\]/g, '@').replace(/@/g, '@');
 });
 
 function openContact() {
