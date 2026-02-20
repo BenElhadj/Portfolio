@@ -5,16 +5,16 @@
     <div class="timeline-overlay" aria-hidden="true">
 
   <div v-for="entry in activeInfoList" :key="entry.key" class="card line-card overlay-item">
-        <div v-if="logoPathForEntry(entry)" class="overlay-logo">
+        <div v-if="entry.logoPath" class="overlay-logo">
           <picture>
-            <source :srcset="logoPathForEntry(entry)" type="image/webp" />
-            <img :src="logoPathForEntry(entry)" :alt="entry.info" loading="lazy" />
+            <source :srcset="entry.logoPath" type="image/webp" />
+            <img :src="entry.logoPath" :alt="entry.info" loading="lazy" />
           </picture>
         </div>
         <!-- Toujours afficher le type (ex: Stage, Technicien...) même si un logo est présent -->
         <div class="overlay-type">{{ t(`timeline.types.${sanitizeKey(entry.type)}`) ?? entry.type }}</div>
         <!-- Afficher l'info (nom de l'entité) uniquement quand il n'y a pas de logo (fallback texte) -->
-        <div v-if="!logoPathForEntry(entry)" class="overlay-info">{{ t(`timeline.infos.${sanitizeKey(entry.info)}`) ?? entry.info }}</div>
+        <div v-if="!entry.logoPath" class="overlay-info">{{ t(`timeline.infos.${sanitizeKey(entry.info)}`) ?? entry.info }}</div>
         <!-- Pour les formations, afficher le niveau si fourni -->
         <div v-if="entry.Niveau" class="overlay-level">{{ t(`timeline.levels.${sanitizeKey(entry.Niveau)}`) ?? entry.Niveau }}</div>
       </div>
@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, computed } from "vue";
+import { ref, reactive, onMounted, onUnmounted, computed, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import gsap from "gsap";
 import Avatar3D from "./Avatar3D.vue";
@@ -49,248 +49,271 @@ import { timelineEvents } from "../timelineEvents.js";
 import YearStream from "./YearStream.vue";
 import { getAssetPath } from "../utils/assets.js";
 
+/* Références DOM */
 const viewport = ref(null);
 const track = ref(null);
-// Garder le même sens pour toutes les langues (pas d'inversion RTL)
 
-let trackWidth = 0;
+/* État réactif */
+const trackWidth = ref(0);
+const worldMax = ref(0);
 const maxSpeed = 1200;
-let worldMax = 0; // coordonnée max (dernier événement)
+const eventSpacing = 380;
 
 const state = reactive({
   worldPos: 0,
   facing: 1
 });
 
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-
-// Espacement et marqueurs (légèrement rapproché)
-const eventSpacing = 380; // px
-
-// Minimal helper: détermine si le type est une formation.
-// Nous gardons uniquement la logique nécessaire pour choisir le dossier
-// d'assets (degrees vs experiences). La logique d'affichage par couleur
-// a été retirée pour simplifier le composant.
-function isFormation(typeStr = "") {
-  return String(typeStr).toLowerCase().includes('formation');
-}
-
-const { t } = useI18n();
-
-// Sanitize a label into a stable i18n key: remove accents, non-alphanumerics to '_', collapse and trim
-function sanitizeKey(str = "") {
-  const s = String(str)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "")
-    .replace(/_+/g, "_");
-  return s || "_";
-}
-
-// Normalize a label to a simple key (remove diacritics, lowercase)
-function normalizeForLookup(s = "") {
-  return String(s)
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .replace(/\(.+\)/g, '') // remove parenthesis content
-    .replace(/[^\w\s+\-]/g, '')
-    .trim()
-    .toLowerCase();
-}
-
-// Attempt to resolve a logo path for an overlay entry.
-// Prefer an explicit `entry.logo` provided in timelineEvents; else derive a probable path
-function logoPathForEntry(entry) {
-  if (!entry) return null;
-  // 1) explicit logo field — accept formats like 'experiences/Name.webp' or 'degrees/Name.webp' or just 'Name.webp'
-  if (entry.logo) {
-    const logo = String(entry.logo || '').trim();
-    if (!logo) return null;
-    // if it's an absolute http(s) URL, return as-is
-    if (/^https?:\/\//i.test(logo)) return logo;
-    // allow both 'experiences/...' and '/experiences/...'
-    if (/^\/?(experiences|degrees)\//i.test(logo)) {
-      return getAssetPath('/' + String(logo).replace(/^\/+/, ''));
-    }
-    // If only filename provided, decide prefix by category
-    const prefix = isFormation(entry.type) ? 'degrees' : 'experiences';
-    return getAssetPath(`/${prefix}/${logo}`);
-  }
-
-  // 2) no explicit logo: try to derive from entry.info
-  if (!entry.info) return null;
-  const norm = normalizeForLookup(entry.info).replace(/\s+/g, '_');
-  const prefix = isFormation(entry.type) ? 'degrees' : 'experiences';
-  return getAssetPath(`/${prefix}/${norm}.webp`);
-}
-
-const eventMarkers = computed(() => {
-  // Toujours LTR: ne pas inverser l'ordre pour l'arabe
-  return timelineEvents.map((ev, i) => ({
-    x: 80 + i * eventSpacing,
-    label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim()
-  }));
-});
-
-// Overlay d'infos actives
-const activeInfoMap = ref(new Map());
-const activeInfoList = computed(() => Array.from(activeInfoMap.value.values()));
-const makeKey = (ev) => `${ev.type}|${ev.info}`;
-
-function applyForward(ev) {
-  const key = makeKey(ev);
-  if (ev.action === "Début") {
-    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
-  } else if (ev.action === "Fin") {
-    activeInfoMap.value.delete(key);
-  } else if (ev.action === "En cours") {
-    if (!activeInfoMap.value.has(key)) {
-      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
-    }
-  }
-}
-
-function applyBackward(ev) {
-  const key = makeKey(ev);
-  if (ev.action === "Début") {
-    // en remontant avant le début: l'info n'est plus active
-    activeInfoMap.value.delete(key);
-  } else if (ev.action === "Fin") {
-    // en remontant avant la fin: l'info redevient active
-    activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
-  } else if (ev.action === "En cours") {
-    if (!activeInfoMap.value.has(key)) {
-      activeInfoMap.value.set(key, { key, type: ev.type, info: ev.info, Niveau: ev.Niveau ?? null, logo: ev.logo ?? null });
-    }
-  }
-}
-
-// Index selon worldPos
-const indexFromWorldPos = (wp) => clamp(Math.floor((wp - 80 + eventSpacing * 0.5) / eventSpacing), 0, timelineEvents.length - 1);
-const prevVisIndex = ref(0);
-const prevChronIndex = ref(0);
-
-// Avatar walk speed (0..1) + cible pour lissage
+/* Animation */
 const avatarWalkSpeed = ref(0);
 const targetWalkSpeed = ref(0);
-// Phase de marche (pour synchroniser distance et pas)
-const CYCLE_BASE = 2.6;   // correspond au preset 'normal' d'Avatar3D
-const CYCLE_GAIN = 6.0;   // idem
-let walkPhase = 0;        // cumul en radians
+const prevVisIndex = ref(0);
+const prevChronIndex = ref(0);
+const activeInfoMap = ref(new Map());
 
-// Helper: peut-on se déplacer dans une direction donnée ?
-const canMoveDir = (dir) => {
-  if (dir === 0) return false;
-  // côté vide = pousser hors de la timeline
-  if (state.worldPos <= 0 && dir < 0) return false;      // au début, gauche interdit
-  if (state.worldPos >= worldMax && dir > 0) return false; // à la fin, droite interdite
-  return true;
+/* Constants */
+const CYCLE_BASE = 2.6;
+const CYCLE_GAIN = 6.0;
+let walkPhase = 0;
+let rafId = null;
+let lastTime = 0;
+let isAnimating = false;
+
+/* Utils optimisés */
+const { t } = useI18n();
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+const isFormation = (typeStr = "") => 
+  String(typeStr).toLowerCase().includes('formation');
+
+/* Memoïfication des fonctions de calcul */
+const sanitizeKey = (() => {
+  const cache = new Map();
+  return (str = "") => {
+    if (cache.has(str)) return cache.get(str);
+    const s = String(str)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .replace(/_+/g, "_");
+    const result = s || "_";
+    cache.set(str, result);
+    return result;
+  };
+})();
+
+const normalizeForLookup = (() => {
+  const cache = new Map();
+  return (s = "") => {
+    if (cache.has(s)) return cache.get(s);
+    const result = String(s)
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/\(.+\)/g, '')
+      .replace(/[^\w+s+\-]/g, '')
+      .trim()
+      .toLowerCase();
+    cache.set(s, result);
+    return result;
+  };
+})();
+
+/* Logo path avec memoïfication */
+const logoPathForEntry = (() => {
+  const cache = new Map();
+  return (entry) => {
+    if (!entry) return null;
+    const cacheKey = `${entry.type}|${entry.info}|${entry.logo || ''}`;
+    if (cache.has(cacheKey)) return cache.get(cacheKey);
+    
+    let result = null;
+    
+    if (entry.logo) {
+      const logo = String(entry.logo || '').trim();
+      if (!logo) {
+        result = null;
+      } else if (/^https?:\/\//i.test(logo)) {
+        result = logo;
+      } else if (/^(experiences|degrees)\//i.test(logo)) {
+        // Si le logo commence déjà par experiences/ ou degrees/, ne pas ajouter de préfixe
+        result = getAssetPath(logo);
+      } else if (/^\/(experiences|degrees)/i.test(logo)) {
+        // Si le logo commence par /experiences/ ou /degrees/, enlever le premier slash
+        result = getAssetPath(logo.replace(/^\//, ''));
+      } else {
+        const prefix = isFormation(entry.type) ? 'degrees' : 'experiences';
+        result = getAssetPath(`${prefix}/${logo}`);
+      }
+    } else if (entry.info) {
+      const norm = normalizeForLookup(entry.info).replace(/\s+/g, '_');
+      const prefix = isFormation(entry.type) ? 'degrees' : 'experiences';
+      result = getAssetPath(`${prefix}/${norm}.webp`);
+    }
+    
+    cache.set(cacheKey, result);
+    return result;
+  };
+})();
+
+/* Computed optimisés */
+const eventMarkers = computed(() => 
+  timelineEvents.map((ev, i) => ({
+    x: 80 + i * eventSpacing,
+    label: `${ev.year} ${t(`timeline.months.${ev.Month}`) ?? ev.Month}`.trim()
+  }))
+);
+
+const activeInfoList = computed(() => Array.from(activeInfoMap.value.values()));
+
+const makeKey = (ev) => `${ev.type}|${ev.info}`;
+const indexFromWorldPos = (wp) => clamp(Math.floor((wp - 80 + eventSpacing * 0.5) / eventSpacing), 0, timelineEvents.length - 1);
+
+/* Gestion des événements optimisée */
+const createEntry = (ev) => ({ 
+  key: makeKey(ev), 
+  type: ev.type, 
+  info: ev.info, 
+  Niveau: ev.Niveau ?? null, 
+  logo: ev.logo ?? null,
+  logoPath: logoPathForEntry(ev)
+});
+
+const applyForward = (ev) => {
+  const key = makeKey(ev);
+  if (ev.action === "Début") {
+    activeInfoMap.value.set(key, createEntry(ev));
+  } else if (ev.action === "Fin") {
+    activeInfoMap.value.delete(key);
+  } else if (ev.action === "En cours" && !activeInfoMap.value.has(key)) {
+    activeInfoMap.value.set(key, createEntry(ev));
+  }
 };
 
-function handleMouseMove(e) {
+const applyBackward = (ev) => {
+  const key = makeKey(ev);
+  if (ev.action === "Début") {
+    activeInfoMap.value.delete(key);
+  } else if (ev.action === "Fin") {
+    // Pour l'événement "Fin", on doit chercher le logo depuis l'événement "Début" correspondant
+    const startEvent = timelineEvents.find(e => 
+      e.action === "Début" && 
+      e.type === ev.type && 
+      e.info === ev.info
+    );
+    const entryWithLogo = { ...ev, logo: startEvent?.logo || ev.logo };
+    activeInfoMap.value.set(key, createEntry(entryWithLogo));
+  } else if (ev.action === "En cours" && !activeInfoMap.value.has(key)) {
+    activeInfoMap.value.set(key, createEntry(ev));
+  }
+};
+
+/* Mouvement et contrôles optimisés */
+const canMoveDir = (dir) => {
+  if (dir === 0) return false;
+  return !(state.worldPos <= 0 && dir < 0) && !(state.worldPos >= worldMax.value && dir > 0);
+};
+
+const handleMouseMove = (e) => {
   const centerX = window.innerWidth / 2;
-  const distanceFromCenter = (e.clientX - centerX) / centerX; // [-1..1]
+  const distanceFromCenter = (e.clientX - centerX) / centerX;
   const dir = Math.sign(distanceFromCenter) || 0;
   const speed = clamp(Math.abs(distanceFromCenter), 0, 1);
-  // Bloquer toute marche vers le côté vide aux bornes
+  
   if (dir === 0) {
     targetWalkSpeed.value = 0;
     return;
   }
+  
   if (canMoveDir(dir)) {
     state.facing = dir > 0 ? 1 : -1;
     targetWalkSpeed.value = speed;
+    startAnimation();
   } else {
-    // côté vide: ne pas changer la direction, arrêter la marche
     targetWalkSpeed.value = 0;
   }
-}
+};
 
-function handleResize() {
-  const totalWidth = 80 + Math.max(0, timelineEvents.length - 1) * eventSpacing; // x du dernier événement
-  // largeur de piste suffisante: contenu + un écran pour le centrage aux bornes
-  trackWidth = Math.max(totalWidth + window.innerWidth, window.innerWidth * 2);
-  // worldMax devient la coordonnée du dernier événement
-  worldMax = totalWidth;
-}
+const handleResize = () => {
+  const totalWidth = 80 + Math.max(0, timelineEvents.length - 1) * eventSpacing;
+  trackWidth.value = Math.max(totalWidth + window.innerWidth, window.innerWidth * 2);
+  worldMax.value = totalWidth;
+};
 
-let rafId;
-let lastTime = performance.now();
+/* Animation optimisée avec démarrage/arrêt automatique */
+const startAnimation = () => {
+  if (!isAnimating) {
+    isAnimating = true;
+    lastTime = performance.now();
+    rafId = requestAnimationFrame(update);
+  }
+};
 
-// Handle motion emitted from YearStream (drag/wheel control)
-function handleYearStreamMotion(e) {
+const stopAnimation = () => {
+  isAnimating = false;
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+};
+
+const handleYearStreamMotion = (e) => {
   const detail = e?.detail || {};
   const deltaWorld = detail.deltaWorld ?? 0;
   const facing = detail.facing ?? state.facing;
   const speedBoost = detail.speedBoost ?? 0;
-  // Apply world position change directly, clamped to bounds
-  state.worldPos = clamp(state.worldPos + deltaWorld, 0, worldMax);
+  
+  state.worldPos = clamp(state.worldPos + deltaWorld, 0, worldMax.value);
   state.facing = facing;
-  // Animate track immediately to reflect new position
+  
   const centerX = window.innerWidth / 2;
   const trackTranslateX = centerX - state.worldPos;
   if (track.value) {
     gsap.to(track.value, { x: trackTranslateX, duration: 0.12, ease: "power1.out", overwrite: true });
   }
-  // Briefly boost avatar leg animation without inducing extra drift
+  
   avatarWalkSpeed.value = Math.min(1, speedBoost);
-  targetWalkSpeed.value = 0; // avoid double movement accumulation
-}
+  targetWalkSpeed.value = 0;
+  
+  if (speedBoost > 0) startAnimation();
+};
 
-function update(now) {
+const update = (now) => {
   const dt = (now - lastTime) / 1000;
   lastTime = now;
 
-  // Lisser la vitesse de marche (0..1)
   avatarWalkSpeed.value += (targetWalkSpeed.value - avatarWalkSpeed.value) * 0.25;
 
-  // Bloquer la marche si on pousse vers l'extérieur aux bornes
-  const outwardBlocked = (state.worldPos <= 0 && state.facing < 0) || (state.worldPos >= worldMax && state.facing > 0);
+  const outwardBlocked = (state.worldPos <= 0 && state.facing < 0) || (state.worldPos >= worldMax.value && state.facing > 0);
   if (outwardBlocked) {
-    // arrêt immédiat de l'animation de marche côté vide
     targetWalkSpeed.value = 0;
-    avatarWalkSpeed.value += (0 - avatarWalkSpeed.value) * 0.6; // amortissement agressif
+    avatarWalkSpeed.value += (0 - avatarWalkSpeed.value) * 0.6;
   }
 
-  // Avancer la phase de marche (synchro avec Avatar3D)
-  const phaseRate = (CYCLE_BASE + CYCLE_GAIN * avatarWalkSpeed.value) * avatarWalkSpeed.value; // rad/s
+  const phaseRate = (CYCLE_BASE + CYCLE_GAIN * avatarWalkSpeed.value) * avatarWalkSpeed.value;
   const dPhase = outwardBlocked ? 0 : phaseRate * dt;
   walkPhase += dPhase;
 
-  // Distance par cycle: dépend fortement de la vitesse et de l'espacement voulu
-  // Objectif: à vitesse max, ~0.6 * eventSpacing par cycle (≈1.2s par événement)
-  // Augmenter la distance parcourue par cycle pour accélérer le déplacement sur la timeline
   const stridePx = eventSpacing * (0.35 + 0.65 * avatarWalkSpeed.value);
   const dWorld = state.facing * (dPhase / (2 * Math.PI)) * stridePx;
-  state.worldPos = clamp(state.worldPos + dWorld, 0, worldMax);
+  state.worldPos = clamp(state.worldPos + dWorld, 0, worldMax.value);
 
-  // translation de la piste pour centrer worldPos au milieu de l'écran
   const centerX = window.innerWidth / 2;
   const trackTranslateX = centerX - state.worldPos;
   if (track.value) {
     gsap.to(track.value, { x: trackTranslateX, duration: 0.22, ease: "power1.out", overwrite: true });
   }
 
-  // Broadcast motion state so YearStream can mirror the avatar's direction and speed
   try {
     window.dispatchEvent(new CustomEvent('timeline-motion', {
-      detail: {
-        worldPos: state.worldPos,
-        facing: state.facing,
-        speed: avatarWalkSpeed.value,
-        eventSpacing
-      }
+      detail: { worldPos: state.worldPos, facing: state.facing, speed: avatarWalkSpeed.value, eventSpacing }
     }));
   } catch {}
 
-  // avatarWalkSpeed déjà lissé plus haut; rien à recalculer ici
-
-  // détection de franchissement d'index (visible → chronologique selon RTL/LTR)
   const curVis = indexFromWorldPos(state.worldPos);
-  // Conserver l'ordre LTR pour toutes les langues
   const curChron = curVis;
+  
   if (curChron > prevChronIndex.value) {
     for (let i = prevChronIndex.value + 1; i <= curChron; i++) applyForward(timelineEvents[i]);
     prevChronIndex.value = curChron;
@@ -300,26 +323,35 @@ function update(now) {
   }
   prevVisIndex.value = curVis;
 
-  rafId = requestAnimationFrame(update);
-}
+  if (Math.abs(avatarWalkSpeed.value) < 0.01 && Math.abs(targetWalkSpeed.value) < 0.01) {
+    stopAnimation();
+  } else {
+    rafId = requestAnimationFrame(update);
+  }
+};
 
+/* Initialisation optimisée */
 onMounted(() => {
-  window.addEventListener("resize", handleResize);
-  window.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("resize", handleResize, { passive: true });
+  window.addEventListener("mousemove", handleMouseMove, { passive: true });
+  window.addEventListener('yearstream-motion', handleYearStreamMotion, { passive: true });
+  
   handleResize();
   lastTime = performance.now();
   prevVisIndex.value = indexFromWorldPos(state.worldPos);
-  // Conserver l'ordre LTR pour toutes les langues
   prevChronIndex.value = prevVisIndex.value;
-  rafId = requestAnimationFrame(update);
-  // Listen to YearStream control events
-  window.addEventListener('yearstream-motion', handleYearStreamMotion);
+  
+  // Initialiser les événements actifs au démarrage
+  const startIndex = indexFromWorldPos(state.worldPos);
+  for (let i = 0; i <= startIndex; i++) {
+    applyForward(timelineEvents[i]);
+  }
 });
 
 onUnmounted(() => {
+  stopAnimation();
   window.removeEventListener("resize", handleResize);
   window.removeEventListener("mousemove", handleMouseMove);
   window.removeEventListener('yearstream-motion', handleYearStreamMotion);
-  cancelAnimationFrame(rafId);
 });
 </script>
