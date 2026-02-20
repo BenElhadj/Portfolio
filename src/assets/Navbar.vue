@@ -53,46 +53,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount } from "vue";
-// Affichage conditionnel des flèches
-const showArrows = ref(false);
-const isAtStart = ref(true);
-const isAtEnd = ref(false);
-
-function checkNavOverflow() {
-  const nav = navLinksRef.value;
-  if (!nav) return;
-  // On compare le scrollWidth (contenu total) à la largeur visible
-  showArrows.value = nav.scrollWidth > nav.offsetWidth + 2; // +2 pour tolérance
-  updateArrowState();
-}
-
-function updateArrowState() {
-  const nav = navLinksRef.value;
-  if (!nav) return;
-  isAtStart.value = nav.scrollLeft <= 2;
-  isAtEnd.value = nav.scrollLeft + nav.offsetWidth >= nav.scrollWidth - 2;
-}
-
-function onNavScroll() {
-  updateArrowState();
-}
-
-let resizeObserver = null;
-import { ref, onMounted, onUnmounted, computed, nextTick, watch } from "vue";
-// Référence vers la liste des liens de navigation
-const navLinksRef = ref(null);
-
-// Scroll horizontal via flèches
-function scrollNav(direction) {
-  const nav = navLinksRef.value;
-  if (!nav) return;
-  const scrollAmount = nav.offsetWidth * 0.6; // scroll de 60% de la largeur visible
-  nav.scrollBy({
-    left: direction * scrollAmount,
-    behavior: 'smooth'
-  });
-}
+import { ref, onMounted, onUnmounted, nextTick, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 /* i18n */
@@ -126,170 +87,163 @@ const fallback = {
   links: "Liens utiles"
 };
 
-/* état */
+/* État */
 const currentIndex = ref(0);
 const theme = ref("dark");
-// Mobile nav open state (pour le burger)
 const isNavOpen = ref(false);
+const showArrows = ref(false);
+const isAtStart = ref(true);
+const isAtEnd = ref(false);
 
-/* Dom refs / observer */
+/* Références DOM */
+const navLinksRef = ref(null);
 let pagesContainer = null;
 let pageEls = [];
 let observer = null;
+let resizeObserver = null;
 
-/* Traduction */
-function getLabel(key) {
+/* Optimisation : memoïfication des libellés */
+const getLabel = (key) => {
   try {
     const translated = tFn(key);
     if (translated && !translated.startsWith("navbar.")) return translated;
   } catch (e) {}
   return fallback[key.split(".").pop()] ?? key;
-}
+};
 
-/* Scroll vers une section */
-function goToIndex(i) {
+/* Scroll vers une section - optimisé */
+const goToIndex = (i) => {
   const el = pageEls[i];
   if (!el) return;
-  if (pagesContainer && pagesContainer.scrollTo) {
-    const top = el.offsetTop - (pagesContainer.offsetTop || 0);
-    pagesContainer.scrollTo({ top, behavior: "smooth" });
-  } else {
-    el.scrollIntoView({ behavior: "smooth" });
-  }
+  
   currentIndex.value = i;
   localStorage.setItem("lastPageIndex", String(i));
-  // Centrer l'élément actif dans la navbar
-  nextTick(() => {
-    const nav = navLinksRef.value;
-    if (nav && nav.children[i]) {
-      const activeEl = nav.children[i];
-      const navRect = nav.getBoundingClientRect();
-      const elRect = activeEl.getBoundingClientRect();
-      const scrollLeft = nav.scrollLeft;
-      const offset = elRect.left - navRect.left - (navRect.width / 2) + (elRect.width / 2);
-      nav.scrollTo({ left: scrollLeft + offset, behavior: 'smooth' });
-    }
-  });
-}
-
-/* Langue */
-function changeLang(lang) {
-  if (locale) locale.value = lang;
   
-  // Save language preference
+  const scrollToElement = () => {
+    if (pagesContainer?.scrollTo) {
+      const top = el.offsetTop - (pagesContainer.offsetTop || 0);
+      pagesContainer.scrollTo({ top, behavior: "smooth" });
+    } else {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+  
+  scrollToElement();
+  
+  // Centrer l'élément actif dans la navbar
+  nextTick(() => centerActiveNav(i));
+};
+
+/* Langue - optimisée */
+const changeLang = (lang) => {
+  if (locale) locale.value = lang;
   localStorage.setItem("lang", lang);
   
   try {
-    window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang } }))
+    window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang } }));
   } catch {}
-}
+};
 
-/* Thème */
-function applySavedTheme() {
+/* Thème - optimisé */
+const applySavedTheme = () => {
   const saved = localStorage.getItem("theme") || "dark";
   theme.value = saved;
   document.documentElement.classList.toggle("dark", saved === "dark");
+  
   try {
-    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme.value } }))
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme.value } }));
   } catch {}
-}
-function toggleTheme() {
+};
+
+const toggleTheme = () => {
   theme.value = theme.value === "light" ? "dark" : "light";
   localStorage.setItem("theme", theme.value);
   document.documentElement.classList.toggle("dark", theme.value === "dark");
+  
   try {
-    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme.value } }))
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme.value } }));
   } catch {}
-}
+};
 
-/* Effet temporaire de clic sur les flèches de navigation */
-function handleArrowClick(event) {
+/* Effet temporaire de clic - optimisé */
+const handleArrowClick = (event) => {
   const btn = event.currentTarget;
-  // Supprimer le focus et l'état actif immédiatement (empêche l'effet bleu sur mobile)
-  btn.blur && btn.blur();
+  btn.blur?.();
   btn.classList.remove('clicked');
-  // Forcer le repaint
   void btn.offsetWidth;
-  // Appliquer l'effet temporaire
   btn.classList.add('clicked');
+  
   setTimeout(() => {
     btn.classList.remove('clicked');
-    // Forcer le repaint à nouveau
     void btn.offsetWidth;
-    // Supprimer le focus une seconde fois au cas où
-    btn.blur && btn.blur();
+    btn.blur?.();
   }, 180);
-}
+};
 
-// Ajout logique Vue pour sélecteur de langue mobile
-const langSwitcherRef = ref(null);
-const isLangOpen = ref(false);
 
-function toggleLangSwitcher() {
-  isLangOpen.value = !isLangOpen.value;
-  // Ajoute ou retire la classe .open sur le conteneur
-  const el = langSwitcherRef.value;
-  if (el) {
-    if (isLangOpen.value) {
-      el.classList.add('open');
-    } else {
-      el.classList.remove('open');
-    }
-  }
-}
+/* Fonctions utilitaires optimisées */
+const checkNavOverflow = () => {
+  const nav = navLinksRef.value;
+  if (!nav) return;
+  showArrows.value = nav.scrollWidth > nav.offsetWidth + 2;
+  updateArrowState();
+};
 
-// function selectLang(lang) {
-//   changeLang(lang);
-//   isLangOpen.value = false;
-//   const el = langSwitcherRef.value;
-//   if (el) el.classList.remove('open');
-// }
+const updateArrowState = () => {
+  const nav = navLinksRef.value;
+  if (!nav) return;
+  isAtStart.value = nav.scrollLeft <= 2;
+  isAtEnd.value = nav.scrollLeft + nav.offsetWidth >= nav.scrollWidth - 2;
+};
 
-/* Init */
+const onNavScroll = () => updateArrowState();
+
+const scrollNav = (direction) => {
+  const nav = navLinksRef.value;
+  if (!nav) return;
+  const scrollAmount = nav.offsetWidth * 0.6;
+  nav.scrollBy({
+    left: direction * scrollAmount,
+    behavior: 'smooth'
+  });
+};
+
+const centerActiveNav = (index = currentIndex.value) => {
+  const nav = navLinksRef.value;
+  if (!nav?.children[index]) return;
+  
+  const activeEl = nav.children[index];
+  const navRect = nav.getBoundingClientRect();
+  const elRect = activeEl.getBoundingClientRect();
+  const offset = elRect.left - navRect.left - (navRect.width / 2) + (elRect.width / 2);
+  
+  nav.scrollTo({ left: nav.scrollLeft + offset, behavior: 'auto' });
+};
+/* Initialisation optimisée */
 onMounted(() => {
-  // Observer le redimensionnement pour afficher/masquer les flèches
   nextTick(() => {
     checkNavOverflow();
     const nav = navLinksRef.value;
+    
     if (window.ResizeObserver && nav) {
       resizeObserver = new ResizeObserver(checkNavOverflow);
       resizeObserver.observe(nav);
     } else {
-      window.addEventListener('resize', checkNavOverflow);
+      window.addEventListener('resize', checkNavOverflow, { passive: true });
     }
+    
+    nav?.addEventListener('scroll', onNavScroll, { passive: true });
   });
 
-  // Watch for language change to re-check overflow
-  watch(locale, () => {
-    nextTick(checkNavOverflow);
-  });
-  nextTick(() => {
-    const nav = navLinksRef.value;
-    if (nav) nav.addEventListener('scroll', onNavScroll, { passive: true });
-  });
-onBeforeUnmount(() => {
-  if (resizeObserver) resizeObserver.disconnect();
-  window.removeEventListener('resize', checkNavOverflow);
-});
-  // Centrer l'élément actif dans la navbar au chargement et lors du resize
-  function centerActiveNav() {
-    const nav = navLinksRef.value;
-    if (nav && nav.children[currentIndex.value]) {
-      const activeEl = nav.children[currentIndex.value];
-      const navRect = nav.getBoundingClientRect();
-      const elRect = activeEl.getBoundingClientRect();
-      const scrollLeft = nav.scrollLeft;
-      const offset = elRect.left - navRect.left - (navRect.width / 2) + (elRect.width / 2);
-      nav.scrollTo({ left: scrollLeft + offset, behavior: 'auto' });
-    }
-  }
-  nextTick(centerActiveNav);
-  window.addEventListener('resize', centerActiveNav);
-  // Centrage aussi lors du changement d'index
-  watch(currentIndex, () => nextTick(centerActiveNav));
+  watch(locale, () => nextTick(checkNavOverflow));
+  watch(currentIndex, () => nextTick(() => centerActiveNav()));
+  
+  const centerActiveNavResize = () => centerActiveNav();
+  window.addEventListener('resize', centerActiveNavResize, { passive: true });
+  
   pagesContainer = document.querySelector(".pages");
-  pageEls = Array.from(document.querySelectorAll(".pages .page"));
-  if (!pageEls.length) pageEls = Array.from(document.querySelectorAll(".page"));
+  pageEls = Array.from(document.querySelectorAll(".pages .page")) || 
+             Array.from(document.querySelectorAll(".page"));
 
   observer = new IntersectionObserver(
     (entries) => {
@@ -316,5 +270,9 @@ onBeforeUnmount(() => {
   applySavedTheme();
 });
 
-onUnmounted(() => { if (observer) observer.disconnect(); });
+onUnmounted(() => { 
+  observer?.disconnect();
+  resizeObserver?.disconnect();
+  window.removeEventListener('resize', checkNavOverflow);
+});
 </script>
