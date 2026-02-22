@@ -741,7 +741,7 @@ function animate() {
     }
 
   // ---- Appliquer à la tête + cou (lissage + anticipation) ----
-  // Réduire l'amplitude quand on marche pour un effet plus naturel
+  // Réduire l'amplitude quand on marche pour un effet plus naturel 
   const headReduction = (isWalking && !props.faceCamera) ? 0.5 : 1.0;
   const maxHeadYaw = Math.min(MAX_HEAD_YAW, 0.9 * headReduction);
   const maxHeadPitch = Math.min(MAX_HEAD_PITCH, 0.9 * headReduction);
