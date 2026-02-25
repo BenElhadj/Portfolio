@@ -71,8 +71,9 @@
   --corner-qr-size: 167px;
   --corner-qr-margin: clamp(2px, 2vw, 36px);
   --corner-qr-margin-top: var(--corner-qr-margin);
-  --corner-qr-margin-left: calc(var(--corner-qr-margin) / 2);
-  --corner-qr-margin-right: calc(var(--corner-qr-margin) / 2);
+  --corner-qr-half: calc(var(--corner-qr-margin) / 2);
+  --corner-qr-margin-left: var(--corner-qr-half);
+  --corner-qr-margin-right: var(--corner-qr-half);
   --favicon-size: clamp(95px, 15vw, 820px);
   
   /* Bouton Telegram */
@@ -85,10 +86,28 @@
   --grid-size: 42px;
 
   /* fallback pour navigateurs anciens */
-  /* fallback pour navigateurs anciens */
   --grid-line: rgba(17,17,17,0.07);
   /* préférence moderne quand supportée */
   --grid-line: color-mix(in hsl, var(--text), transparent 87%);
+  
+  /* ===== UTILITAIRES D'OPTIMISATION ===== */
+  /* Glow effects optimisés */
+  --glow-primary: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
+  --glow-secondary: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
+  --glow-fallback: drop-shadow(0 0 16px rgba(11,111,184,0.18));
+  --glow-fallback-secondary: 0 0 8px rgba(11,111,184,0.09);
+  
+  /* Transitions optimisées */
+  --transition-fast: 120ms ease;
+  --transition-base: 160ms ease;
+  --transition-slow: 200ms ease;
+  --transition-hover: 180ms ease;
+  
+  /* Transformations communes */
+  --scale-up: scale(1.02);
+  --scale-down: scale(0.98);
+  --scale-logo: scale(1.04);
+  --scale-logo-active: scale(0.98);
 
   /* ===== ESPACEMENTS (clamp-based responsive spacing) ===== */
   --pad-xs: clamp(4px, 1.2vw, 8px);
@@ -132,6 +151,10 @@
   /* fallback pour navigateurs anciens */
   --grid-line: rgb(255 255 255 / 7%);
   --grid-line: color-mix(in hsl, var(--text), transparent 87%);
+  
+  /* Mode sombre - glow effects */
+  --glow-primary-dark: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
+  --glow-secondary-dark: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
 }
 
 /* ==========================================================================
@@ -320,12 +343,11 @@ small {
   box-sizing: border-box;
   overflow: visible;
   border-radius: var(--radius);
-  /* margin managed by the container gap: use 0 here to avoid double spacing */
   margin: 0;
   position: relative;
   z-index: 1;
   will-change: transform;
-  transition: filter 160ms ease, box-shadow 160ms ease;
+  transition: filter var(--transition-base), box-shadow var(--transition-base);
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   background: var(--card-bg);
@@ -345,26 +367,28 @@ small {
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
-/* Glow externe au survol */
+/* Glow externe au survol - optimisé */
 html.has-scrolled .sub-section:hover,
 html.has-scrolled .sub-section:focus-within {
-  /* fallback pour navigateurs plus anciens */
-  filter: drop-shadow(0 0 16px rgba(11,111,184,0.18));
-  box-shadow: 0 0 8px rgba(11,111,184,0.09);
-  /* modern color-mix when supported */
-  filter: drop-shadow(0 0 16px color-mix(in hsl, var(--blue), transparent 78%));
-  box-shadow: 0 0 8px color-mix(in hsl, var(--blue), transparent 90%);
+  filter: var(--glow-primary);
+  box-shadow: var(--glow-secondary);
   z-index: 2998;
+  
+  /* Fallback pour navigateurs anciens */
+  @supports not (color: color-mix(in hsl, red, blue)) {
+    filter: var(--glow-fallback);
+    box-shadow: var(--glow-fallback-secondary);
+  }
 }
 
-/* Couche de glow au-dessus du contenu */
+/* Couche de glow au-dessus du contenu - optimisée */
 .sub-section::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 160ms ease;
+  transition: opacity var(--transition-base);
   border-radius: inherit;
   z-index: 2999;
   box-shadow: 0 0 12px 4px rgb(11 111 184 / 6%);
@@ -401,24 +425,24 @@ html.has-scrolled .sub-section:focus-within::after {
   transition: background 0.3s, color 0.3s;
 }
 
-/* Carte avec bordure gauche */
+/* Carte avec bordure gauche - optimisée */
 .line-card {
   padding: var(--pad-md) var(--pad-md);
   border-left: 4px solid var(--blue);
   display: flex;
   flex-direction: column;
-  transition: transform 160ms ease, box-shadow 160ms ease, filter 120ms ease;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), filter var(--transition-fast);
 }
 
-/* Effets hover par défaut */
+/* Effets hover par défaut - optimisés */
 .line-card:hover,
 .line-card:focus-visible {
-  transform: translateZ(0) scale(1.02);
+  transform: translateZ(0) var(--scale-up);
   box-shadow: 0 8px 22px var(--card-shadow);
 }
 
 .line-card:active {
-  transform: translateZ(0) scale(0.98);
+  transform: translateZ(0) var(--scale-down);
 }
 
 /* Désactiver hover pour formulaire de contact */
@@ -439,23 +463,21 @@ html.has-scrolled .sub-section:focus-within::after {
   color: var(--text);
 }
 
-/* Petite carte pour compétences */
+/* Petite carte pour compétences - optimisée */
 .small-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--pad-xxs);
-  /* la carte s'adapte uniquement via des clamp : padding et max-width */
   padding: clamp(4px, 1.6vw, 12px);
   width: 100%;
-  /* limite la taille générale de la card tout en restant responsive */
   max-width: clamp(90px, 12vw, 140px);
   height: auto;
   box-sizing: border-box;
   overflow: hidden;
   cursor: pointer;
   transform: translateY(0);
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .small-card.visible {
@@ -520,7 +542,7 @@ html.has-scrolled .sub-section:focus-within::after {
   color: var(--text);
   font-weight: 500;
   white-space: nowrap;
-  transition: color 0.18s, background 0.18s, transform 0.12s;
+  transition: color var(--transition-base), background var(--transition-base), transform var(--transition-fast);
 }
 
 .nav-links li:hover {
@@ -553,7 +575,7 @@ html.has-scrolled .sub-section:focus-within::after {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: color 0.18s, background 0.18s;
+  transition: color var(--transition-base), background var(--transition-base);
   z-index: 1;
   outline: none;
 }
@@ -577,12 +599,12 @@ html.has-scrolled .sub-section:focus-within::after {
   border: 1px solid var(--border);
   opacity: 0.55;
   cursor: pointer;
-  transition: transform 0.15s, opacity 0.15s;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .lang-switcher img.active {
   opacity: 1;
-  transform: scale(1.08);
+  transform: var(--scale-up);
   border: 2px solid var(--blue);
 }
 
@@ -633,7 +655,7 @@ html.has-scrolled .sub-section:focus-within::after {
   background: var(--text);
   height: 2px;
   border-radius: 2px;
-  transition: transform 200ms ease, opacity 200ms ease;
+  transition: transform var(--transition-slow), opacity var(--transition-slow);
   position: absolute;
   left: 0;
   right: 0;
@@ -679,7 +701,7 @@ html.has-scrolled .sub-section:focus-within::after {
   border-radius: var(--radius);
 }
 
-/* Éléments timeline */
+/* Éléments timeline - optimisés */
 .timeline-item {
   position: relative;
   margin-bottom: 28px;
@@ -857,42 +879,36 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .timeline-overlay .overlay-logo img {
   display: block;
-  /* responsive logo sizing: shrink smoothly on smaller viewports */
   max-height: var(--logo-timeline-max-h);
   max-width: var(--logo-timeline-max-w);
   width: auto;
   height: auto;
   object-fit: contain;
-  /* double-ring luminous outline: sharp inner ring + softer outer halo to double the contour */
-  /* inner ring: small blur, high opacity; outer halo: larger blur, softer opacity */
   filter: drop-shadow(0 0 1px rgba(11,111,184,1)) drop-shadow(0 0 12px rgba(11,111,184,0.42));
-  transition: transform 180ms ease, filter 180ms ease, opacity 200ms ease;
+  transition: transform var(--transition-hover), filter var(--transition-hover), opacity var(--transition-base);
 }
 
-/* Hover / active effects to give a small light/zoom like other pages */
+/* Hover / active effects optimisés */
 .overlay-item:hover .overlay-logo img,
 .overlay-logo:hover img {
-  transform: translateZ(0) scale(1.04);
-  /* hover: intensify both rings (slightly larger and brighter) */
+  transform: translateZ(0) var(--scale-logo);
   filter: drop-shadow(0 0 1.5px rgba(11,111,184,1)) drop-shadow(0 0 20px rgba(11,111,184,0.65)) brightness(1.06) contrast(1.04);
 }
 
 .overlay-item:active .overlay-logo img,
 .overlay-logo:active img {
-  transform: translateZ(0) scale(0.98);
+  transform: translateZ(0) var(--scale-logo-active);
 }
 
-/* Éléments overlay */
+/* Éléments overlay - optimisés */
 .overlay-item {
-  /* reuse card/line-card base but use the same visual tokens as other cards */
   position: relative;
   display: flex;
-  flex-direction: row; /* logo + texte alignés sur une ligne */
+  flex-direction: row;
   align-items: center;
   gap: clamp(6px, 1.2vw, 16px);
   min-height: var(--card-timeline-min-h);
   max-width: var(--card-timeline-max-w);
-  /* Use the same background, border and shadow as .card to match Experiences/Diplomas */
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -900,22 +916,19 @@ html.has-scrolled .sub-section:focus-within::after {
   overflow: hidden;
   font-size: var(--fs-body);
   color: var(--text);
-  /* responsive padding so the card gets proportionally smaller on narrow screens */
   padding: clamp(0.25rem, 1.0vw, 0.9rem);
-  /* keep inline layout similar to line-card and show the colored inline border like other .line-card */
   border-left: 4px solid var(--blue);
-  /* transitions and hover/active states to match .line-card (Experiences/Diplomas) */
-  transition: transform 160ms ease, box-shadow 160ms ease, filter 120ms ease;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), filter var(--transition-fast);
 }
 
 .overlay-item:hover,
 .overlay-item:focus-visible {
-  transform: translateZ(0) scale(1.02);
+  transform: translateZ(0) var(--scale-up);
   box-shadow: 0 8px 22px var(--card-shadow);
 }
 
 .overlay-item:active {
-  transform: translateZ(0) scale(0.98);
+  transform: translateZ(0) var(--scale-down);
 }
 
 /* In RTL, place the inline colored border on the right like other line-card elements */
@@ -1010,16 +1023,16 @@ html.has-scrolled .sub-section:focus-within::after {
   filter: drop-shadow(0 0 1px rgba(11,111,184,1)) drop-shadow(0 0 14px rgba(11,111,184,0.40));
 }
 
-/* Hover sur logos */
+/* Hover sur logos - optimisé */
 .company-logo-link:hover .degree-thumb img,
 .degree-thumb:hover img {
-  transform: translateZ(0) scale(1.04);
+  transform: translateZ(0) var(--scale-logo);
   filter: drop-shadow(0 0 1.5px rgba(11,111,184,1)) drop-shadow(0 0 22px rgba(11,111,184,0.7)) brightness(1.02) contrast(1.02);
 }
 
 .company-logo-link:active .degree-thumb img,
 .degree-thumb:active img {
-  transform: translateZ(0) scale(0.98);
+  transform: translateZ(0) var(--scale-logo-active);
 }
 
 .company-logo-link {
@@ -1064,17 +1077,17 @@ html.has-scrolled .sub-section:focus-within::after {
 
 .small-card:hover .logo :deep(svg) {
   filter: url("#glow-green");
-  transform: scale(1.05);
+  transform: var(--scale-up);
 }
 
 .small-card:hover .logo {
   opacity: 1;
-  transform: scale(1.05);
+  transform: var(--scale-up);
   filter: drop-shadow(0 0 2px var(--green-glow));
 }
 
 .small-card:active .logo {
-  transform: scale(0.95);
+  transform: var(--scale-down);
 }
 
 .small-card:not(.is-clicked):hover .logo :deep(svg) {
