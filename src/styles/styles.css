@@ -1540,7 +1540,7 @@ html.has-scrolled .sub-section:focus-within::after {
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 4px 10px var(--card-shadow);
-  transition: transform 120ms ease;
+  transition: transform var(--transition-fast);
 }
 
 .close-btn:hover {
@@ -2678,9 +2678,10 @@ a:hover {
   transform: translateX(50%);
 }
 
-/* Bouton popup */
+/* RTL support pour le bouton de fermeture */
 [dir="rtl"] .close-btn {
-  float: left;
+  right: auto;
+  left: 16px;
 }
 
 /* Iframes toujours LTR */
