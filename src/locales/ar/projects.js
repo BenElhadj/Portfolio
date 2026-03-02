@@ -26,8 +26,8 @@ export default {
     {
       name: "Learn2Slither",
       year: "2025",
-      description: "لعبة تعليمية تفاعلية مستوحاة من لعبة Snake الشهيرة، صممت لتعليم أساسيات البرمجة بطريقة ممتعة.",
-      stack: "Svelte، Vite، GitHub Pages",
+      description: "لعبة التعلم بالتعزيز حيث يتعامل عميل الذكاء الاصطناعي مع البيئة باستخدام خوارزمية Q-Learning الجدولية. يكتشف العميل بيئته خلية بخلية مع نظام المكافآت/العقوبات، ويتلقى ردودًا إيجابية/سلبية، ويمكنه حفظ معلمات التدريب في JSON لإعادة استخدامها في وضع اللعب.",
+      stack: "Python، Q-Learning، Temporal Difference، JSON، Heuristics",
       link: "https://benelhadj.github.io/Learn2Slither/",
     },
     {

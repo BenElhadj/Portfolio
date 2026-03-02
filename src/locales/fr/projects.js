@@ -26,12 +26,11 @@ export default {
     {
       name: "Learn2Slither",
       year: "2025",
-      description:
-        "Jeu éducatif interactif inspiré du célèbre Snake, conçu pour apprendre les bases du développement tout en s'amusant.",
-      stack: "Svelte, Vite, GitHub Pages",
+      description: "Jeu d'apprentissage par renforcement où un agent IA apprend à naviguer dans un environnement en utilisant l'algorithme Q-Learning tabulaire. L'agent découvre son environnement case par case avec un système de bonus/malus, reçoit des réponses positives/négatives, et peut sauvegarder ses paramètres d'entraînement en JSON pour les réutiliser en mode jeu.",
+      stack: "Python, Q-Learning, Temporal Difference, JSON, Heuristics",
       link: "https://benelhadj.github.io/Learn2Slither/",
     },
-        {
+    {
       name: "Matcha (Frontend)",
       year: "2025",
       description: "Application web de réseau social et de rencontre inspirée de Tinder, avec gestion des profils, matching et chat en temps réel.",

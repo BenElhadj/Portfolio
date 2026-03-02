@@ -26,9 +26,8 @@ export default {
     {
       name: "Learn2Slither",
       year: "2025",
-      description:
-        "An interactive educational game inspired by Snake, designed to help users learn coding basics while having fun.",
-      stack: "Svelte, Vite, GitHub Pages",
+      description: "Reinforcement learning game where an AI agent learns to navigate an environment using tabular Q-Learning algorithm. The agent discovers its environment cell by cell with a bonus/malus system, receives positive/negative feedback, and can save training parameters to JSON for reuse in game mode.",
+      stack: "Python, Q-Learning, Temporal Difference, JSON, Heuristics",
       link: "https://benelhadj.github.io/Learn2Slither/",
     },
     {
