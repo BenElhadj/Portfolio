@@ -12,8 +12,8 @@ export default {
     {
       name: "Conception AI",
       year: "2025",
-      description: "تطبيق ذكاء اصطناعي يسمح بتصميم الواجهات والعوامل التفاعلية عبر نماذج الذكاء الاصطناعي التوليدية.",
-      stack: "Vue.js، Python، FastAPI، Docker",
+      description: "عميل ذكاء اصطناعي يستخدم واجهة برمجة تطبيقات OpenAI لتوليد كود Svelte نظيف من طلبات اللغة البشرية، مع محرر أكواد ومعاينة مباشرة وإمكانية التنزيل وإدارة السجل.",
+      stack: "Svelte، CSS، JavaScript، OpenAI API",
       link: "https://benelhadj.github.io/Conception-AI/"
     },
     {

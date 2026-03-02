@@ -12,8 +12,8 @@ export default {
     {
       name: "Conception AI",
       year: "2025",
-  description: "AI application for designing interfaces and interactive agents using generative models.",
-  stack: "Vue.js, Python, FastAPI, Docker",
+      description: "AI agent that uses OpenAI API to generate clean Svelte code from human language requests, featuring code editor, live preview, download functionality, and history management.",
+      stack: "Svelte, CSS, JavaScript, OpenAI API",
       link: "https://benelhadj.github.io/Conception-AI/"
     },
     {
