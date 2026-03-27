@@ -53,7 +53,7 @@
       </template>
     </PageLayout>
 
-    <!-- Popup ContactForm rendered globally as modal -->
+    <!-- Popup ContactForm rendered globally as modal --> 
     <teleport to="body">
       <Popup :visible="showContact" :title="$t('links.items.contact.name')" @close="closeContact">
         <ContactForm />
