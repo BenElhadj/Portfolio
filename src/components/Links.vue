@@ -225,7 +225,7 @@ function downloadCV() {
   }
 }
 
-/* ---------- Nouvelle structure de slots pour PageLayout ---------- */  
+/* ---------- Nouvelle structure de slots pour PageLayout ---------- */   
 const slots = [
   { key: 'github', cls: 'tl' },
   { key: 'linkedin', cls: 'tr' },
