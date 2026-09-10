@@ -65,3 +65,5 @@ package-lock.json
 avatar/
 public/svg/
 .fake
+generate.sh
+activity.txt
