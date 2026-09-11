@@ -67,4 +67,4 @@ public/svg/
 .fake
 
 generate.sh
-!/activity.txt
+activity.txt
