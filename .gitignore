@@ -66,5 +66,5 @@ avatar/
 public/svg/
 .fake
 
-generate.sh
+generate*.sh
 activity.txt
